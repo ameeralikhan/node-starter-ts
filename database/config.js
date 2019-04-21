@@ -4,14 +4,14 @@ const config = require('../src/config/index.ts').default;
 
 module.exports = {
     development: {
-        host: 'ec2-174-129-25-182.compute-1.amazonaws.com',
+        host: 'localhost',
         port: 5432,
-        username: 'gesuwubgqepidn',
-        password: '7cdce70c200110d914c826f525d23930bd3fd2a685a8d45dbd9331e21ee27af1',
-        database: 'd6p31d2vd650cp',
+        username: 'postgres',
+        password: 'postgres',
+        database: 'aetasaal',
         dialect: 'postgres',
         dialectOptions: {
-            ssl: true
+            ssl: false
         },
         operatorsAliases: false
     }
