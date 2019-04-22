@@ -14,11 +14,6 @@ export interface IUserAttributes {
   contactNo: string;
   pictureUrl: string;
   gender: string;
-  country: string;
-  city: string;
-  countryOfBirth: string;
-  skypeId: string;
-  yearOfBirth: number;
   timezone: string;
   isApproved: boolean;
   isActive: boolean;
@@ -36,11 +31,6 @@ export interface IUserInstance extends Sequelize.Instance<IUserAttributes> {
   contactNo: string;
   pictureUrl: string;
   gender: string;
-  country: string;
-  city: string;
-  countryOfBirth: string;
-  skypeId: string;
-  yearOfBirth: number;
   timezone: string;
   isApproved: boolean;
   isActive: boolean;
@@ -101,26 +91,6 @@ export const define = (sequelize: Sequelize.Sequelize): IUserModel => {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      country: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      city: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      countryOfBirth: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      skypeId: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      yearOfBirth: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
       timezone: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -135,6 +105,10 @@ export const define = (sequelize: Sequelize.Sequelize): IUserModel => {
 
   model.associate = (models: IModelFactory) => {
     model.belongsTo(models.Role);
+
+    model.hasMany(models.Department);
+    model.hasMany(models.OfficeLocation);
+    model.hasMany(models.UserGroup);
   };
 
   return model;

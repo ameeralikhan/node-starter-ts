@@ -27,4 +27,4 @@ export const saveUser = async (userId: string, payload: IUserRequest) => {
     user = _.omitBy(user, _.isUndefined);
     await userRepo.updateUser(userId, user);
     return { success: true };
-  };
+};

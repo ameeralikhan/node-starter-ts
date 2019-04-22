@@ -16,6 +16,14 @@ export const authenticate = async (email: string, password: string) => {
     });
 };
 
+export const getAll = async () => {
+    return Models.User.findAll({
+        where: {
+            isActive: true
+        },
+    });
+};
+
 export const findById = async (id: string) => {
     return Models.User.findOne({
         where: {

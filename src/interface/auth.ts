@@ -30,11 +30,6 @@ export interface IAuthResponse {
     contactNo: string;
     pictureUrl: string;
     gender: string;
-    country: string;
-    city: string;
-    countryOfBirth: string;
-    skypeId: string;
-    yearOfBirth: number;
     role?: string;
     isEmailVerified: boolean;
     isApproved: boolean;

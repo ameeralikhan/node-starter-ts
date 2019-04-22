@@ -14,7 +14,7 @@ const handler = async (ctx: Context, next: () => void) => {
       },
       data: ctx.state.data,
     };
-    if (ctx.pagination) {
+    if (ctx.pagination && ctx.method === 'GET') {
       ctx.body.meta.limit = ctx.pagination.limit;
       ctx.body.meta.offset = ctx.pagination.offset;
       ctx.body.meta.totalCount = ctx.pagination.totalCount;

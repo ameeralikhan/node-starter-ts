@@ -15,6 +15,7 @@ import { Logger } from './utils/logger';
 
 const whitelist = [
   'http://localhost:4200',
+  'http://localhost:3000'
 ];
 
 function checkOriginAgainstWhitelist(ctx: Koa.Context) {

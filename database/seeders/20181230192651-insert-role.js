@@ -7,16 +7,20 @@ module.exports = {
       $do$
       BEGIN
 
-      IF NOT EXISTS (SELECT 1 FROM role where name = 'admin') THEN
-         INSERT INTO role VALUES (Default,'admin');
+      IF NOT EXISTS (SELECT 1 FROM role where name = 'superAdmin') THEN
+         INSERT INTO role VALUES (Default,'superAdmin');
       END IF;
 
-      IF NOT EXISTS (SELECT 1 FROM role where name = 'student') THEN
-        INSERT INTO role VALUES (Default,'student');
+      IF NOT EXISTS (SELECT 1 FROM role where name = 'user') THEN
+        INSERT INTO role VALUES (Default,'user');
       END IF;
       
-      IF NOT EXISTS (SELECT 1 FROM role where name = 'tutor') THEN
-        INSERT INTO role VALUES (Default,'tutor');
+      IF NOT EXISTS (SELECT 1 FROM role where name = 'billing') THEN
+        INSERT INTO role VALUES (Default,'billing');
+      END IF;
+
+      IF NOT EXISTS (SELECT 1 FROM role where name = 'appCreator') THEN
+        INSERT INTO role VALUES (Default,'appCreator');
       END IF;
       
       END
