@@ -6,6 +6,8 @@ import auth from './auth';
 import file from './file';
 import listOfValue from './list-of-value';
 import user from './user';
+import department from './department';
+import officeLocation from './office-location';
 
 const router = new Router({
   prefix: '/api/v1',
@@ -24,7 +26,9 @@ const routesToExport = [
   auth,
   file,
   listOfValue,
-  user
+  user,
+  department,
+  officeLocation
 ];
 
 export default () => compose(routesToExport);

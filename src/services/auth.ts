@@ -48,7 +48,7 @@ export const signUp = async (payload: ISignUpRequest): Promise<IAuthResponse> =>
     isEmailVerified: false,
     isApproved: true
   };
-  if (role.name === Role.TUTOR) {
+  if (role.name === Role.SUPER_ADMIN) {
     toSaveUser.isApproved = false;
   }
   await userRepo.saveUser(toSaveUser);

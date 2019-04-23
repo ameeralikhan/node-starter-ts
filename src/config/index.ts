@@ -19,6 +19,9 @@ interface IConfig {
     database: string;
     url: string;
   };
+  apiAccessKeys: {
+    app: string;
+  };
   email: {
     host: string;
     port: number;
@@ -111,6 +114,13 @@ const config = convict<IConfig>({
       format: String,
       env: 'DB_URL',
       default: ''
+    }
+  },
+  apiAccessKeys: {
+    app: {
+      format: String,
+      env: 'API_ACCESS_KEY',
+      default: '123456'
     }
   },
   email: {
