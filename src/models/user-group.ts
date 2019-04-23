@@ -3,15 +3,15 @@ import * as Sequelize from 'sequelize';
 import { IModelFactory } from './index';
 
 export interface IUserGroupAttributes {
-    id: number;
-    groupId: number;
+    id?: number;
+    groupId?: number;
     userId: string;
     isActive: boolean;
 }
 
 export interface IUserGroupInstance extends Sequelize.Instance<IUserGroupAttributes> {
-    id: number;
-    groupId: number;
+    id?: number;
+    groupId?: number;
     userId: string;
     isActive: boolean;
 }

@@ -3,16 +3,14 @@ import * as Sequelize from 'sequelize';
 import { IModelFactory } from './index';
 
 export interface IGroupAttributes {
-    id: number;
+    id?: number;
     name: string;
-    userId: string;
     isActive: boolean;
 }
 
 export interface IGroupInstance extends Sequelize.Instance<IGroupAttributes> {
-    id: number;
+    id?: number;
     name: string;
-    userId: string;
     isActive: boolean;
 }
 
