@@ -16,6 +16,14 @@ export const getAll = async () => {
     });
 };
 
+export const findById = async (id: number) => {
+    return Models.OfficeLocation.findOne({ where: { id }});
+};
+
 export const saveOfficeLocation = async (officeLocation: IOfficeLocationAttributes) => {
     return Models.OfficeLocation.insertOrUpdate(officeLocation);
+};
+
+export const deleteOfficeLocation = async (id: number) => {
+    return Models.OfficeLocation.update({ isActive: false }, { where: { id }});
 };

@@ -16,4 +16,6 @@ router.get('/', ctrl.getAll);
 
 router.post('/', ctrl.saveDepartment);
 
+router.delete('/:id', ctrl.deleteDepartment);
+
 export default router.routes();

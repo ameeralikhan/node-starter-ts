@@ -11,3 +11,9 @@ export const saveOfficeLocation = async (ctx: Context, next: () => void) => {
   ctx.state.data = await officeLocationService.saveOfficeLocation(payload);
   await next();
 };
+
+export const deleteOfficeLocation = async (ctx: Context, next: () => void) => {
+  const id: number = +ctx.params.id;
+  ctx.state.data = await officeLocationService.deleteOfficeLocation(id);
+  await next();
+};

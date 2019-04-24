@@ -16,6 +16,14 @@ export const getAll = async () => {
     });
 };
 
+export const findById = async (id: number) => {
+    return Models.Department.findOne({ where: { id }});
+};
+
 export const saveDepartment = async (department: IDepartmentAttributes) => {
     return Models.Department.insertOrUpdate(department);
+};
+
+export const deleteDepartment = async (id: number) => {
+    return Models.Department.update({ isActive: false }, { where: { id }});
 };

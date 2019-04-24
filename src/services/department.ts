@@ -12,6 +12,12 @@ export const getAll = async (): Promise<IDepartmentInstance[]> => {
 
 export const saveDepartment = async (department: IDepartmentAttributes) => {
     await validate(department, joiSchema.saveDepartment);
+    if (department.id) {
+        const savedDepart = await departmentRepo.findById(department.id);
+        if (!savedDepart) {
+            throw boom.badRequest('Invalid Department Id');
+        }
+    }
     if (department.userId) {
         const user = await userRepo.findById(department.userId);
         if (!user) {
@@ -19,5 +25,15 @@ export const saveDepartment = async (department: IDepartmentAttributes) => {
         }
     }
     await departmentRepo.saveDepartment(department);
+    return { success: true };
+};
+
+export const deleteDepartment = async (id: number) => {
+    await validate({ id }, joiSchema.deleteDepartment);
+    const department = await departmentRepo.findById(id);
+    if (!department) {
+        throw boom.badRequest('Invalid Department Id');
+    }
+    await departmentRepo.deleteDepartment(id);
     return { success: true };
 };

@@ -16,4 +16,6 @@ router.get('/', ctrl.getAll);
 
 router.post('/', ctrl.saveOfficeLocation);
 
+router.delete('/:id', ctrl.deleteOfficeLocation);
+
 export default router.routes();
