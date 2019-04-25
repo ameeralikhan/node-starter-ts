@@ -17,11 +17,8 @@ export const saveUser = async (userId: string, payload: IUserRequest) => {
       country: payload.country,
       city: payload.city,
       contactNo: payload.contactNo,
-      countryOfBirth: payload.countryOfBirth,
-      yearOfBirth: payload.yearOfBirth,
       pictureUrl: payload.pictureUrl || undefined,
       gender: payload.gender,
-      skypeId: payload.skypeId,
       timezone: payload.timezone || undefined,
     };
     user = _.omitBy(user, _.isUndefined);
