@@ -15,7 +15,9 @@ import { Logger } from './utils/logger';
 
 const whitelist = [
   'http://localhost:4200',
-  'http://localhost:3000'
+  'http://localhost:3000',
+  'http://aetasaal-api.herokuapp.com',
+  'https://aetasaal-api.herokuapp.com'
 ];
 
 function checkOriginAgainstWhitelist(ctx: Koa.Context) {
