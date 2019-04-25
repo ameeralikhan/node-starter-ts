@@ -9,6 +9,10 @@ export const findById = async (userId: string) => {
     return userRepo.findById(userId);
 };
 
+export const getAll = async () => {
+    return userRepo.getAll();
+};
+
 export const saveUser = async (userId: string, payload: IUserRequest) => {
     await validate(payload, joiSchema.userRequest);
     let user: Partial<IUserRequest> = {

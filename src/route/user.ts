@@ -3,6 +3,8 @@ import * as Router from 'koa-router';
 import * as ctrl from '../controller/auth';
 import * as userCtrl from '../controller/user';
 import authentication from '../middleware/authentication';
+import authorization from '../middleware/authorization';
+import { Role } from '../enum/role';
 
 const router = new Router({
   prefix: `/api/user`,
@@ -10,9 +12,11 @@ const router = new Router({
 
 router.use(authentication);
 
+router.get('/', authorization(false, [Role.SUPER_ADMIN]), userCtrl.getAll);
+
 router.get('/me', userCtrl.getUser);
 
-router.put('/', userCtrl.saveUser);
+router.put('/', authorization(false, [Role.SUPER_ADMIN]), userCtrl.saveUser);
 
 router.put('/change-password', ctrl.changePassword);
 

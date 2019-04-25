@@ -14,4 +14,8 @@ router.use(authorization(false, [Role.SUPER_ADMIN]));
 
 router.get('/', ctrl.getAll);
 
+router.post('/', ctrl.saveRole);
+
+router.delete('/:id', ctrl.deleteRole);
+
 export default router.routes();

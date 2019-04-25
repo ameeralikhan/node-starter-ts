@@ -18,3 +18,15 @@ export const findByName = async (name: string) => {
         }
     });
 };
+
+export const findById = async (id: number) => {
+    return Models.Role.findOne({ where: { id }});
+};
+
+export const saveRole = async (role: IRoleAttributes) => {
+    return Models.Role.insertOrUpdate(role);
+};
+
+export const deleteRole = async (id: number) => {
+    return Models.Role.update({ isActive: false }, { where: { id }});
+};
