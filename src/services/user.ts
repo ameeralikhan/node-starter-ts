@@ -4,6 +4,7 @@ import * as userRepo from '../repositories/user';
 import * as joiSchema from '../validations/schemas/user';
 import { IUserRequest } from '../interface/user';
 import { validate } from './../validations/index';
+import { IUserAttributes, IUserInstance } from '../models/user';
 
 export const findById = async (userId: string) => {
     return userRepo.findById(userId);
