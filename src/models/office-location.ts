@@ -7,6 +7,8 @@ export interface IOfficeLocationAttributes {
     name: string;
     userId: string;
     isActive: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface IOfficeLocationInstance extends Sequelize.Instance<IOfficeLocationAttributes> {
@@ -14,6 +16,8 @@ export interface IOfficeLocationInstance extends Sequelize.Instance<IOfficeLocat
     name: string;
     userId: string;
     isActive: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface IOfficeLocationModel extends Sequelize.Model<IOfficeLocationInstance, IOfficeLocationAttributes> { }
@@ -38,7 +42,15 @@ export const define = (sequelize: Sequelize.Sequelize): IOfficeLocationModel => 
                 key: 'id'
             }
         },
-        isActive: Sequelize.BOOLEAN
+        isActive: Sequelize.BOOLEAN,
+        createdAt: {
+            type: Sequelize.DATE,
+            defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        },
+        updatedAt: {
+            type: Sequelize.DATE,
+            defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        }
     }, {
         freezeTableName: true
     });

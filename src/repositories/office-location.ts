@@ -5,7 +5,7 @@ import { IOfficeLocationInstance, IOfficeLocationAttributes } from '../models/of
 
 export const getAll = async () => {
     return Models.OfficeLocation.findAll({
-        attributes: ['id', 'name', 'userId'],
+        attributes: ['id', 'name', 'userId', 'createdAt', 'updatedAt'],
         where: {
             isActive: true
         },

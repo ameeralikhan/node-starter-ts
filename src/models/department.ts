@@ -7,6 +7,8 @@ export interface IDepartmentAttributes {
     name: string;
     userId: string;
     isActive: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface IDepartmentInstance extends Sequelize.Instance<IDepartmentAttributes> {
@@ -14,6 +16,8 @@ export interface IDepartmentInstance extends Sequelize.Instance<IDepartmentAttri
     name: string;
     userId: string;
     isActive: boolean;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface IDepartmentModel extends Sequelize.Model<IDepartmentInstance, IDepartmentAttributes> { }
@@ -38,7 +42,15 @@ export const define = (sequelize: Sequelize.Sequelize): IDepartmentModel => {
                 key: 'id'
             }
         },
-        isActive: Sequelize.BOOLEAN
+        isActive: Sequelize.BOOLEAN,
+        createdAt: {
+            type: Sequelize.DATE,
+            defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        },
+        updatedAt: {
+            type: Sequelize.DATE,
+            defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        }
     }, {
         freezeTableName: true
     });
