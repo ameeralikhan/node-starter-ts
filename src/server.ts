@@ -17,7 +17,9 @@ const whitelist = [
   'http://localhost:4200',
   'http://localhost:3000',
   'http://aetasaal-api.herokuapp.com',
-  'https://aetasaal-api.herokuapp.com'
+  'https://aetasaal-api.herokuapp.com',
+  'http://aetasaal-web.herokuapp.com',
+  'https://aetasaal-web.herokuapp.com'
 ];
 
 function checkOriginAgainstWhitelist(ctx: Koa.Context) {
