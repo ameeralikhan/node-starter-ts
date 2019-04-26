@@ -5,3 +5,7 @@ export const saveGroup: Joi.SchemaMap = {
     name: Joi.string().required(),
     userIds: Joi.array().items(Joi.string().uuid())
 };
+
+export const deleteGroup: Joi.SchemaMap = {
+    id: Joi.number().required(),
+};

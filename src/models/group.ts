@@ -1,3 +1,4 @@
+import { IUserGroupAttributes, IUserGroupInstance } from './user-group';
 import * as Sequelize from 'sequelize';
 
 import { IModelFactory } from './index';
@@ -6,12 +7,14 @@ export interface IGroupAttributes {
     id?: number;
     name: string;
     isActive: boolean;
+    userGroups?: IUserGroupAttributes[];
 }
 
 export interface IGroupInstance extends Sequelize.Instance<IGroupAttributes> {
     id?: number;
     name: string;
     isActive: boolean;
+    userGroups?: IUserGroupInstance[];
 }
 
 export interface IGroupModel extends Sequelize.Model<IGroupInstance, IGroupAttributes> { }

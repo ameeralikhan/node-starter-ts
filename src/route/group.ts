@@ -16,4 +16,6 @@ router.get('/', ctrl.getAll);
 
 router.post('/', ctrl.saveGroup);
 
+router.delete('/:id', ctrl.deleteGroup);
+
 export default router.routes();

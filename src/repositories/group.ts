@@ -13,12 +13,20 @@ export const getAll = async () => {
     });
 };
 
+export const findById = async (id: number) => {
+    return Models.Group.findOne({ where: { id }});
+};
+
 export const saveGroup = async (group: IGroupAttributes) => {
     return Models.Group.insertOrUpdate(group, { returning: true });
 };
 
 export const insertUserGroup = async (userGroup: IUserGroupAttributes[]) => {
     return Models.UserGroup.bulkCreate(userGroup);
+};
+
+export const deleteGroup = async (id: number) => {
+    return Models.Group.update({ isActive: false }, { where: { id }});
 };
 
 export const deleteUserGroupByGroupId = async (groupId: number) => {

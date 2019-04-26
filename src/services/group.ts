@@ -6,11 +6,21 @@ import * as joiSchema from '../validations/schemas/group';
 import * as groupRepo from '../repositories/group';
 import * as userRepo from '../repositories/user';
 import { IGroupInstance, IGroupAttributes } from '../models/group';
-import { ISaveGroup } from '../interface/group';
+import { ISaveGroup, IGetGroupResponse } from '../interface/group';
 import { IUserGroupAttributes } from '../models/user-group';
 
-export const getAll = async (): Promise<IGroupInstance[]> => {
-    return groupRepo.getAll();
+export const getAll = async (): Promise<IGetGroupResponse[]> => {
+    const groups = await groupRepo.getAll();
+    const response: IGetGroupResponse[] = [];
+    groups.forEach(group => {
+        const userIds = group.userGroups ? _.map(group.userGroups, 'userId') : [];
+        response.push({
+            id: group.id,
+            name: group.name,
+            userIds
+        });
+    });
+    return response;
 };
 
 export const saveGroup = async (group: ISaveGroup) => {
@@ -41,5 +51,15 @@ export const saveGroup = async (group: ISaveGroup) => {
         };
     });
     await groupRepo.insertUserGroup(userGroups);
+    return { success: true };
+};
+
+export const deleteGroup = async (id: number) => {
+    await validate({ id }, joiSchema.deleteGroup);
+    const group = await groupRepo.findById(id);
+    if (!group) {
+        throw boom.badRequest('Invalid Group Id');
+    }
+    await groupRepo.deleteGroup(id);
     return { success: true };
 };
