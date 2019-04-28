@@ -16,6 +16,14 @@ export const getAll = async () => {
     });
 };
 
+export const getCount = async () => {
+    return Models.Department.count({
+        where: {
+            isActive: true
+        }
+    });
+};
+
 export const findById = async (id: number) => {
     return Models.Department.findOne({ where: { id }});
 };

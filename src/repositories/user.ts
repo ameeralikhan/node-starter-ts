@@ -16,6 +16,22 @@ export const authenticate = async (email: string, password: string) => {
     });
 };
 
+export const getActiveUserCount = async () => {
+    return Models.User.count({
+        where: {
+            isActive: true
+        }
+    });
+};
+
+export const getInActiveUserCount = async () => {
+    return Models.User.count({
+        where: {
+            isActive: false
+        }
+    });
+};
+
 export const getAll = async () => {
     return Models.User.findAll({
         where: {

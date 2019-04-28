@@ -10,6 +10,7 @@ import department from './department';
 import officeLocation from './office-location';
 import group from './group';
 import role from './role';
+import dashboard from './dashboard';
 
 const router = new Router({
   prefix: '/api/v1',
@@ -32,7 +33,8 @@ const routesToExport = [
   department,
   officeLocation,
   group,
-  role
+  role,
+  dashboard
 ];
 
 export default () => compose(routesToExport);
