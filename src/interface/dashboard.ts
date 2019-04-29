@@ -4,4 +4,5 @@ export interface IAdminDashboardStatistics {
     departments: number;
     officeLocations: number;
     groups: number;
+    roles: number;
 }

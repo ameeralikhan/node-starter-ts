@@ -11,7 +11,7 @@ export const getAll = async () => {
         },
         include: [{
             model: Models.User,
-            attributes: ['id', 'firstName', 'lastName']
+            attributes: ['id', 'firstName', 'lastName', 'email']
         }]
     });
 };

@@ -11,6 +11,14 @@ export const getAll = async () => {
     });
 };
 
+export const getCount = async () => {
+    return Models.Role.count({
+        where: {
+            isActive: true
+        }
+    });
+};
+
 export const findByName = async (name: string) => {
     return Models.Role.findOne({
         where: {
