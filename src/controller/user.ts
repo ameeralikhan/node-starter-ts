@@ -13,9 +13,14 @@ export const getUser = async (ctx: Context, next: () => void) => {
     await next();
 };
 
+export const getUserById = async (ctx: Context, next: () => void) => {
+    const userId: string = ctx.params.userId;
+    ctx.state.data = await userService.findById(userId);
+    await next();
+};
+
 export const saveUser = async (ctx: Context, next: () => void) => {
-    const userId: string = ctx.state.user.userId;
     const user: IUserRequest = ctx.request.body;
-    ctx.state.data = await userService.saveUser(userId, user);
+    ctx.state.data = await userService.saveUser(user);
     await next();
 };

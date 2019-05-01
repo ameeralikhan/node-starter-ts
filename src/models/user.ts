@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize';
-import { IRoleAttributes, IRoleInstance } from './role';
+import { IUserRoleAttributes, IUserRoleInstance } from './user-role';
 
 import { IModelFactory } from './index';
 
@@ -10,14 +10,13 @@ export interface IUserAttributes {
   email: string;
   isEmailVerified: boolean;
   password: string;
-  roleId: number;
   contactNo: string;
   pictureUrl: string;
   gender: string;
   timezone: string;
   isApproved: boolean;
   isActive: boolean;
-  role: IRoleAttributes;
+  userRoles: IUserRoleAttributes[];
 }
 
 export interface IUserInstance extends Sequelize.Instance<IUserAttributes> {
@@ -27,7 +26,6 @@ export interface IUserInstance extends Sequelize.Instance<IUserAttributes> {
   email: string;
   isEmailVerified: boolean;
   password: string;
-  roleId: number;
   contactNo: string;
   pictureUrl: string;
   gender: string;
@@ -35,7 +33,7 @@ export interface IUserInstance extends Sequelize.Instance<IUserAttributes> {
   isApproved: boolean;
   isActive: boolean;
   createdAt: Date;
-  role: IRoleInstance;
+  userRoles: IUserRoleInstance[];
 }
 
 export interface IUserModel extends Sequelize.Model<IUserInstance, IUserAttributes> {}
@@ -71,14 +69,6 @@ export const define = (sequelize: Sequelize.Sequelize): IUserModel => {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      roleId: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-        references: {
-          model: 'role',
-          key: 'id',
-        },
-      },
       contactNo: {
         type: Sequelize.STRING,
         allowNull: true,
@@ -104,11 +94,10 @@ export const define = (sequelize: Sequelize.Sequelize): IUserModel => {
   );
 
   model.associate = (models: IModelFactory) => {
-    model.belongsTo(models.Role);
-
     model.hasMany(models.Department);
     model.hasMany(models.OfficeLocation);
     model.hasMany(models.UserGroup);
+    model.hasMany(models.UserRole);
   };
 
   return model;

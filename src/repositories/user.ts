@@ -1,3 +1,4 @@
+import { IUserRoleInstance, IUserRoleAttributes } from './../models/user-role';
 import * as Sequelize from 'sequelize';
 
 import { Models } from '../models/index';
@@ -10,8 +11,12 @@ export const authenticate = async (email: string, password: string) => {
             password
         },
         include: [{
-            model: Models.Role,
-            attributes: ['id', 'name']
+            model: Models.UserRole,
+            include: [{
+                model: Models.Role,
+                attributes: ['id', 'name']
+            }],
+            attributes: ['id', 'userId', 'roleId']
         }]
     });
 };
@@ -34,6 +39,7 @@ export const getInActiveUserCount = async () => {
 
 export const getAll = async () => {
     return Models.User.findAll({
+        attributes: ['id', 'firstName', 'lastName', 'email', 'contactNo', 'gender', 'createdAt', 'updatedAt'],
         where: {
             isActive: true
         },
@@ -42,10 +48,10 @@ export const getAll = async () => {
 
 export const findById = async (id: string) => {
     return Models.User.findOne({
+        attributes: ['id', 'firstName', 'lastName', 'email', 'contactNo', 'gender', 'createdAt', 'updatedAt'],
         where: {
             id
         },
-        include: [Models.Role]
     });
 };
 
@@ -65,7 +71,6 @@ export const findByEmail = async (email: string) => {
         where: {
             email
         },
-        include: [Models.Role]
     });
 };
 
@@ -73,6 +78,18 @@ export const saveUser = async (user: any) => {
     return Models.User.create(user);
 };
 
+export const upsertUser = async (user: any) => {
+    return Models.User.insertOrUpdate(user, { returning: true });
+};
+
+export const saveUserRoles = async (userRoles: any) => {
+    return Models.UserRole.bulkCreate(userRoles);
+};
+
 export const updateUser = async (id: string, user: any) => {
     return Models.User.update(user, { where: { id }});
+};
+
+export const deleteUserRoles = async (userId: string) => {
+    return Models.UserRole.destroy({ where: { userId }});
 };

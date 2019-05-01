@@ -12,9 +12,9 @@ const authorization = (isPublic: boolean = true, allowedRoles: string[] = []) =>
         throw forbidden('error.api_forbidden');
       }
     } else {
-      const isInvalid = (currentRole: string) => _.indexOf(allowedRoles, currentRole) <= -1;
-      const currentLoggedInUserRole = ctx.state.user.role;
-      if (isInvalid(currentLoggedInUserRole)) {
+      const isInvalid = (currentRole: string[]) => _.difference(allowedRoles, currentRole).length <= 0;
+      const currentLoggedInUserRole: string[] = ctx.state.user.roles;
+      if (!isInvalid(currentLoggedInUserRole)) {
         throw forbidden('error.api_forbidden');
       }
     }

@@ -13,7 +13,7 @@ const authentication = async (ctx: Context, next: () => void) => {
         ctx.state.user = {
           userId: decoded.id,
           email: decoded.email,
-          role: decoded.role.name
+          roles: decoded.roles
         };
       } catch (e) {
         throw boom.unauthorized();

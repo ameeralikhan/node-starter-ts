@@ -1,4 +1,5 @@
 export interface IUserRequest {
+    id?: string;
     firstName: string;
     lastName: string;
     contactNo: string;
@@ -6,5 +7,8 @@ export interface IUserRequest {
     gender: string;
     country: string;
     city: string;
+    email: string;
+    password?: string;
     timezone?: number;
+    roleIds: number[];
 }

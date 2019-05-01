@@ -30,7 +30,7 @@ export interface IAuthResponse {
     contactNo: string;
     pictureUrl: string;
     gender: string;
-    role?: string;
+    roles?: string[];
     isEmailVerified: boolean;
     isApproved: boolean;
     accessToken: string;

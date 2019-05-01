@@ -34,7 +34,8 @@ export const define = (sequelize: Sequelize.Sequelize): IRoleModel => {
     });
 
     model.associate = (models: IModelFactory) => {
-        model.hasMany(models.User);
+        model.hasMany(models.UserGroup);
+        model.hasMany(models.UserRole);
     };
 
     return model;

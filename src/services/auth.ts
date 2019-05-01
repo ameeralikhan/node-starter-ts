@@ -1,4 +1,5 @@
 import * as boom from 'boom';
+import * as _ from 'lodash';
 import * as jwt from 'jsonwebtoken';
 import * as moment from 'moment';
 import * as config from '../config';
@@ -44,7 +45,6 @@ export const signUp = async (payload: ISignUpRequest): Promise<IAuthResponse> =>
     email: payload.email,
     password: encryptedPassword,
     timezone: payload.timezone,
-    roleId: role.id,
     isEmailVerified: false,
     isApproved: true
   };
@@ -125,12 +125,14 @@ export const signUp = async (payload: ISignUpRequest): Promise<IAuthResponse> =>
 // };
 
 const generateTokenAndAuthResponse = (user: IUserInstance) => {
+  const userRoles = user.userRoles.map(userRole => userRole.role);
+  const roles = _.reject(userRoles.map(role => role && role.name), _.isUndefined);
   const token = jwt.sign(
     {
       id: user.id,
       email: user.email,
       createdAt: user.createdAt,
-      role: user.role,
+      roles,
     },
     config.default.tokenSecret,
     { expiresIn: config.default.server.tokenExpiry },
@@ -143,11 +145,11 @@ const generateTokenAndAuthResponse = (user: IUserInstance) => {
     contactNo: user.contactNo,
     pictureUrl: user.pictureUrl,
     gender: user.gender,
-    role: user.role.name,
     isEmailVerified: user.isEmailVerified,
     isApproved: user.isApproved,
     accessToken: token,
-    timezone: user.timezone
+    timezone: user.timezone,
+    roles
   };
   return response;
 };

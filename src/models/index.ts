@@ -9,6 +9,7 @@ import * as OfficeLocation from './office-location';
 import * as Group from './group';
 import * as UserGroup from './user-group';
 import * as ListOfValue from './list-of-value';
+import * as UserRole from './user-role';
 
 export interface IModelFactory extends Sequelize.Models {
   Role: Role.IRoleModel;
@@ -18,6 +19,7 @@ export interface IModelFactory extends Sequelize.Models {
   Group: Group.IGroupModel;
   UserGroup: UserGroup.IUserGroupModel;
   ListOfValue: ListOfValue.IListOfValueModel;
+  UserRole: UserRole.IUserRoleModel;
 }
 
 const models: IModelFactory = {
@@ -28,6 +30,7 @@ const models: IModelFactory = {
   Group: Group.define(Database),
   UserGroup: UserGroup.define(Database),
   ListOfValue: ListOfValue.define(Database),
+  UserRole: UserRole.define(Database)
 };
 
 // Execute the associations where defined
