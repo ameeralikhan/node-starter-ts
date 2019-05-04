@@ -22,4 +22,6 @@ router.post('/', authorization(false, [Role.SUPER_ADMIN]), userCtrl.saveUser);
 
 router.put('/change-password', ctrl.changePassword);
 
+router.delete('/:userId/delete', authorization(false, [Role.SUPER_ADMIN]), userCtrl.deleteUser);
+
 export default router.routes();

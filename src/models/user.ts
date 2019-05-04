@@ -16,6 +16,8 @@ export interface IUserAttributes {
   timezone: string;
   isApproved: boolean;
   isActive: boolean;
+  deletedAt: Date;
+  deletedBy: string;
   userRoles: IUserRoleAttributes[];
 }
 
@@ -33,6 +35,8 @@ export interface IUserInstance extends Sequelize.Instance<IUserAttributes> {
   isApproved: boolean;
   isActive: boolean;
   createdAt: Date;
+  deletedAt: Date;
+  deletedBy: string;
   userRoles: IUserRoleInstance[];
 }
 
@@ -87,6 +91,8 @@ export const define = (sequelize: Sequelize.Sequelize): IUserModel => {
       },
       isApproved: Sequelize.BOOLEAN,
       isActive: Sequelize.BOOLEAN,
+      deletedAt: Sequelize.DATE,
+      deletedBy: Sequelize.UUID
     },
     {
       freezeTableName: true,

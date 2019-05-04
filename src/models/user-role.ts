@@ -1,7 +1,7 @@
-import { IRoleAttributes, IRoleInstance } from './../../dist/models/role.d';
 import * as Sequelize from 'sequelize';
 
 import { IModelFactory } from './index';
+import { IRoleAttributes, IRoleInstance } from './role';
 
 export interface IUserRoleAttributes {
     id?: number;

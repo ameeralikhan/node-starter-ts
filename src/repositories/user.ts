@@ -1,14 +1,15 @@
-import { IUserRoleInstance, IUserRoleAttributes } from './../models/user-role';
 import * as Sequelize from 'sequelize';
 
 import { Models } from '../models/index';
 import { IUserInstance, IUserAttributes } from './../models/user';
+import { IUserRoleInstance, IUserRoleAttributes } from './../models/user-role';
 
 export const authenticate = async (email: string, password: string) => {
     return Models.User.findOne({
         where: {
             email,
-            password
+            password,
+            deletedAt: null
         },
         include: [{
             model: Models.UserRole,
@@ -39,18 +40,29 @@ export const getInActiveUserCount = async () => {
 
 export const getAll = async () => {
     return Models.User.findAll({
-        attributes: ['id', 'firstName', 'lastName', 'email', 'contactNo', 'gender', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'firstName', 'lastName', 'email', 'contactNo', 'gender',
+            'isActive', 'createdAt', 'updatedAt'],
+        include: [{
+            model: Models.UserRole,
+            include: [Models.Role]
+        }],
         where: {
-            isActive: true
+            deletedAt: null
         },
     });
 };
 
 export const findById = async (id: string) => {
     return Models.User.findOne({
-        attributes: ['id', 'firstName', 'lastName', 'email', 'contactNo', 'gender', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'firstName', 'lastName', 'email', 'contactNo', 'gender',
+             'isActive', 'createdAt', 'updatedAt'],
+        include: [{
+            model: Models.UserRole,
+            include: [Models.Role]
+        }],
         where: {
-            id
+            id,
+            deletedAt: null
         },
     });
 };
@@ -92,4 +104,8 @@ export const updateUser = async (id: string, user: any) => {
 
 export const deleteUserRoles = async (userId: string) => {
     return Models.UserRole.destroy({ where: { userId }});
+};
+
+export const deleteUser = async (loggedInUserId: string, userId: string) => {
+    return Models.User.update({ deletedAt: new Date(), deletedBy: loggedInUserId }, { where: { id: userId }});
 };

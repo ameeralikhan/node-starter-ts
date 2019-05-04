@@ -10,7 +10,7 @@ import { IUserRoleAttributes } from './../models/user-role';
 
 export const findById = async (userId: string) => {
     await validate({ userId }, joiSchema.getUserById);
-    const user =  userRepo.findById(userId);
+    const user = await userRepo.findById(userId);
     if (!user) {
         throw boom.badRequest('Invalid user id');
     }
@@ -18,7 +18,17 @@ export const findById = async (userId: string) => {
 };
 
 export const getAll = async () => {
-    return userRepo.getAll();
+    const users: any = await userRepo.getAll();
+    const returnUsers = [];
+    for (let user of users) {
+        user = user.get({ plain: true });
+        const roles = _.reject(
+            user.userRoles.map((userRole: any) => userRole.role && userRole.role.name), _.isUndefined);
+        user.role = roles;
+        delete user.userRoles;
+        returnUsers.push(user);
+    }
+    return returnUsers;
 };
 
 export const saveUser = async (payload: IUserRequest) => {
@@ -61,5 +71,18 @@ export const saveUser = async (payload: IUserRequest) => {
     });
     await userRepo.deleteUserRoles(savedUser[0].id);
     await userRepo.saveUserRoles(userRoles);
+    return { success: true };
+};
+
+export const deleteUser = async (loggedInUserId: string, userId: string) => {
+    await validate({ userId }, joiSchema.getUserById);
+    if (loggedInUserId === userId) {
+        throw boom.badRequest('You are not authorize to delete this user');
+    }
+    const user = await userRepo.findById(userId);
+    if (!user) {
+        throw boom.badRequest('Invalid user id');
+    }
+    await userRepo.deleteUser(loggedInUserId, userId);
     return { success: true };
 };

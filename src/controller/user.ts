@@ -24,3 +24,10 @@ export const saveUser = async (ctx: Context, next: () => void) => {
     ctx.state.data = await userService.saveUser(user);
     await next();
 };
+
+export const deleteUser = async (ctx: Context, next: () => void) => {
+    const userId: string = ctx.params.userId;
+    const loggedInUserId: string = ctx.state.user.userId;
+    ctx.state.data = await userService.deleteUser(loggedInUserId, userId);
+    await next();
+};
