@@ -74,7 +74,6 @@ export const findByIds = async (id: string[]) => {
                 [Sequelize.Op.in]: id
             }
         },
-        include: [Models.Role]
     });
 };
 
