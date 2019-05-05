@@ -40,7 +40,7 @@ export const getInActiveUserCount = async () => {
 
 export const getAll = async () => {
     return Models.User.findAll({
-        attributes: ['id', 'firstName', 'lastName', 'email', 'contactNo', 'gender',
+        attributes: ['id', 'firstName', 'lastName', 'email', 'contactNo', 'gender', 'pictureUrl',
             'isActive', 'createdAt', 'updatedAt'],
         include: [{
             model: Models.UserRole,
@@ -54,7 +54,7 @@ export const getAll = async () => {
 
 export const findById = async (id: string) => {
     return Models.User.findOne({
-        attributes: ['id', 'firstName', 'lastName', 'email', 'contactNo', 'gender',
+        attributes: ['id', 'firstName', 'lastName', 'email', 'contactNo', 'gender', 'pictureUrl',
              'isActive', 'createdAt', 'updatedAt'],
         include: [{
             model: Models.UserRole,

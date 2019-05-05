@@ -10,10 +10,15 @@ import { IUserRoleAttributes } from './../models/user-role';
 
 export const findById = async (userId: string) => {
     await validate({ userId }, joiSchema.getUserById);
-    const user = await userRepo.findById(userId);
+    let user: any = await userRepo.findById(userId);
     if (!user) {
         throw boom.badRequest('Invalid user id');
     }
+    user = user.get({ plain: true });
+    const roleIds = _.reject(
+        user.userRoles.map((userRole: any) => userRole.role && userRole.role.id), _.isUndefined);
+    user.roleIds = roleIds;
+    delete user.userRoles;
     return user;
 };
 
