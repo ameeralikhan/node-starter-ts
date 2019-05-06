@@ -11,7 +11,7 @@ export const userRequest: Joi.SchemaMap = {
   contactNo: Joi.string().required(),
   email: Joi.string().required(),
   password: Joi.string().allow(['', null]),
-  pictureUrl: Joi.string(),
+  pictureUrl: Joi.string().allow(['', null]),
   gender: Joi.string(),
   country: Joi.string(),
   city: Joi.string(),

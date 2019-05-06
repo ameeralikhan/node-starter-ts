@@ -12,7 +12,6 @@ export const saveProfilePicture = async (userId: string, file: any) => {
   return { fileKey: `${userId}_${fileName}` };
 };
 
-
 export const uploadProfilePicture = async (userId: string, file: any) => {
   await validate({ file }, joiSchema.uploadUserProfileImage);
   const fileName = file.name;

@@ -9,6 +9,6 @@ const router = new Router({
 
 router.use(authentication);
 
-router.post('/picture', ctrl.saveProfilePicture);
+// router.post('/picture', ctrl.saveProfilePicture);
 
 export default router.routes();
