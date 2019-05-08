@@ -8,6 +8,9 @@ export const saveProfilePicture = async (userId: string, file: any) => {
   const fileName = file.name;
   const nameToSave = `/upload/profile/${userId}_${fileName}`;
   const buff = fs.readFileSync(file.path);
+  if (!fs.existsSync(`${__dirname}/../../upload/profile`)) {
+    fs.mkdirSync(`${__dirname}/../../upload/profile`);
+  }
   fs.writeFileSync(`${__dirname}/../../${nameToSave}`, buff);
   return { fileKey: `${userId}_${fileName}` };
 };
