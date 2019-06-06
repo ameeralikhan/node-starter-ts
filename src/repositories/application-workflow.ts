@@ -24,8 +24,13 @@ export const findById = async (id: string) => {
     return Models.ApplicationWorkflow.findOne({ where: { id }});
 };
 
+export const findByIds = async (ids: string[]) => {
+    return Models.ApplicationWorkflow.findAll({ where: { id: { [Sequelize.Op.in]: ids } }});
+};
+
 export const saveApplicationWorkflow = async (applicationWorkflow: IApplicationWorkflowAttributes) => {
-    return Models.ApplicationWorkflow.insertOrUpdate(applicationWorkflow);
+    return Models.ApplicationWorkflow.upsert(applicationWorkflow, { returning: true })
+        .then((res) => res[0]);
 };
 
 export const deleteApplicationWorkflow = async (id: string) => {

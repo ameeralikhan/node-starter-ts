@@ -3,8 +3,8 @@ import * as Sequelize from 'sequelize';
 import { IModelFactory } from './index';
 
 export interface IApplicationFormFieldAttributes {
-    id: string;
-    applicationFormSectionId: string;
+    id?: string;
+    applicationFormSectionId?: string;
     name: string;
     helpText: string;
     fieldId: string;
@@ -20,8 +20,8 @@ export interface IApplicationFormFieldAttributes {
 }
 
 export interface IApplicationFormFieldInstance extends Sequelize.Instance<IApplicationFormFieldAttributes> {
-    id: string;
-    applicationFormSectionId: string;
+    id?: string;
+    applicationFormSectionId?: string;
     name: string;
     helpText: string;
     fieldId: string;

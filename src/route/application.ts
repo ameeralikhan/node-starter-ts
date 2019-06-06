@@ -16,9 +16,13 @@ router.get('/', ctrl.getCurrentLoggedInUserApplications);
 
 router.get('/:applicationId/form', ctrl.getApplicationForm);
 
+router.get('/:applicationId/workflow', ctrl.getApplicationWorkflow);
+
 router.post('/', ctrl.saveApplication);
 
 router.post('/:applicationId/form', ctrl.saveApplicationForm);
+
+router.post('/:applicationId/workflow', ctrl.saveApplicationWorkflow);
 
 router.delete('/:id', ctrl.deleteApplication);
 

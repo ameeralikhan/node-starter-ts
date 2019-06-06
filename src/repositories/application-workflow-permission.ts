@@ -11,9 +11,14 @@ export const findById = async (id: string) => {
 
 export const saveApplicationWorkflowPermission =
     async (applicationWorkflowPermission: IApplicationWorkflowPermissionAttributes) => {
-    return Models.ApplicatioApplicationWorkflowPermissionnWorkflow.insertOrUpdate(applicationWorkflowPermission);
+    return Models.ApplicationWorkflowPermission.upsert(applicationWorkflowPermission,
+        { returning: true }).then((res) => res[0]);
 };
 
 export const deleteApplicationWorkflowPermission = async (id: string) => {
     return Models.ApplicationWorkflowPermission.update({ isActive: false }, { where: { id }});
+};
+
+export const hardDeleteWorkflowPermissionByWorkflowId = async (applicationWorkflowId: string) => {
+    return Models.ApplicationWorkflowPermission.destroy({ where: { applicationWorkflowId }});
 };

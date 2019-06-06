@@ -31,14 +31,22 @@ export const saveApplicationForm = async (applicationId: string,
     if (applicationSections.length !== ids.length) {
         throw boom.badRequest('Invalid application section id');
     }
-    const formIds = _.pick(applicationForms.map(form => form.applicationFormFields), 'id') as string[];
+    let formIds = _.pick(applicationForms.map(form => form.applicationFormFields), 'id') as string[];
+    formIds = _.reject(formIds, _.isUndefined);
     const savedApplicationForms = await applicationFormFieldRepo.findByIds(formIds);
     if (savedApplicationForms.length !== formIds.length) {
         throw boom.badRequest('Invalid application form id');
     }
-    await Promise.all(applicationForms.map(form => {
+    for (const form of applicationForms) {
         form.applicationId = applicationId;
-        return applicationFormSectionRepo.saveApplicationFormSection(form);
-    }));
+        const section = await applicationFormSectionRepo.saveApplicationFormSection(form);
+        if (!form.applicationFormFields) {
+            continue;
+        }
+        for (const field of form.applicationFormFields) {
+            field.applicationFormSectionId = section.id;
+            await applicationFormFieldRepo.saveApplicationFormField(field);
+        }
+    }
     return { success: true };
 };

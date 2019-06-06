@@ -24,7 +24,8 @@ export const findByIds = async (ids: string[]) => {
 };
 
 export const saveApplicationFormField = async (applicationFormField: IApplicationFormFieldAttributes) => {
-    return Models.ApplicationFormField.insertOrUpdate(applicationFormField);
+    return Models.ApplicationFormField.upsert(applicationFormField, { returning: true })
+        .then((res) => res[0]);
 };
 
 export const deleteApplicationFormField = async (id: string) => {

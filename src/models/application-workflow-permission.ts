@@ -3,20 +3,20 @@ import * as Sequelize from 'sequelize';
 import { IModelFactory } from './index';
 
 export interface IApplicationWorkflowPermissionAttributes {
-    id: string;
-    applicationWorkflowId: string;
-    userId: string;
-    isActive: boolean;
+    id?: string;
+    applicationWorkflowId?: string;
+    userId?: string;
+    isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }
 
 export interface IApplicationWorkflowPermissionInstance
     extends Sequelize.Instance<IApplicationWorkflowPermissionAttributes> {
-    id: string;
-    applicationWorkflowId: string;
-    userId: string;
-    isActive: boolean;
+    id?: string;
+    applicationWorkflowId?: string;
+    userId?: string;
+    isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }

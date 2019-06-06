@@ -26,6 +26,7 @@ export const saveApplicationForm: Joi.SchemaMap = {
         fieldId: Joi.string().required(),
         key: Joi.string().required(),
         type: Joi.string().required(),
+        isRequired: Joi.boolean().required(),
         defaultValue: Joi.string().allow([null, '']),
         templateOptions: Joi.any(),
         order: Joi.number().required(),
@@ -35,5 +36,19 @@ export const saveApplicationForm: Joi.SchemaMap = {
 export const saveApplicationFormArray: Joi.SchemaMap = {
     payload: Joi.array().items(Joi.object({
         ...saveApplicationForm
+    })).min(1)
+};
+
+export const saveApplicationWorkflow: Joi.SchemaMap = {
+    id: Joi.string().uuid(),
+    name: Joi.string().required(),
+    type: Joi.string().required(),
+    order: Joi.number().required(),
+    userIds: Joi.array().items(Joi.string().uuid().required())
+};
+
+export const saveApplicationWorkflowArray: Joi.SchemaMap = {
+    payload: Joi.array().items(Joi.object({
+        ...saveApplicationWorkflow
     })).min(1)
 };

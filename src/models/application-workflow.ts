@@ -1,6 +1,10 @@
 import * as Sequelize from 'sequelize';
 
 import { IModelFactory } from './index';
+import {
+  IApplicationWorkflowPermissionAttributes,
+  IApplicationWorkflowPermissionInstance
+} from './application-workflow-permission';
 
 export interface IApplicationWorkflowAttributes {
     id: string;
@@ -15,6 +19,8 @@ export interface IApplicationWorkflowAttributes {
     updatedBy?: string;
     deletedAt?: Date;
     deletedBy?: string;
+    applicationWorkflowPermissions?: IApplicationWorkflowPermissionAttributes[];
+    userIds?: string[];
 }
 
 export interface IApplicationWorkflowInstance extends Sequelize.Instance<IApplicationWorkflowAttributes> {
@@ -30,6 +36,8 @@ export interface IApplicationWorkflowInstance extends Sequelize.Instance<IApplic
     updatedBy?: string;
     deletedAt?: Date;
     deletedBy?: string;
+    applicationWorkflowPermissions?: IApplicationWorkflowPermissionInstance[];
+    userIds?: string[];
 }
 
 export interface IApplicationWorkflowModel

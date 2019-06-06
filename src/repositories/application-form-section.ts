@@ -33,7 +33,8 @@ export const findByIds = async (ids: string[]) => {
 };
 
 export const saveApplicationFormSection = async (applicationFormSection: IApplicationFormSectionAttributes) => {
-    return Models.ApplicationFormSection.upsert(applicationFormSection);
+    return Models.ApplicationFormSection.upsert(applicationFormSection, { returning: true })
+        .then((res) => res[0]);
 };
 
 export const deleteApplicationFormSection = async (id: string) => {
