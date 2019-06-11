@@ -16,6 +16,8 @@ import * as ApplicationFormSection from './application-form-section';
 import * as ApplicationFormField from './application-form-field';
 import * as ApplicationWorkflowPermission from './application-workflow-permission';
 import * as ApplicationWorkflowFieldPermission from './application-workflow-field-permission';
+import * as Lookup from './lookup';
+import * as LookupData from './lookup-data';
 
 export interface IModelFactory extends Sequelize.Models {
   Role: Role.IRoleModel;
@@ -32,6 +34,8 @@ export interface IModelFactory extends Sequelize.Models {
   ApplicationFormField: ApplicationFormField.IApplicationFormFieldModel;
   ApplicationWorkflowPermission: ApplicationWorkflowPermission.IApplicationWorkflowPermissionModel;
   ApplicationWorkflowFieldPermission: ApplicationWorkflowFieldPermission.IApplicationWorkflowFieldPermissionModel;
+  Lookup: Lookup.ILookupModel;
+  LookupData: LookupData.ILookupDataModel;
 }
 
 const models: IModelFactory = {
@@ -49,6 +53,8 @@ const models: IModelFactory = {
   ApplicationFormField: ApplicationFormField.define(Database),
   ApplicationWorkflowPermission: ApplicationWorkflowPermission.define(Database),
   ApplicationWorkflowFieldPermission: ApplicationWorkflowFieldPermission.define(Database),
+  Lookup: Lookup.define(Database),
+  LookupData: LookupData.define(Database)
 };
 
 // Execute the associations where defined

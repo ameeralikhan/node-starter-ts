@@ -48,5 +48,5 @@ export const saveApplicationForm = async (applicationId: string,
             await applicationFormFieldRepo.saveApplicationFormField(field);
         }
     }
-    return { success: true };
+    return getByApplicationId(applicationId);
 };

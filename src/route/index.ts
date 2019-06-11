@@ -12,6 +12,7 @@ import group from './group';
 import role from './role';
 import dashboard from './dashboard';
 import application from './application';
+import lookup from './lookup';
 
 const router = new Router({
   prefix: '/api/v1',
@@ -36,7 +37,8 @@ const routesToExport = [
   group,
   role,
   dashboard,
-  application
+  application,
+  lookup
 ];
 
 export default () => compose(routesToExport);
