@@ -24,6 +24,8 @@ router.post('/:applicationId/form', ctrl.saveApplicationForm);
 
 router.post('/:applicationId/workflow', ctrl.saveApplicationWorkflow);
 
+router.post('/:applicationId/field-permission', ctrl.saveApplicationWorkflowFieldPermission);
+
 router.delete('/:id', ctrl.deleteApplication);
 
 export default router.routes();

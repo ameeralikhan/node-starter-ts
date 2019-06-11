@@ -3,22 +3,22 @@ import * as Sequelize from 'sequelize';
 import { IModelFactory } from './index';
 
 export interface IApplicationWorkflowFieldPermissionAttributes {
-    id: string;
-    applicationFormSectionId: string;
-    applicationFormFieldId: string;
-    permission: string;
-    isActive: boolean;
+    id?: string;
+    applicationFormSectionId?: string;
+    applicationFormFieldId?: string;
+    permission?: string;
+    isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }
 
 export interface IApplicationWorkflowFieldPermissionInstance
     extends Sequelize.Instance<IApplicationWorkflowFieldPermissionAttributes> {
-    id: string;
-    applicationFormSectionId: string;
-    applicationFormFieldId: string;
-    permission: string;
-    isActive: boolean;
+    id?: string;
+    applicationFormSectionId?: string;
+    applicationFormFieldId?: string;
+    permission?: string;
+    isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
 }

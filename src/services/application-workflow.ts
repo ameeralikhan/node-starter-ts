@@ -7,9 +7,12 @@ import * as applicationRepo from '../repositories/application';
 import * as applicationWorkflowRepo from '../repositories/application-workflow';
 import * as applicationFormFieldRepo from '../repositories/application-form-field';
 import * as applicationWorkflowPermissionRepo from '../repositories/application-workflow-permission';
+import * as applicationWorkflowFieldPermissionRepo from '../repositories/application-workflow-field-permission';
+import * as applicationFormSectionRepo from '../repositories/application-form-section';
 import * as userRepo from '../repositories/user';
 import { IApplicationInstance, IApplicationAttributes } from '../models/application';
 import { IApplicationWorkflowInstance, IApplicationWorkflowAttributes } from '../models/application-workflow';
+import { IApplicationWorkflowFieldPermissionAttributes } from '../models/application-workflow-field-permission';
 import { Role } from '../enum/role';
 
 export const getByApplicationId = async (applicationId: string): Promise<IApplicationWorkflowInstance[]> => {
@@ -55,4 +58,30 @@ export const saveApplicationWorkflow = async (applicationId: string,
         }
     }
     return { success: true };
+};
+
+export const saveApplicationWorkflowFieldPermission = async (
+    applicationId: string, applicationWorkflowFieldPermissions: IApplicationWorkflowFieldPermissionAttributes[]) => {
+        await validate({ payload: applicationWorkflowFieldPermissions }, joiSchema.saveWorkflowFieldPermissionArray);
+        const savedApp = await applicationRepo.findById(applicationId);
+        if (!savedApp) {
+            throw boom.badRequest('Invalid application id');
+        }
+        const formSectionIds = _.reject(applicationWorkflowFieldPermissions.map(form =>
+            form.applicationFormSectionId), _.isUndefined);
+        const sections = await applicationFormSectionRepo.findByIds(formSectionIds);
+        if (sections.length !== formSectionIds.length) {
+            throw boom.badRequest('Invalid form section ids');
+        }
+        const formFieldIds = _.reject(applicationWorkflowFieldPermissions.map(form =>
+            form.applicationFormFieldId), _.isUndefined);
+        const fields = await applicationFormFieldRepo.findByIds(formFieldIds);
+        if (fields.length !== formFieldIds.length) {
+            throw boom.badRequest('Invalid form field ids');
+        }
+        for (const workflowFieldPermission of applicationWorkflowFieldPermissions) {
+            await applicationWorkflowFieldPermissionRepo.
+                saveApplicationWorkflowFieldPermission(workflowFieldPermission);
+        }
+        return { success: true };
 };

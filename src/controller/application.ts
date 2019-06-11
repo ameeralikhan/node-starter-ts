@@ -42,6 +42,13 @@ export const saveApplicationWorkflow = async (ctx: Context, next: () => void) =>
   await next();
 };
 
+export const saveApplicationWorkflowFieldPermission = async (ctx: Context, next: () => void) => {
+  const applicationId: string = ctx.params.applicationId;
+  const payload = ctx.request.body;
+  ctx.state.data = await applicationWorkflowService.saveApplicationWorkflowFieldPermission(applicationId, payload);
+  await next();
+};
+
 export const deleteApplication = async (ctx: Context, next: () => void) => {
   const id: string = ctx.params.id;
   const userId: string = ctx.state.user.userId;
