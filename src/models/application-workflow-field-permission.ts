@@ -4,9 +4,12 @@ import { IModelFactory } from './index';
 
 export interface IApplicationWorkflowFieldPermissionAttributes {
     id?: string;
+    applicationId?: string;
     applicationFormSectionId?: string;
     applicationFormFieldId?: string;
     permission?: string;
+    type?: string;
+    conditions?: any;
     isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -15,9 +18,12 @@ export interface IApplicationWorkflowFieldPermissionAttributes {
 export interface IApplicationWorkflowFieldPermissionInstance
     extends Sequelize.Instance<IApplicationWorkflowFieldPermissionAttributes> {
     id?: string;
+    applicationId?: string;
     applicationFormSectionId?: string;
     applicationFormFieldId?: string;
     permission?: string;
+    type?: string;
+    conditions?: any;
     isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -33,6 +39,14 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationWorkflowFiel
         primaryKey: true,
         allowNull: false,
         autoIncrement: true
+      },
+      applicationId: {
+        type: Sequelize.UUID,
+        allowNull: false,
+        references: {
+          model: 'application',
+          key: 'id'
+        }
       },
       applicationFormSectionId: {
         type: Sequelize.UUID,
@@ -54,6 +68,14 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationWorkflowFiel
         type: Sequelize.STRING,
         allowNull: false,
       },
+      type: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      conditions: {
+        type: Sequelize.JSONB,
+        allowNull: true,
+      },
       isActive: {
         type: Sequelize.BOOLEAN,
         defaultValue: true
@@ -73,6 +95,7 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationWorkflowFiel
     });
 
     model.associate = (models: IModelFactory) => {
+      model.belongsTo(models.Application);
       model.belongsTo(models.ApplicationFormSection);
       model.belongsTo(models.ApplicationFormField);
     };

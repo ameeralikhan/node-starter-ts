@@ -18,6 +18,8 @@ router.get('/:applicationId/form', ctrl.getApplicationForm);
 
 router.get('/:applicationId/workflow', ctrl.getApplicationWorkflow);
 
+router.get('/:applicationId/field-permission', ctrl.getApplicationWorkflowFieldPermission);
+
 router.post('/', ctrl.saveApplication);
 
 router.post('/:applicationId/form', ctrl.saveApplicationForm);

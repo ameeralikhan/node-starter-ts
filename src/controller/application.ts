@@ -2,6 +2,7 @@ import { Context } from 'koa';
 import * as applicationService from '../services/application';
 import * as applicationFormService from '../services/application-form';
 import * as applicationWorkflowService from '../services/application-workflow';
+import * as applicationWorkflowFieldPermissionService from '../services/application-workflow-field-permission';
 
 export const getCurrentLoggedInUserApplications = async (ctx: Context, next: () => void) => {
   const userId: string = ctx.state.user.userId;
@@ -18,6 +19,12 @@ export const getApplicationForm = async (ctx: Context, next: () => void) => {
 export const getApplicationWorkflow = async (ctx: Context, next: () => void) => {
   const applicationId: string = ctx.params.applicationId;
   ctx.state.data = await applicationWorkflowService.getByApplicationId(applicationId);
+  await next();
+};
+
+export const getApplicationWorkflowFieldPermission = async (ctx: Context, next: () => void) => {
+  const applicationId: string = ctx.params.applicationId;
+  ctx.state.data = await applicationWorkflowFieldPermissionService.getByApplicationId(applicationId);
   await next();
 };
 
@@ -45,7 +52,8 @@ export const saveApplicationWorkflow = async (ctx: Context, next: () => void) =>
 export const saveApplicationWorkflowFieldPermission = async (ctx: Context, next: () => void) => {
   const applicationId: string = ctx.params.applicationId;
   const payload = ctx.request.body;
-  ctx.state.data = await applicationWorkflowService.saveApplicationWorkflowFieldPermission(applicationId, payload);
+  ctx.state.data =
+    await applicationWorkflowFieldPermissionService.saveApplicationWorkflowFieldPermission(applicationId, payload);
   await next();
 };
 

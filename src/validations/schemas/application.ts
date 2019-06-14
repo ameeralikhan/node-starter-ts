@@ -56,13 +56,16 @@ export const saveApplicationWorkflowArray: Joi.SchemaMap = {
 
 export const saveWorkflowFieldPermission: Joi.SchemaMap = {
     id: Joi.string().uuid(),
-    applicationFormSectionId: Joi.string().required(),
-    applicationFormFieldId: Joi.string().required(),
+    applicationFormSectionId: Joi.string(),
+    applicationFormFieldId: Joi.string(),
     permission: Joi.string().required(),
+    type: Joi.string().required(),
+    conditions: Joi.any()
 };
 
 export const saveWorkflowFieldPermissionArray: Joi.SchemaMap = {
     payload: Joi.array().items(Joi.object({
         ...saveWorkflowFieldPermission
-    })).min(1)
+    })).min(1),
+    applicationId: Joi.string().uuid().required(),
 };

@@ -109,6 +109,7 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationModel => {
     });
 
     model.associate = (models: IModelFactory) => {
+        model.hasMany(models.ApplicationWorkflowFieldPermission);
         model.hasMany(models.ApplicationWorkflow);
         model.hasMany(models.ApplicationFormSection);
     };
