@@ -11,9 +11,10 @@ export interface IApplicationFormFieldAttributes {
     key: string;
     type: string;
     defaultValue: string;
+    icon: string;
+    templateName: string;
     templateOptions: any;
     order: number;
-    isRequired: boolean;
     isActive: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -28,9 +29,10 @@ export interface IApplicationFormFieldInstance extends Sequelize.Instance<IAppli
     key: string;
     type: string;
     defaultValue: string;
+    icon: string;
+    templateName: string;
     templateOptions: any;
     order: number;
-    isRequired: boolean;
     isActive: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -78,16 +80,20 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationFormFieldMod
         type: Sequelize.STRING,
         allowNull: true
       },
+      icon: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
+      templateName: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       templateOptions: {
         type: Sequelize.JSONB,
         allowNull: true
       },
       order: {
         type: Sequelize.INTEGER,
-        allowNull: false
-      },
-      isRequired: {
-        type: Sequelize.BOOLEAN,
         allowNull: false
       },
       isActive: {
