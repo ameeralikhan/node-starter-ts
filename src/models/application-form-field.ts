@@ -14,6 +14,7 @@ export interface IApplicationFormFieldAttributes {
     icon: string;
     templateName: string;
     templateOptions: any;
+    lookupId: number;
     order: number;
     isActive: boolean;
     createdAt?: Date;
@@ -32,6 +33,7 @@ export interface IApplicationFormFieldInstance extends Sequelize.Instance<IAppli
     icon: string;
     templateName: string;
     templateOptions: any;
+    lookupId: number;
     order: number;
     isActive: boolean;
     createdAt?: Date;
@@ -92,6 +94,14 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationFormFieldMod
         type: Sequelize.JSONB,
         allowNull: true
       },
+      lookupId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+            model: 'lookup',
+            key: 'id'
+        }
+      },
       order: {
         type: Sequelize.INTEGER,
         allowNull: false
@@ -116,6 +126,7 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationFormFieldMod
 
     model.associate = (models: IModelFactory) => {
       model.belongsTo(models.ApplicationFormSection);
+      model.belongsTo(models.Lookup);
 
       model.hasMany(models.ApplicationWorkflowFieldPermission);
     };

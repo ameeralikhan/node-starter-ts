@@ -2,6 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
+    await queryInterface.renameTable('applicationWorkflowFormPermission', 'applicationWorkflowFieldPermission');
     await Promise.all([
       queryInterface.addColumn('applicationWorkflowFieldPermission', 'applicationId', {
         type: Sequelize.UUID,
@@ -23,6 +24,8 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
+    await queryInterface.renameTable('applicationWorkflowFieldPermission', 'applicationWorkflowFormPermission');
+    await queryInterface.removeColumn('applicationWorkflowFieldPermission', 'applicationId');
     await queryInterface.removeColumn('applicationWorkflowFieldPermission', 'type');
     await queryInterface.removeColumn('applicationWorkflowFieldPermission', 'conditions');
   }

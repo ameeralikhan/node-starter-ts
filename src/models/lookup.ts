@@ -63,8 +63,8 @@ export const define = (sequelize: Sequelize.Sequelize): ILookupModel => {
         freezeTableName: true
     });
 
-    model.associate = () => {
-        // no model
+    model.associate = (models: IModelFactory) => {
+        model.hasMany(models.ApplicationFormField);
     };
 
     return model;
