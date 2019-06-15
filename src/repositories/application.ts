@@ -39,7 +39,8 @@ export const findById = async (id: string) => {
 };
 
 export const saveApplication = async (application: IApplicationAttributes) => {
-    return Models.Application.insertOrUpdate(application);
+    return Models.Application.insertOrUpdate(application, { returning: true})
+        .then((res) => res[0]);
 };
 
 export const deleteApplication = async (id: string, deletedAt: Date, deletedBy: string) => {

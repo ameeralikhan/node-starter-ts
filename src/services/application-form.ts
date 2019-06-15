@@ -9,6 +9,7 @@ import * as applicationFormFieldRepo from '../repositories/application-form-fiel
 import * as userRepo from '../repositories/user';
 import { IApplicationInstance, IApplicationAttributes } from '../models/application';
 import { IApplicationFormSectionInstance, IApplicationFormSectionAttributes } from '../models/application-form-section';
+import { IApplicationFormFieldInstance } from '../models/application-form-field';
 import { Role } from '../enum/role';
 
 export const getByApplicationId = async (applicationId: string): Promise<IApplicationFormSectionInstance[]> => {
@@ -17,6 +18,32 @@ export const getByApplicationId = async (applicationId: string): Promise<IApplic
         throw boom.badRequest('Invalid application id');
     }
     return applicationFormSectionRepo.getByApplicationId(applicationId);
+};
+
+export const getApplicationSectionById =
+    async (applicationId: string, sectionId: string): Promise<IApplicationFormSectionInstance> => {
+    const application = await applicationRepo.findById(applicationId);
+    if (!application) {
+        throw boom.badRequest('Invalid application id');
+    }
+    const formSection = await applicationFormSectionRepo.findById(sectionId);
+    if (!formSection) {
+        throw boom.badRequest('Invalid application section id');
+    }
+    return formSection;
+};
+
+export const getApplicationFormFieldById =
+    async (applicationId: string, fieldId: string) => {
+    const application = await applicationRepo.findById(applicationId);
+    if (!application) {
+        throw boom.badRequest('Invalid application id');
+    }
+    const formFeild = await applicationFormFieldRepo.findById(fieldId);
+    if (!formFeild) {
+        throw boom.badRequest('Invalid application form field id');
+    }
+    return formFeild;
 };
 
 export const saveApplicationForm = async (applicationId: string,

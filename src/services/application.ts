@@ -11,6 +11,14 @@ export const getCurrentLoggedInUserApplications = async (loggedInUserId: string)
     return applicationRepo.getByUserId(loggedInUserId);
 };
 
+export const getById = async (applicationId: string) => {
+    const savedApp = await applicationRepo.findById(applicationId);
+    if (!savedApp) {
+        throw boom.badRequest('Invalid Application Id');
+    }
+    return savedApp;
+};
+
 export const saveApplication = async (loggedInUserId: string, application: IApplicationAttributes) => {
     await validate(application, joiSchema.saveApplication);
     if (application.id) {
@@ -28,8 +36,7 @@ export const saveApplication = async (loggedInUserId: string, application: IAppl
             throw boom.badRequest('Invalid User');
         }
     }
-    await applicationRepo.saveApplication(application);
-    return { success: true };
+    return applicationRepo.saveApplication(application);
 };
 
 export const deleteApplication = async (id: string, loggedInUserId: string) => {

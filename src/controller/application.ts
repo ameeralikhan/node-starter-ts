@@ -10,6 +10,26 @@ export const getCurrentLoggedInUserApplications = async (ctx: Context, next: () 
   await next();
 };
 
+export const getApplicationById = async (ctx: Context, next: () => void) => {
+  const applicationId: string = ctx.params.id;
+  ctx.state.data = await applicationService.getById(applicationId);
+  await next();
+};
+
+export const getApplicationFormSectionById = async (ctx: Context, next: () => void) => {
+  const applicationId: string = ctx.params.id;
+  const sectionId: string = ctx.params.sectionId;
+  ctx.state.data = await applicationFormService.getApplicationSectionById(applicationId, sectionId);
+  await next();
+};
+
+export const getApplicationFormFieldById = async (ctx: Context, next: () => void) => {
+  const applicationId: string = ctx.params.id;
+  const fieldId: string = ctx.params.fieldId;
+  ctx.state.data = await applicationFormService.getApplicationFormFieldById(applicationId, fieldId);
+  await next();
+};
+
 export const getApplicationForm = async (ctx: Context, next: () => void) => {
   const applicationId: string = ctx.params.applicationId;
   ctx.state.data = await applicationFormService.getByApplicationId(applicationId);

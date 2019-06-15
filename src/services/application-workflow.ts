@@ -55,5 +55,5 @@ export const saveApplicationWorkflow = async (applicationId: string,
             await applicationWorkflowPermissionRepo.saveApplicationWorkflowPermission(newPermission);
         }
     }
-    return { success: true };
+    return getByApplicationId(applicationId);
 };
