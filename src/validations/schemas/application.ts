@@ -1,7 +1,7 @@
 import * as Joi from 'joi';
 
 export const saveApplication: Joi.SchemaMap = {
-    id: Joi.string().uuid(),
+    id: Joi.string().uuid().allow([null, '']),
     name: Joi.string().required(),
     shortDescription: Joi.string().required(),
     userIds: Joi.string().allow([null, '']),
@@ -15,19 +15,20 @@ export const deleteApplication: Joi.SchemaMap = {
 };
 
 export const saveApplicationForm: Joi.SchemaMap = {
-    id: Joi.string().uuid(),
+    id: Joi.string().uuid().allow([null, '']),
     name: Joi.string().required(),
-    helpText: Joi.string().required(),
+    helpText: Joi.string().allow([null, '']),
     type: Joi.string().required(),
     order: Joi.number().required(),
     applicationFormFields: Joi.array().items(Joi.object({
+        id: Joi.string().uuid().allow([null, '']),
         name: Joi.string().required(),
-        helpText: Joi.string().required(),
+        helpText: Joi.string().allow([null, '']),
         fieldId: Joi.string().required(),
         key: Joi.string().required(),
         type: Joi.string().required(),
-        icon: Joi.string(),
-        templateName: Joi.string(),
+        icon: Joi.string().allow([null, '']),
+        templateName: Joi.string().allow([null, '']),
         defaultValue: Joi.string().allow([null, '']),
         templateOptions: Joi.any(),
         order: Joi.number().required(),
@@ -41,7 +42,7 @@ export const saveApplicationFormArray: Joi.SchemaMap = {
 };
 
 export const saveApplicationWorkflow: Joi.SchemaMap = {
-    id: Joi.string().uuid(),
+    id: Joi.string().uuid().allow([null, '']),
     name: Joi.string().required(),
     type: Joi.string().required(),
     order: Joi.number().required(),
@@ -55,9 +56,9 @@ export const saveApplicationWorkflowArray: Joi.SchemaMap = {
 };
 
 export const saveWorkflowFieldPermission: Joi.SchemaMap = {
-    id: Joi.string().uuid(),
-    applicationFormSectionId: Joi.string(),
-    applicationFormFieldId: Joi.string(),
+    id: Joi.string().uuid().allow([null, '']),
+    applicationFormSectionId: Joi.string().allow([null, '']),
+    applicationFormFieldId: Joi.string().allow([null, '']),
     permission: Joi.string().required(),
     type: Joi.string().required(),
     conditions: Joi.any()

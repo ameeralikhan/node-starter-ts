@@ -64,6 +64,7 @@ export const define = (sequelize: Sequelize.Sequelize): ILookupModel => {
     });
 
     model.associate = (models: IModelFactory) => {
+        model.hasMany(models.LookupData);
         model.hasMany(models.ApplicationFormField);
     };
 

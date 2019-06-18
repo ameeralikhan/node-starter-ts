@@ -69,8 +69,8 @@ export const define = (sequelize: Sequelize.Sequelize): ILookupDataModel => {
         freezeTableName: true
     });
 
-    model.associate = () => {
-        // no model
+    model.associate = (models: IModelFactory) => {
+        model.belongsTo(models.Lookup);
     };
 
     return model;
