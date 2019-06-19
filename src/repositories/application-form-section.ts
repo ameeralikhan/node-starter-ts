@@ -14,7 +14,7 @@ export const getByApplicationId = async (applicationId: string) => {
         include: [{
             model: Models.ApplicationFormField,
             attributes: ['id', 'applicationFormSectionId', 'name', 'helpText', 'fieldId', 'key', 'type',
-                'defaultValue', 'icon', 'templateName', 'templateOptions', 'order', 'isActive'],
+                'defaultValue', 'lookupId', 'icon', 'templateName', 'templateOptions', 'order', 'isActive'],
             where: {
                 isActive: true
             },
