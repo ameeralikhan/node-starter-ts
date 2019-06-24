@@ -2,6 +2,7 @@ import * as boom from 'boom';
 import * as _ from 'lodash';
 import { validate } from '../validations/index';
 
+import * as helper from '../utils/helper';
 import * as joiSchema from '../validations/schemas/application';
 import * as applicationRepo from '../repositories/application';
 import * as applicationFormSectionRepo from '../repositories/application-form-section';
@@ -46,8 +47,6 @@ export const getApplicationFormFieldById =
     return formFeild;
 };
 
-const rejectUndefinedOrNull = (id: string) => _.isUndefined(id) || _.isNull(id) || _.isEmpty(id);
-
 export const saveApplicationForm = async (applicationId: string,
                                           applicationForms: IApplicationFormSectionAttributes[]) => {
     await validate({ payload: applicationForms }, joiSchema.saveApplicationFormArray);
@@ -55,7 +54,7 @@ export const saveApplicationForm = async (applicationId: string,
     if (!savedApp) {
         throw boom.badRequest('Invalid application id');
     }
-    const ids: any = _.reject(applicationForms.map(form => form.id), rejectUndefinedOrNull);
+    const ids: any = _.reject(applicationForms.map(form => form.id), helper.rejectUndefinedOrNull);
     const applicationSections = await applicationFormSectionRepo.findByIds(ids);
     if (applicationSections.length !== ids.length) {
         throw boom.badRequest('Invalid application section id');

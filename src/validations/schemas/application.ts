@@ -54,6 +54,7 @@ export const saveApplicationWorkflowArray: Joi.SchemaMap = {
 
 export const saveWorkflowFieldPermission: Joi.SchemaMap = {
     id: Joi.string().uuid().allow([null, '']),
+    applicationWorkflowId: Joi.string().uuid().allow([null, '']),
     applicationFormSectionId: Joi.string().allow([null, '']),
     applicationFormFieldId: Joi.string().allow([null, '']),
     permission: Joi.string().required(),

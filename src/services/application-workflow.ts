@@ -2,6 +2,7 @@ import * as boom from 'boom';
 import * as _ from 'lodash';
 import { validate } from '../validations/index';
 
+import * as helper from '../utils/helper';
 import * as joiSchema from '../validations/schemas/application';
 import * as applicationRepo from '../repositories/application';
 import * as applicationWorkflowRepo from '../repositories/application-workflow';
@@ -21,8 +22,6 @@ export const getByApplicationId = async (applicationId: string): Promise<IApplic
     return applicationWorkflowRepo.getByApplicationId(applicationId);
 };
 
-const rejectUndefinedOrNull = (id: string) => _.isUndefined(id) || _.isNull(id) || _.isEmpty(id);
-
 export const saveApplicationWorkflow = async (applicationId: string,
                                               applicationWorkflows: IApplicationWorkflowAttributes[]) => {
     await validate({ payload: applicationWorkflows }, joiSchema.saveApplicationWorkflowArray);
@@ -30,7 +29,7 @@ export const saveApplicationWorkflow = async (applicationId: string,
     if (!savedApp) {
         throw boom.badRequest('Invalid application id');
     }
-    const ids: any = _.reject(applicationWorkflows.map(form => form.id), rejectUndefinedOrNull);
+    const ids: any = _.reject(applicationWorkflows.map(form => form.id), helper.rejectUndefinedOrNull);
     const applicationSections = await applicationWorkflowRepo.findByIds(ids);
     if (applicationSections.length !== ids.length) {
         throw boom.badRequest('Invalid application workflow id');

@@ -5,6 +5,7 @@ import { IModelFactory } from './index';
 export interface IApplicationWorkflowFieldPermissionAttributes {
     id?: string;
     applicationId?: string;
+    applicationWorkflowId?: string;
     applicationFormSectionId?: string;
     applicationFormFieldId?: string;
     permission?: string;
@@ -19,6 +20,7 @@ export interface IApplicationWorkflowFieldPermissionInstance
     extends Sequelize.Instance<IApplicationWorkflowFieldPermissionAttributes> {
     id?: string;
     applicationId?: string;
+    applicationWorkflowId?: string;
     applicationFormSectionId?: string;
     applicationFormFieldId?: string;
     permission?: string;
@@ -45,6 +47,14 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationWorkflowFiel
         allowNull: false,
         references: {
           model: 'application',
+          key: 'id'
+        }
+      },
+      applicationWorkflowId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: 'applicationWorkflow',
           key: 'id'
         }
       },
