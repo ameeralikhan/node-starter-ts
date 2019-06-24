@@ -46,6 +46,8 @@ export const getApplicationFormFieldById =
     return formFeild;
 };
 
+const rejectUndefinedOrNull = (id: string) => _.isUndefined(id) || _.isNull(id) || _.isEmpty(id);
+
 export const saveApplicationForm = async (applicationId: string,
                                           applicationForms: IApplicationFormSectionAttributes[]) => {
     await validate({ payload: applicationForms }, joiSchema.saveApplicationFormArray);
@@ -53,7 +55,7 @@ export const saveApplicationForm = async (applicationId: string,
     if (!savedApp) {
         throw boom.badRequest('Invalid application id');
     }
-    const ids = _.reject(applicationForms.map(form => form.id), _.isUndefined);
+    const ids: any = _.reject(applicationForms.map(form => form.id), rejectUndefinedOrNull);
     const applicationSections = await applicationFormSectionRepo.findByIds(ids);
     if (applicationSections.length !== ids.length) {
         throw boom.badRequest('Invalid application section id');

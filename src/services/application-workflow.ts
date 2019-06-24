@@ -21,6 +21,8 @@ export const getByApplicationId = async (applicationId: string): Promise<IApplic
     return applicationWorkflowRepo.getByApplicationId(applicationId);
 };
 
+const rejectUndefinedOrNull = (id: string) => _.isUndefined(id) || _.isNull(id) || _.isEmpty(id);
+
 export const saveApplicationWorkflow = async (applicationId: string,
                                               applicationWorkflows: IApplicationWorkflowAttributes[]) => {
     await validate({ payload: applicationWorkflows }, joiSchema.saveApplicationWorkflowArray);
@@ -28,12 +30,13 @@ export const saveApplicationWorkflow = async (applicationId: string,
     if (!savedApp) {
         throw boom.badRequest('Invalid application id');
     }
-    const ids = _.reject(applicationWorkflows.map(form => form.id), _.isUndefined);
+    const ids: any = _.reject(applicationWorkflows.map(form => form.id), rejectUndefinedOrNull);
     const applicationSections = await applicationWorkflowRepo.findByIds(ids);
     if (applicationSections.length !== ids.length) {
         throw boom.badRequest('Invalid application workflow id');
     }
-    const userIds = _.reject(applicationWorkflows.map(form => form.userIds), _.isUndefined) as string[];
+    let userIds = _.reject(applicationWorkflows.map(form => form.userIds), _.isUndefined);
+    userIds = _.flatMap(userIds);
     const users = await userRepo.findByIds(userIds);
     if (users.length !== userIds.length) {
         throw boom.badRequest('Invalid user ids');
