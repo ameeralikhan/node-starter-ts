@@ -38,8 +38,10 @@ export const saveApplicationWorkflow = async (applicationId: string,
     if (users.length !== userIds.length) {
         throw boom.badRequest('Invalid user ids');
     }
+    let workflowIndex = 1;
     for (const workflow of applicationWorkflows) {
         workflow.applicationId = applicationId;
+        workflow.order = workflowIndex;
         if (workflow.id) {
             await applicationWorkflowPermissionRepo.hardDeleteWorkflowPermissionByWorkflowId(workflow.id);
         }
@@ -54,6 +56,7 @@ export const saveApplicationWorkflow = async (applicationId: string,
             };
             await applicationWorkflowPermissionRepo.saveApplicationWorkflowPermission(newPermission);
         }
+        workflowIndex += 1;
     }
     return getByApplicationId(applicationId);
 };

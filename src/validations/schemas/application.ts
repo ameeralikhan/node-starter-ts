@@ -19,7 +19,6 @@ export const saveApplicationForm: Joi.SchemaMap = {
     name: Joi.string().required(),
     helpText: Joi.string().allow([null, '']),
     type: Joi.string().required(),
-    order: Joi.number().required(),
     applicationFormFields: Joi.array().items(Joi.object({
         id: Joi.string().uuid().allow([null, '']),
         name: Joi.string().required(),
@@ -31,7 +30,6 @@ export const saveApplicationForm: Joi.SchemaMap = {
         templateName: Joi.string().allow([null, '']),
         defaultValue: Joi.string().allow([null, '']),
         templateOptions: Joi.any(),
-        order: Joi.number().required(),
     }))
 };
 
@@ -45,7 +43,6 @@ export const saveApplicationWorkflow: Joi.SchemaMap = {
     id: Joi.string().uuid().allow([null, '']),
     name: Joi.string().required(),
     type: Joi.string().required(),
-    order: Joi.number().required(),
     userIds: Joi.array().items(Joi.string().uuid().required())
 };
 
