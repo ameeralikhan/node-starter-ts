@@ -43,6 +43,7 @@ export const saveApplicationWorkflow: Joi.SchemaMap = {
     id: Joi.string().uuid().allow([null, '']),
     name: Joi.string().required(),
     type: Joi.string().required(),
+    stepId: Joi.string().uuid().allow([null, '']),
     userIds: Joi.array().items(Joi.string().uuid().required())
 };
 

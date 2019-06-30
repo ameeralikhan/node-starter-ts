@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('applicationWorkflowFieldPermission', 'applicationWorkflowId', {
+    await queryInterface.addColumn('applicationWorkflow', 'stepId', {
       type: Sequelize.UUID,
       allowNull: true,
       references: {
@@ -13,6 +13,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.removeColumn('applicationWorkflowFieldPermission', 'applicationWorkflowId');
+    await queryInterface.removeColumn('applicationWorkflow', 'stepId');
   }
 };

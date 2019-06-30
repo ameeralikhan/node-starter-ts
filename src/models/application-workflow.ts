@@ -12,6 +12,7 @@ export interface IApplicationWorkflowAttributes {
     name: string;
     type: string;
     order: number;
+    stepId: string;
     isActive: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -29,6 +30,7 @@ export interface IApplicationWorkflowInstance extends Sequelize.Instance<IApplic
     name: string;
     type: string;
     order: number;
+    stepId: string;
     isActive: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -69,6 +71,14 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationWorkflowMode
       order: {
         type: Sequelize.INTEGER,
         allowNull: true,
+      },
+      stepId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: 'applicationWorkflow',
+          key: 'id'
+        }
       },
       isActive: {
         type: Sequelize.BOOLEAN,
@@ -120,6 +130,7 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationWorkflowMode
         model.belongsTo(models.Application);
 
         model.hasMany(models.ApplicationWorkflowPermission);
+        model.hasMany(models.ApplicationWorkflow, { foreignKey: 'stepId', as: 'step' });
     };
 
     return model;
