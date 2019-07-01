@@ -37,7 +37,7 @@ export const saveApplicationWorkflow = async (applicationId: string,
     let userIds = _.reject(applicationWorkflows.map(form => form.userIds), _.isUndefined);
     userIds = _.flatMap(userIds);
     const users = await userRepo.findByIds(userIds);
-    if (users.length !== userIds.length) {
+    if (users.length !== _.uniq(userIds).length) {
         throw boom.badRequest('Invalid user ids');
     }
     let workflowIndex = 1;

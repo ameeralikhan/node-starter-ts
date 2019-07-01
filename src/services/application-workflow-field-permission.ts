@@ -34,17 +34,17 @@ export const saveApplicationWorkflowFieldPermission =
     }
     const ids: any = _.reject(payload.map(form => form.id), helper.rejectUndefinedOrNull);
     const applicationWorkflowFieldPermissions = await applicationWorkflowFieldPermissionRepo.findByIds(ids);
-    if (applicationWorkflowFieldPermissions.length !== ids.length) {
+    if (applicationWorkflowFieldPermissions.length !== _.uniq(ids).length) {
         throw boom.badRequest('Invalid ids');
     }
     const sectionIds: any = _.reject(payload.map(form => form.applicationFormSectionId), helper.rejectUndefinedOrNull);
     const applicationSections = await applicationFormSectionRepo.findByIds(sectionIds);
-    if (applicationSections.length !== ids.length) {
+    if (applicationSections.length !== _.uniq(sectionIds).length) {
         throw boom.badRequest('Invalid application section id');
     }
     const formIds: any = _.reject(payload.map(form => form.applicationFormFieldId), helper.rejectUndefinedOrNull);
     const savedApplicationForms = await applicationFormFieldRepo.findByIds(formIds);
-    if (savedApplicationForms.length !== formIds.length) {
+    if (savedApplicationForms.length !== _.uniq(formIds).length) {
         throw boom.badRequest('Invalid application section field id');
     }
     for (const form of payload) {
