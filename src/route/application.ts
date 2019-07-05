@@ -26,6 +26,8 @@ router.get('/:applicationId/workflow', ctrl.getApplicationWorkflow);
 
 router.get('/:applicationId/field-permission', ctrl.getApplicationWorkflowFieldPermission);
 
+router.get('/:applicationId/execution', ctrl.getApplicationExecution);
+
 router.post('/', ctrl.saveApplication);
 
 router.post('/:applicationId/form', ctrl.saveApplicationForm);
@@ -33,6 +35,8 @@ router.post('/:applicationId/form', ctrl.saveApplicationForm);
 router.post('/:applicationId/workflow', ctrl.saveApplicationWorkflow);
 
 router.post('/:applicationId/field-permission', ctrl.saveApplicationWorkflowFieldPermission);
+
+router.post('/:applicationId/execution', ctrl.saveApplicationExecution);
 
 router.delete('/:id', ctrl.deleteApplication);
 

@@ -3,6 +3,7 @@ import * as applicationService from '../services/application';
 import * as applicationFormService from '../services/application-form';
 import * as applicationWorkflowService from '../services/application-workflow';
 import * as applicationWorkflowFieldPermissionService from '../services/application-workflow-field-permission';
+import * as applicationExecutionService from '../services/application-execution';
 
 export const getCurrentLoggedInUserApplications = async (ctx: Context, next: () => void) => {
   const userId: string = ctx.state.user.userId;
@@ -48,6 +49,12 @@ export const getApplicationWorkflowFieldPermission = async (ctx: Context, next: 
   await next();
 };
 
+export const getApplicationExecution = async (ctx: Context, next: () => void) => {
+  const applicationId: string = ctx.params.applicationId;
+  ctx.state.data = await applicationExecutionService.getByApplicationId(applicationId);
+  await next();
+};
+
 export const saveApplication = async (ctx: Context, next: () => void) => {
   const userId: string = ctx.state.user.userId;
   const payload = ctx.request.body;
@@ -74,6 +81,13 @@ export const saveApplicationWorkflowFieldPermission = async (ctx: Context, next:
   const payload = ctx.request.body;
   ctx.state.data =
     await applicationWorkflowFieldPermissionService.saveApplicationWorkflowFieldPermission(applicationId, payload);
+  await next();
+};
+
+export const saveApplicationExecution = async (ctx: Context, next: () => void) => {
+  const applicationId: string = ctx.params.applicationId;
+  const payload = ctx.request.body;
+  ctx.state.data = await applicationExecutionService.saveApplicationExecution(applicationId, payload);
   await next();
 };
 
