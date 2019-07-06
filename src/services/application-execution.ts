@@ -23,34 +23,32 @@ export const getByApplicationId = async (applicationId: string): Promise<IApplic
 };
 
 export const saveApplicationExecution = async (applicationId: string,
-                                               applicationExecutions: IApplicationExecutionAttributes[]) => {
-    await validate({ payload: applicationExecutions, applicationId }, joiSchema.saveApplicationExecutionArray);
+                                               applicationExecution: IApplicationExecutionAttributes) => {
+    await validate(applicationExecution, joiSchema.saveApplicationExecution);
     const savedApp = await applicationRepo.findById(applicationId);
     if (!savedApp) {
         throw boom.badRequest('Invalid application id');
     }
-    const ids: any = _.reject(applicationExecutions.map(form => form.id), helper.rejectUndefinedOrNull);
-    const savedApplicationExecutions = await applicationExecutionRepo.findByIds(ids);
-    if (savedApplicationExecutions.length !== ids.length) {
-        throw boom.badRequest('Invalid application execution id');
+    if (applicationExecution.id) {
+        const savedApplicationExecutions = await applicationExecutionRepo.findById(applicationExecution.id);
+        if (!savedApplicationExecutions) {
+            throw boom.badRequest('Invalid application execution id');
+        }
     }
-    let formFieldIds = _.pick(
-        applicationExecutions.map(form => form.applicationExecutionForms), 'applicationFormFieldId') as string[];
+    let formFieldIds = _.pick(applicationExecution.applicationExecutionForms, 'applicationFormFieldId') as string[];
     formFieldIds = _.reject(formFieldIds, helper.rejectUndefinedOrNull);
     const savedApplicationFormFields = await applicationFormFieldRepo.findByIds(formFieldIds);
     if (savedApplicationFormFields.length !== _.uniq(formFieldIds).length) {
         throw boom.badRequest('Invalid application form field id');
     }
-    for (const form of applicationExecutions) {
-        form.applicationId = applicationId;
-        const execution = await applicationExecutionRepo.saveApplicationExecution(form);
-        if (!form.applicationExecutionForms) {
-            continue;
-        }
-        for (const field of form.applicationExecutionForms) {
-            field.applicationExecutionId = execution.id;
-            await applicationExecutionFormRepo.saveApplicationExecutionForm(field);
-        }
+    applicationExecution.applicationId = applicationId;
+    const execution = await applicationExecutionRepo.saveApplicationExecution(applicationExecution);
+    if (!applicationExecution.applicationExecutionForms) {
+        return getByApplicationId(applicationId);
+    }
+    for (const field of applicationExecution.applicationExecutionForms) {
+        field.applicationExecutionId = execution.id;
+        await applicationExecutionFormRepo.saveApplicationExecutionForm(field);
     }
     return getByApplicationId(applicationId);
 };
