@@ -13,6 +13,19 @@ import { IApplicationInstance, IApplicationAttributes } from '../models/applicat
 import { IApplicationExecutionInstance, IApplicationExecutionAttributes } from '../models/application-execution';
 import { IApplicationFormFieldInstance } from '../models/application-form-field';
 import { Role } from '../enum/role';
+import { ApplicationExecutionStatus } from '../enum/application';
+
+export const getAll = async (): Promise<IApplicationExecutionInstance[]> => {
+    return applicationExecutionRepo.getAll();
+};
+
+export const getById = async (executionId: string): Promise<IApplicationExecutionInstance> => {
+    const execution = await applicationExecutionRepo.findById(executionId);
+    if (!execution) {
+        throw boom.badRequest('Invalid execution id');
+    }
+    return execution;
+};
 
 export const getByApplicationId = async (applicationId: string): Promise<IApplicationExecutionInstance[]> => {
     const application = await applicationRepo.findById(applicationId);
@@ -34,6 +47,9 @@ export const saveApplicationExecution = async (applicationId: string,
         if (!savedApplicationExecutions) {
             throw boom.badRequest('Invalid application execution id');
         }
+    } else {
+        applicationExecution.startedAt = new Date();
+        applicationExecution.status = ApplicationExecutionStatus.DRAFT;
     }
     let formFieldIds = _.pick(applicationExecution.applicationExecutionForms, 'applicationFormFieldId') as string[];
     formFieldIds = _.reject(formFieldIds, helper.rejectUndefinedOrNull);
@@ -41,6 +57,7 @@ export const saveApplicationExecution = async (applicationId: string,
     if (savedApplicationFormFields.length !== _.uniq(formFieldIds).length) {
         throw boom.badRequest('Invalid application form field id');
     }
+    // validation for required in form fields
     applicationExecution.applicationId = applicationId;
     const execution = await applicationExecutionRepo.saveApplicationExecution(applicationExecution);
     if (!applicationExecution.applicationExecutionForms) {
@@ -51,4 +68,13 @@ export const saveApplicationExecution = async (applicationId: string,
         await applicationExecutionFormRepo.saveApplicationExecutionForm(field);
     }
     return getByApplicationId(applicationId);
+};
+
+export const deleteApplicationExecution = async (id: string) => {
+    const applicationExecution = await applicationExecutionRepo.findById(id);
+    if (!applicationExecution) {
+        throw boom.badRequest('Invalid application execution id');
+    }
+    await applicationExecutionRepo.deleteApplicationExecution(id);
+    return { success: true };
 };

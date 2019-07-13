@@ -28,6 +28,10 @@ router.get('/:applicationId/field-permission', ctrl.getApplicationWorkflowFieldP
 
 router.get('/:applicationId/execution', ctrl.getApplicationExecution);
 
+router.get('/executions', ctrl.getAllExecution);
+
+router.get('/execution/:executionId', ctrl.getExecutionById);
+
 router.post('/', ctrl.saveApplication);
 
 router.post('/:applicationId/form', ctrl.saveApplicationForm);
@@ -39,5 +43,7 @@ router.post('/:applicationId/field-permission', ctrl.saveApplicationWorkflowFiel
 router.post('/:applicationId/execution', ctrl.saveApplicationExecution);
 
 router.delete('/:id', ctrl.deleteApplication);
+
+router.delete('/:executionId', ctrl.deleteApplicationExecution);
 
 export default router.routes();

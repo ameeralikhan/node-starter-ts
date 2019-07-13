@@ -55,6 +55,17 @@ export const getApplicationExecution = async (ctx: Context, next: () => void) =>
   await next();
 };
 
+export const getExecutionById = async (ctx: Context, next: () => void) => {
+  const executionId: string = ctx.params.executionId;
+  ctx.state.data = await applicationExecutionService.getById(executionId);
+  await next();
+};
+
+export const getAllExecution = async (ctx: Context, next: () => void) => {
+  ctx.state.data = await applicationExecutionService.getAll();
+  await next();
+};
+
 export const saveApplication = async (ctx: Context, next: () => void) => {
   const userId: string = ctx.state.user.userId;
   const payload = ctx.request.body;
@@ -95,5 +106,11 @@ export const deleteApplication = async (ctx: Context, next: () => void) => {
   const id: string = ctx.params.id;
   const userId: string = ctx.state.user.userId;
   ctx.state.data = await applicationService.deleteApplication(id, userId);
+  await next();
+};
+
+export const deleteApplicationExecution = async (ctx: Context, next: () => void) => {
+  const executionId: string = ctx.params.executionId;
+  ctx.state.data = await applicationExecutionService.deleteApplicationExecution(executionId);
   await next();
 };
