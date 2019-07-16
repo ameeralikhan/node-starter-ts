@@ -44,6 +44,6 @@ router.post('/:applicationId/execution', ctrl.saveApplicationExecution);
 
 router.delete('/:id', ctrl.deleteApplication);
 
-router.delete('/:executionId', ctrl.deleteApplicationExecution);
+router.delete('/execution/:executionId', ctrl.deleteApplicationExecution);
 
 export default router.routes();

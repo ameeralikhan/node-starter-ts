@@ -38,12 +38,30 @@ export const getByApplicationId = async (applicationId: string) => {
             include: [{
                 model: Models.ApplicationFormField,
             }],
+        }, {
+            model: Models.Application
         }]
     });
 };
 
 export const findById = async (id: string) => {
-    return Models.ApplicationExecution.findOne({ where: { id }});
+    return Models.ApplicationExecution.findOne({
+        attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt'],
+        where: {
+            isActive: true,
+            id
+        },
+        include: [{
+            model: Models.ApplicationExecutionForm,
+            attributes: ['id', 'applicationExecutionId', 'applicationFormFieldId', 'value', 'isActive'],
+            where: {
+                isActive: true
+            },
+            include: [{
+                model: Models.ApplicationFormField,
+            }],
+        }]
+    });
 };
 
 export const findByIds = async (ids: string[]) => {
