@@ -6,7 +6,7 @@ import { IApplicationInstance, IApplicationAttributes } from '../models/applicat
 export const getAll = async () => {
     return Models.Application.findAll({
         attributes: ['id', 'name', 'shortDescription', 'userIds', 'canAllStart', 'canAllEdits', 'editableUserIds',
-         'createdAt', 'updatedAt'],
+        'isPublished', 'createdAt', 'updatedAt'],
         where: {
             isActive: true,
             deletedAt: null
@@ -17,7 +17,7 @@ export const getAll = async () => {
 export const getByUserId = async (userId: string) => {
     return Models.Application.findAll({
         attributes: ['id', 'name', 'shortDescription', 'userIds', 'canAllStart', 'canAllEdits', 'editableUserIds',
-         'createdAt', 'updatedAt'],
+         'isPublished', 'createdAt', 'updatedAt'],
         where: {
             isActive: true,
             deletedAt: null,
@@ -40,6 +40,11 @@ export const findById = async (id: string) => {
 
 export const saveApplication = async (application: IApplicationAttributes) => {
     return Models.Application.insertOrUpdate(application, { returning: true})
+        .then((res) => res[0]);
+};
+
+export const publishApplication = async (id: string) => {
+    return Models.Application.update({ isPublished: true }, { where: { id }})
         .then((res) => res[0]);
 };
 

@@ -10,6 +10,7 @@ export interface IApplicationAttributes {
     canAllStart: boolean;
     canAllEdits: boolean;
     editableUserIds: string;
+    isPublished: boolean;
     isActive: boolean;
     createdAt?: Date;
     createdBy?: string;
@@ -26,6 +27,7 @@ export interface IApplicationInstance extends Sequelize.Instance<IApplicationAtt
     canAllStart: boolean;
     canAllEdits: boolean;
     editableUserIds: string;
+    isPublished: boolean;
     isActive: boolean;
     createdAt?: Date;
     createdBy?: string;
@@ -69,6 +71,10 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationModel => {
       editableUserIds: {
         type: Sequelize.STRING,
         allowNull: true,
+      },
+      isPublished: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       isActive: {
         type: Sequelize.BOOLEAN,

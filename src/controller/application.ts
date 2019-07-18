@@ -73,6 +73,12 @@ export const saveApplication = async (ctx: Context, next: () => void) => {
   await next();
 };
 
+export const publishApplication = async (ctx: Context, next: () => void) => {
+  const id: string = ctx.params.id;
+  ctx.state.data = await applicationService.publishApplication(id);
+  await next();
+};
+
 export const saveApplicationForm = async (ctx: Context, next: () => void) => {
   const applicationId: string = ctx.params.applicationId;
   const payload = ctx.request.body;

@@ -16,6 +16,8 @@ router.get('/', ctrl.getCurrentLoggedInUserApplications);
 
 router.get('/:id', ctrl.getApplicationById);
 
+router.put('/:id/publish', ctrl.publishApplication);
+
 router.get('/:id/section/:sectionId', ctrl.getApplicationFormSectionById);
 
 router.get('/:id/field/:fieldId', ctrl.getApplicationFormFieldById);
