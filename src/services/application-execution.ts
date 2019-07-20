@@ -43,10 +43,12 @@ export const saveApplicationExecution = async (applicationId: string,
         throw boom.badRequest('Invalid application id');
     }
     if (applicationExecution.id) {
-        const savedApplicationExecutions = await applicationExecutionRepo.findById(applicationExecution.id);
-        if (!savedApplicationExecutions) {
+        const savedApplicationExecution = await applicationExecutionRepo.findById(applicationExecution.id);
+        if (!savedApplicationExecution) {
             throw boom.badRequest('Invalid application execution id');
         }
+        applicationExecution.startedAt = savedApplicationExecution.startedAt;
+        applicationExecution.status = savedApplicationExecution.status;
     } else {
         applicationExecution.startedAt = new Date();
         applicationExecution.status = ApplicationExecutionStatus.DRAFT;
