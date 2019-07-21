@@ -14,6 +14,10 @@ router.use(authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]));
 
 router.get('/', ctrl.getCurrentLoggedInUserApplications);
 
+router.get('/executions', ctrl.getAllExecution);
+
+router.get('/execution/:executionId', ctrl.getExecutionById);
+
 router.get('/:id', ctrl.getApplicationById);
 
 router.put('/:id/publish', ctrl.publishApplication);
@@ -29,10 +33,6 @@ router.get('/:applicationId/workflow', ctrl.getApplicationWorkflow);
 router.get('/:applicationId/field-permission', ctrl.getApplicationWorkflowFieldPermission);
 
 router.get('/:applicationId/execution', ctrl.getApplicationExecution);
-
-router.get('/executions', ctrl.getAllExecution);
-
-router.get('/execution/:executionId', ctrl.getExecutionById);
 
 router.post('/', ctrl.saveApplication);
 

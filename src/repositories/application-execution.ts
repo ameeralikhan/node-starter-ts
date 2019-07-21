@@ -18,6 +18,8 @@ export const getAll = async () => {
             include: [{
                 model: Models.ApplicationFormField,
             }],
+        }, {
+            model: Models.Application
         }]
     });
 };
