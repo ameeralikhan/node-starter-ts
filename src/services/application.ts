@@ -39,13 +39,19 @@ export const saveApplication = async (loggedInUserId: string, application: IAppl
     return applicationRepo.saveApplication(application);
 };
 
-export const publishApplication = async (id: string) => {
-    await validate({ id }, joiSchema.deleteApplication);
+export const publishApplication = async (id: string, editableUserIds: string[]) => {
+    await validate({ id, editableUserIds }, joiSchema.publishApplication);
     const application = await applicationRepo.findById(id);
     if (!application) {
         throw boom.badRequest('Invalid Application Id');
     }
-    await applicationRepo.publishApplication(id);
+    if (editableUserIds && editableUserIds.length) {
+        const users = await userRepo.findByIds(editableUserIds);
+        if (!users || users.length !== editableUserIds.length) {
+            throw boom.badRequest('Invalid User');
+        }
+    }
+    await applicationRepo.publishApplication(id, editableUserIds.join(','));
     return { success: true };
 };
 

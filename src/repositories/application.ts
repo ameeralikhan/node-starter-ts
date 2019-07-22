@@ -43,8 +43,8 @@ export const saveApplication = async (application: IApplicationAttributes) => {
         .then((res) => res[0]);
 };
 
-export const publishApplication = async (id: string) => {
-    return Models.Application.update({ isPublished: true }, { where: { id }})
+export const publishApplication = async (id: string, editableUserIds: string) => {
+    return Models.Application.update({ isPublished: true, editableUserIds }, { where: { id }})
         .then((res) => res[0]);
 };
 
