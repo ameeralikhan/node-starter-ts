@@ -10,9 +10,10 @@ const router = new Router({
 });
 
 router.use(authentication);
-router.use(authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]));
 
 router.get('/', ctrl.getCurrentLoggedInUserApplications);
+
+router.use(authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]));
 
 router.get('/execution/all', ctrl.getAllExecution);
 
