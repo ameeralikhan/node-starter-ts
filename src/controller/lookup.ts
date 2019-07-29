@@ -35,7 +35,8 @@ export const saveLookupData = async (ctx: Context, next: () => void) => {
 };
 
 export const deleteLookupData = async (ctx: Context, next: () => void) => {
-  const id: number = +ctx.params.lookupId;
-  ctx.state.data = await lookupDataService.deleteLookupData(id);
+  const lookupId: number = +ctx.params.lookupId;
+  const id: number = +ctx.params.id;
+  ctx.state.data = await lookupDataService.deleteLookupData(lookupId, id);
   await next();
 };

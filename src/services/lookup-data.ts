@@ -28,8 +28,12 @@ export const saveLookupData = async (userId: string, lookupId: number, lookupDat
     return lookupDataRepo.saveLookupData(lookupData);
 };
 
-export const deleteLookupData = async (id: number) => {
+export const deleteLookupData = async (lookupId: number, id: number) => {
     await validate({ id }, joiSchema.deleteLookup);
+    const savedLookup = await lookupRepo.findById(lookupId);
+    if (!savedLookup) {
+        throw boom.badRequest('Invalid Lookup Id');
+    }
     const lookupData = await lookupDataRepo.findById(id);
     if (!lookupData) {
         throw boom.badRequest('Invalid Lookup Data Id');
