@@ -12,20 +12,20 @@ export const getCurrentLoggedInUserApplications = async (ctx: Context, next: () 
 };
 
 export const getApplicationById = async (ctx: Context, next: () => void) => {
-  const applicationId: string = ctx.params.id;
+  const applicationId: string = ctx.params.applicationId;
   ctx.state.data = await applicationService.getById(applicationId);
   await next();
 };
 
 export const getApplicationFormSectionById = async (ctx: Context, next: () => void) => {
-  const applicationId: string = ctx.params.id;
+  const applicationId: string = ctx.params.applicationId;
   const sectionId: string = ctx.params.sectionId;
   ctx.state.data = await applicationFormService.getApplicationSectionById(applicationId, sectionId);
   await next();
 };
 
 export const getApplicationFormFieldById = async (ctx: Context, next: () => void) => {
-  const applicationId: string = ctx.params.id;
+  const applicationId: string = ctx.params.applicationId;
   const fieldId: string = ctx.params.fieldId;
   ctx.state.data = await applicationFormService.getApplicationFormFieldById(applicationId, fieldId);
   await next();
@@ -74,7 +74,7 @@ export const saveApplication = async (ctx: Context, next: () => void) => {
 };
 
 export const publishApplication = async (ctx: Context, next: () => void) => {
-  const id: string = ctx.params.id;
+  const id: string = ctx.params.applicationId;
   const editableUserIds: string[] = ctx.request.body.editableUserIds;
   ctx.state.data = await applicationService.publishApplication(id, editableUserIds);
   await next();

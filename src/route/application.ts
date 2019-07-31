@@ -19,13 +19,13 @@ router.get('/execution/all', ctrl.getAllExecution);
 
 router.get('/execution/:executionId/id', ctrl.getExecutionById);
 
-router.get('/:id', ctrl.getApplicationById);
+router.get('/:applicationId', ctrl.getApplicationById);
 
-router.put('/:id/publish', ctrl.publishApplication);
+router.put('/:applicationId/publish', ctrl.publishApplication);
 
-router.get('/:id/section/:sectionId', ctrl.getApplicationFormSectionById);
+router.get('/:applicationId/section/:sectionId', ctrl.getApplicationFormSectionById);
 
-router.get('/:id/field/:fieldId', ctrl.getApplicationFormFieldById);
+router.get('/:applicationId/field/:fieldId', ctrl.getApplicationFormFieldById);
 
 router.get('/:applicationId/form', ctrl.getApplicationForm);
 

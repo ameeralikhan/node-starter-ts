@@ -22,7 +22,7 @@ export const getByUserId = async (userId: string) => {
             isActive: true,
             deletedAt: null,
             [Sequelize.Op.or]: {
-                canAllEdits: true,
+                canAllStart: true,
                 createdBy: userId,
                 editableUserIds: {
                     [Sequelize.Op.like]: `%${userId}%`
