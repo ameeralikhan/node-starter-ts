@@ -75,8 +75,9 @@ export const saveApplication = async (ctx: Context, next: () => void) => {
 
 export const publishApplication = async (ctx: Context, next: () => void) => {
   const id: string = ctx.params.applicationId;
-  const editableUserIds: string[] = ctx.request.body.editableUserIds;
-  ctx.state.data = await applicationService.publishApplication(id, editableUserIds);
+  const editableUserIds: string = ctx.request.body.editableUserIds;
+  const canAllEdits: boolean = ctx.request.body.canAllEdits;
+  ctx.state.data = await applicationService.publishApplication(id, editableUserIds, canAllEdits);
   await next();
 };
 

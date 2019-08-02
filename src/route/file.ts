@@ -11,4 +11,6 @@ router.use(authentication);
 
 router.post('/picture', ctrl.saveProfilePicture);
 
+router.post('/execution', ctrl.saveExecutionFile);
+
 export default router.routes();

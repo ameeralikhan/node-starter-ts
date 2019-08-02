@@ -89,5 +89,6 @@ export const saveApplicationExecutionArray: Joi.SchemaMap = {
 
 export const publishApplication: Joi.SchemaMap = {
     id: Joi.string().uuid().required(),
-    editableUserIds: Joi.array().items(Joi.string().uuid()).min(1).required()
+    editableUserIds: Joi.array().items(Joi.string().uuid()).min(1).required(),
+    canAllEdits: Joi.boolean().required()
 };
