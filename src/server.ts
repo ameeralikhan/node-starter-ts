@@ -45,7 +45,7 @@ export async function startServer(log: Bunyan) {
 
   // Static files (images)
   const uploads = new Koa();
-  uploads.use(serve(__dirname + '/../upload/profile/'));
+  uploads.use(serve(__dirname + '/../upload/'));
   app.use(mount('/', uploads));
 
   app.use(errorMiddleware());
