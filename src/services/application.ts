@@ -40,7 +40,10 @@ export const saveApplication = async (loggedInUserId: string, application: IAppl
 };
 
 export const publishApplication = async (id: string, userIds: string, canAllEdits: boolean) => {
-    const editableUserIds: string[] = userIds.split(',');
+    let editableUserIds: string[] = [];
+    if (userIds) {
+        editableUserIds = userIds.split(',');
+    }
     await validate({ id, editableUserIds, canAllEdits }, joiSchema.publishApplication);
     const application = await applicationRepo.findById(id);
     if (!application) {
