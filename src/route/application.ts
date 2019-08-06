@@ -13,35 +13,41 @@ router.use(authentication);
 
 router.get('/', ctrl.getCurrentLoggedInUserApplications);
 
-router.use(authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]));
-
-router.get('/execution/all', ctrl.getAllExecution);
+router.get('/execution/all', authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.getAllExecution);
 
 router.get('/execution/:executionId/id', ctrl.getExecutionById);
 
-router.get('/:applicationId', ctrl.getApplicationById);
+router.get('/:applicationId', authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.getApplicationById);
 
-router.put('/:applicationId/publish', ctrl.publishApplication);
+router.put('/:applicationId/publish',
+authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.publishApplication);
 
-router.get('/:applicationId/section/:sectionId', ctrl.getApplicationFormSectionById);
+router.get('/:applicationId/section/:sectionId',
+authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.getApplicationFormSectionById);
 
-router.get('/:applicationId/field/:fieldId', ctrl.getApplicationFormFieldById);
+router.get('/:applicationId/field/:fieldId',
+authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.getApplicationFormFieldById);
 
-router.get('/:applicationId/form', ctrl.getApplicationForm);
+router.get('/:applicationId/form', authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.getApplicationForm);
 
-router.get('/:applicationId/workflow', ctrl.getApplicationWorkflow);
+router.get('/:applicationId/workflow',
+authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.getApplicationWorkflow);
 
-router.get('/:applicationId/field-permission', ctrl.getApplicationWorkflowFieldPermission);
+router.get('/:applicationId/field-permission',
+authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.getApplicationWorkflowFieldPermission);
 
 router.get('/:applicationId/execution', ctrl.getApplicationExecution);
 
-router.post('/', ctrl.saveApplication);
+router.post('/', authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.saveApplication);
 
-router.post('/:applicationId/form', ctrl.saveApplicationForm);
+router.post('/:applicationId/form',
+authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.saveApplicationForm);
 
-router.post('/:applicationId/workflow', ctrl.saveApplicationWorkflow);
+router.post('/:applicationId/workflow',
+authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.saveApplicationWorkflow);
 
-router.post('/:applicationId/field-permission', ctrl.saveApplicationWorkflowFieldPermission);
+router.post('/:applicationId/field-permission',
+authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.saveApplicationWorkflowFieldPermission);
 
 router.post('/:applicationId/execution', ctrl.saveApplicationExecution);
 
