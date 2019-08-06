@@ -92,3 +92,8 @@ export const publishApplication: Joi.SchemaMap = {
     editableUserIds: Joi.array().items(Joi.string().uuid().allow('')).allow(null),
     canAllEdits: Joi.boolean().required()
 };
+
+export const publishApplicationExecution: Joi.SchemaMap = {
+    applicationId: Joi.string().uuid().required(),
+    applicationExecutionId: Joi.string().uuid().required(),
+};

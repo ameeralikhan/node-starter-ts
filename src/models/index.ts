@@ -18,6 +18,7 @@ import * as ApplicationWorkflowPermission from './application-workflow-permissio
 import * as ApplicationWorkflowFieldPermission from './application-workflow-field-permission';
 import * as ApplicationExecution from './application-execution';
 import * as ApplicationExecutionForm from './application-execution-form';
+import * as ApplicationExecutionWorkflow from './application-execution-workflow';
 import * as Lookup from './lookup';
 import * as LookupData from './lookup-data';
 
@@ -38,6 +39,7 @@ export interface IModelFactory extends Sequelize.Models {
   ApplicationWorkflowFieldPermission: ApplicationWorkflowFieldPermission.IApplicationWorkflowFieldPermissionModel;
   ApplicationExecution: ApplicationExecution.IApplicationExecutionModel;
   ApplicationExecutionForm: ApplicationExecutionForm.IApplicationExecutionFormModel;
+  ApplicationExecutionWorkflow: ApplicationExecutionWorkflow.IApplicationExecutionExecutionModel;
   Lookup: Lookup.ILookupModel;
   LookupData: LookupData.ILookupDataModel;
 }
@@ -59,6 +61,7 @@ const models: IModelFactory = {
   ApplicationWorkflowFieldPermission: ApplicationWorkflowFieldPermission.define(Database),
   ApplicationExecution: ApplicationExecution.define(Database),
   ApplicationExecutionForm: ApplicationExecutionForm.define(Database),
+  ApplicationExecutionWorkflow: ApplicationExecutionWorkflow.define(Database),
   Lookup: Lookup.define(Database),
   LookupData: LookupData.define(Database)
 };

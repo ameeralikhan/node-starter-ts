@@ -1,84 +1,66 @@
 import * as Sequelize from 'sequelize';
 
 import { IModelFactory } from './index';
-import {
-  IApplicationWorkflowPermissionAttributes,
-  IApplicationWorkflowPermissionInstance
-} from './application-workflow-permission';
 
-export interface IApplicationWorkflowAttributes {
-    id: string;
-    applicationId: string;
-    name: string;
-    type: string;
-    order: number;
-    stepId: string;
-    isActive: boolean;
+export interface IApplicationExecutionWorkflowAttributes {
+    id?: string;
+    applicationExecutionId: string;
+    applicationWorkflowId: string;
+    comments?: string;
+    isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
     createdBy?: string;
     updatedBy?: string;
     deletedAt?: Date;
     deletedBy?: string;
-    applicationWorkflowPermissions?: IApplicationWorkflowPermissionAttributes[];
-    userIds?: string[];
 }
 
-export interface IApplicationWorkflowInstance extends Sequelize.Instance<IApplicationWorkflowAttributes> {
-    id: string;
-    applicationId: string;
-    name: string;
-    type: string;
-    order: number;
-    stepId: string;
-    isActive: boolean;
+export interface IApplicationExecutionWorkflowInstance
+    extends Sequelize.Instance<IApplicationExecutionWorkflowAttributes> {
+    id?: string;
+    applicationExecutionId: string;
+    applicationWorkflowId: string;
+    comments?: string;
+    isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
     createdBy?: string;
     updatedBy?: string;
     deletedAt?: Date;
     deletedBy?: string;
-    applicationWorkflowPermissions?: IApplicationWorkflowPermissionInstance[];
-    userIds?: string[];
 }
 
-export interface IApplicationWorkflowModel
-    extends Sequelize.Model<IApplicationWorkflowInstance, IApplicationWorkflowAttributes> { }
+export interface IApplicationExecutionExecutionModel
+    extends Sequelize.Model<IApplicationExecutionWorkflowInstance, IApplicationExecutionWorkflowAttributes> { }
 
-export const define = (sequelize: Sequelize.Sequelize): IApplicationWorkflowModel => {
-    const model: IApplicationWorkflowModel = sequelize.define('applicationWorkflow', {
+export const define = (sequelize: Sequelize.Sequelize): IApplicationExecutionExecutionModel => {
+    const model: IApplicationExecutionExecutionModel = sequelize.define('applicationExecutionWorkflow', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,
         allowNull: false,
         autoIncrement: true
       },
-      applicationId: {
+      applicationExecutionId: {
         type: Sequelize.UUID,
+        allowNull: false,
         references: {
-            model: 'application',
-            key: 'id'
+          model: 'applicationExecution',
+          key: 'id'
         }
       },
-      name: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      type: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
-      order: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
-      stepId: {
+      applicationWorkflowId: {
         type: Sequelize.UUID,
-        allowNull: true,
+        allowNull: false,
         references: {
           model: 'applicationWorkflow',
           key: 'id'
         }
+      },
+      comments: {
+        type: Sequelize.STRING(1000),
+        allowNull: true
       },
       isActive: {
         type: Sequelize.BOOLEAN,
@@ -127,11 +109,8 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationWorkflowMode
     });
 
     model.associate = (models: IModelFactory) => {
-        model.belongsTo(models.Application);
-
-        model.hasMany(models.ApplicationWorkflowPermission);
-        model.hasMany(models.ApplicationWorkflow, { foreignKey: 'stepId', as: 'step' });
-        model.hasMany(models.ApplicationExecutionWorkflow);
+        model.belongsTo(models.ApplicationExecution);
+        model.belongsTo(models.ApplicationWorkflow);
     };
 
     return model;

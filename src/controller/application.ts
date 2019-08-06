@@ -110,6 +110,13 @@ export const saveApplicationExecution = async (ctx: Context, next: () => void) =
   await next();
 };
 
+export const publishApplicationExecution = async (ctx: Context, next: () => void) => {
+  const applicationId: string = ctx.params.applicationId;
+  const applicationExecutionId: string = ctx.params.applicationExecutionId;
+  ctx.state.data = await applicationExecutionService.publishApplicationExecution(applicationId, applicationExecutionId);
+  await next();
+};
+
 export const deleteApplication = async (ctx: Context, next: () => void) => {
   const id: string = ctx.params.id;
   const userId: string = ctx.state.user.userId;

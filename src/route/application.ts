@@ -51,6 +51,8 @@ authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.saveApplication
 
 router.post('/:applicationId/execution', ctrl.saveApplicationExecution);
 
+router.put('/:applicationId/execution/:applicationExecutionId/publish', ctrl.publishApplicationExecution);
+
 router.delete('/execution/:executionId', ctrl.deleteApplicationExecution);
 
 router.delete('/:id', ctrl.deleteApplication);

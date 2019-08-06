@@ -5,15 +5,18 @@ import { validate } from '../validations/index';
 import * as helper from '../utils/helper';
 import * as joiSchema from '../validations/schemas/application';
 import * as applicationRepo from '../repositories/application';
+import * as applicationWorkflowRepo from '../repositories/application-workflow';
 import * as applicationFormFieldRepo from '../repositories/application-form-field';
 import * as applicationExecutionRepo from '../repositories/application-execution';
 import * as applicationExecutionFormRepo from '../repositories/application-execution-form';
+import * as applicationExecutionWorkflowRepo from '../repositories/application-execution-workflow';
 import * as userRepo from '../repositories/user';
 import { IApplicationInstance, IApplicationAttributes } from '../models/application';
 import { IApplicationExecutionInstance, IApplicationExecutionAttributes } from '../models/application-execution';
 import { IApplicationFormFieldInstance } from '../models/application-form-field';
 import { Role } from '../enum/role';
 import { ApplicationExecutionStatus } from '../enum/application';
+import { IApplicationExecutionWorkflowAttributes } from '../models/application-execution-workflow';
 
 export const getAll = async (): Promise<IApplicationExecutionInstance[]> => {
     return applicationExecutionRepo.getAll();
@@ -47,6 +50,9 @@ export const saveApplicationExecution = async (applicationId: string,
         if (!savedApplicationExecution) {
             throw boom.badRequest('Invalid application execution id');
         }
+        if (savedApplicationExecution.status === ApplicationExecutionStatus.PUBLISHED) {
+            throw boom.badRequest('Application execution is already published');
+        }
         applicationExecution.startedAt = savedApplicationExecution.startedAt;
         applicationExecution.status = savedApplicationExecution.status;
     } else {
@@ -69,7 +75,42 @@ export const saveApplicationExecution = async (applicationId: string,
         field.applicationExecutionId = execution.id;
         await applicationExecutionFormRepo.saveApplicationExecutionForm(field);
     }
+    if (!applicationExecution.id) {
+        const workflows = await applicationWorkflowRepo.getByApplicationId(applicationId);
+        const payload: IApplicationExecutionWorkflowAttributes = {
+            applicationExecutionId: execution.id,
+            applicationWorkflowId: workflows[0].id,
+        };
+        await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(payload);
+    }
     return getByApplicationId(applicationId);
+};
+
+export const publishApplicationExecution = async (applicationId: string,
+                                                  applicationExecutionId: string) => {
+    await validate({ applicationId, applicationExecutionId }, joiSchema.publishApplicationExecution);
+    const savedApp = await applicationRepo.findById(applicationId);
+    if (!savedApp) {
+        throw boom.badRequest('Invalid application id');
+    }
+    const savedApplicationExecution = await applicationExecutionRepo.findById(applicationExecutionId);
+    if (!savedApplicationExecution) {
+        throw boom.badRequest('Invalid application execution id');
+    }
+    if (savedApplicationExecution.status === ApplicationExecutionStatus.PUBLISHED) {
+        throw boom.badRequest('Application execution is already published');
+    }
+    savedApplicationExecution.status = ApplicationExecutionStatus.PUBLISHED;
+    await applicationExecutionRepo.saveApplicationExecution(savedApplicationExecution);
+    const workflows = await applicationWorkflowRepo.getByApplicationId(applicationId);
+    if (workflows && workflows.length > 1) {
+        const payload: IApplicationExecutionWorkflowAttributes = {
+            applicationExecutionId,
+            applicationWorkflowId: workflows[1].id,
+        };
+        await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(payload);
+    }
+    return { success: true };
 };
 
 export const deleteApplicationExecution = async (id: string) => {
