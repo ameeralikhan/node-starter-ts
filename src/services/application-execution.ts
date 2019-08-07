@@ -38,6 +38,15 @@ export const getByApplicationId = async (applicationId: string): Promise<IApplic
     return applicationExecutionRepo.getByApplicationId(applicationId);
 };
 
+export const getExecutionByLoggedInUserId =
+    async (applicationId: string, loggedInUserId: string, type: string): Promise<IApplicationExecutionInstance[]> => {
+    const application = await applicationRepo.findById(applicationId);
+    if (!application) {
+        throw boom.badRequest('Invalid application id');
+    }
+    return applicationExecutionRepo.getApplicationExecutionByLoggedInUser(loggedInUserId, type);
+};
+
 export const saveApplicationExecution = async (applicationId: string,
                                                applicationExecution: IApplicationExecutionAttributes) => {
     await validate(applicationExecution, joiSchema.saveApplicationExecution);
@@ -75,14 +84,6 @@ export const saveApplicationExecution = async (applicationId: string,
         field.applicationExecutionId = execution.id;
         await applicationExecutionFormRepo.saveApplicationExecutionForm(field);
     }
-    if (!applicationExecution.id) {
-        const workflows = await applicationWorkflowRepo.getByApplicationId(applicationId);
-        const payload: IApplicationExecutionWorkflowAttributes = {
-            applicationExecutionId: execution.id,
-            applicationWorkflowId: workflows[0].id,
-        };
-        await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(payload);
-    }
     return getByApplicationId(applicationId);
 };
 
@@ -100,13 +101,17 @@ export const publishApplicationExecution = async (applicationId: string,
     if (savedApplicationExecution.status === ApplicationExecutionStatus.PUBLISHED) {
         throw boom.badRequest('Application execution is already published');
     }
-    savedApplicationExecution.status = ApplicationExecutionStatus.PUBLISHED;
-    await applicationExecutionRepo.saveApplicationExecution(savedApplicationExecution);
+    await applicationExecutionRepo.saveApplicationExecution({
+        id: savedApplicationExecution.id,
+        applicationId: savedApplicationExecution.applicationId,
+        startedAt: savedApplicationExecution.startedAt,
+        status: ApplicationExecutionStatus.PUBLISHED });
     const workflows = await applicationWorkflowRepo.getByApplicationId(applicationId);
-    if (workflows && workflows.length > 1) {
+    if (workflows && workflows.length) {
         const payload: IApplicationExecutionWorkflowAttributes = {
             applicationExecutionId,
-            applicationWorkflowId: workflows[1].id,
+            applicationWorkflowId: workflows[0].id,
+            status: ApplicationExecutionStatus.DRAFT
         };
         await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(payload);
     }

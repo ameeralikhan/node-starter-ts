@@ -7,11 +7,11 @@ import {
 } from './application-execution-form';
 
 export interface IApplicationExecutionAttributes {
-    id: string;
-    applicationId: string;
-    startedAt: Date;
-    status: string;
-    isActive: boolean;
+    id?: string;
+    applicationId?: string;
+    startedAt?: Date;
+    status?: string;
+    isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
     createdBy?: string;
@@ -112,6 +112,7 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationExecutionMod
         model.belongsTo(models.Application);
 
         model.hasMany(models.ApplicationExecutionForm);
+        model.hasMany(models.ApplicationExecutionWorkflow);
     };
 
     return model;

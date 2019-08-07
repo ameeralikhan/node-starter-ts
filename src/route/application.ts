@@ -38,6 +38,8 @@ authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.getApplicationW
 
 router.get('/:applicationId/execution', ctrl.getApplicationExecution);
 
+router.get('/:applicationId/execution/workflow', ctrl.getExecutionByLoggedInUserId);
+
 router.post('/', authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.saveApplication);
 
 router.post('/:applicationId/form',

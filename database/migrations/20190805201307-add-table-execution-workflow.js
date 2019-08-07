@@ -29,11 +29,20 @@ module.exports = {
         type: Sequelize.STRING(1000),
         allowNull: true
       },
+      status: {
+        type: Sequelize.STRING(50),
+        allowNull: false
+      },
       isActive: {
         type: Sequelize.BOOLEAN,
         defaultValue: true
       },
       createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      },
+      updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
@@ -46,10 +55,13 @@ module.exports = {
           key: 'id'
         }
       },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+      updatedBy: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: 'user',
+          key: 'id'
+        }
       },
       deletedAt: {
         type: Sequelize.DATE,

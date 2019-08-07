@@ -66,6 +66,14 @@ export const getAllExecution = async (ctx: Context, next: () => void) => {
   await next();
 };
 
+export const getExecutionByLoggedInUserId = async (ctx: Context, next: () => void) => {
+  const applicationId: string = ctx.params.applicationId;
+  const type: string = ctx.request.query.type;
+  const userId: string = ctx.state.user.userId;
+  ctx.state.data = await applicationExecutionService.getExecutionByLoggedInUserId(applicationId, userId, type);
+  await next();
+};
+
 export const saveApplication = async (ctx: Context, next: () => void) => {
   const userId: string = ctx.state.user.userId;
   const payload = ctx.request.body;

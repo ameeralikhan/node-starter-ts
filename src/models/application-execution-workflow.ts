@@ -7,6 +7,7 @@ export interface IApplicationExecutionWorkflowAttributes {
     applicationExecutionId: string;
     applicationWorkflowId: string;
     comments?: string;
+    status?: string;
     isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -22,6 +23,7 @@ export interface IApplicationExecutionWorkflowInstance
     applicationExecutionId: string;
     applicationWorkflowId: string;
     comments?: string;
+    status?: string;
     isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -61,6 +63,10 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationExecutionExe
       comments: {
         type: Sequelize.STRING(1000),
         allowNull: true
+      },
+      status: {
+        type: Sequelize.STRING(50),
+        allowNull: false
       },
       isActive: {
         type: Sequelize.BOOLEAN,

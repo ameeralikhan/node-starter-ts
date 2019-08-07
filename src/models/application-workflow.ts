@@ -10,7 +10,7 @@ export interface IApplicationWorkflowAttributes {
     id: string;
     applicationId: string;
     name: string;
-    type: string;
+    type?: string;
     order: number;
     stepId: string;
     isActive: boolean;
@@ -28,7 +28,7 @@ export interface IApplicationWorkflowInstance extends Sequelize.Instance<IApplic
     id: string;
     applicationId: string;
     name: string;
-    type: string;
+    type?: string;
     order: number;
     stepId: string;
     isActive: boolean;

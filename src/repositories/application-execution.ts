@@ -2,6 +2,7 @@ import * as Sequelize from 'sequelize';
 
 import { Models } from '../models/index';
 import { IApplicationExecutionInstance, IApplicationExecutionAttributes } from '../models/application-execution';
+import { ApplicationExecutionStatus } from './../enum/application';
 
 export const getAll = async () => {
     return Models.ApplicationExecution.findAll({
@@ -62,6 +63,42 @@ export const findById = async (id: string) => {
             include: [{
                 model: Models.ApplicationFormField,
             }],
+        }]
+    });
+};
+
+export const getApplicationExecutionByLoggedInUser = async (userId: string, type: string) => {
+    let innerWhere = {};
+    if (type) {
+        innerWhere = {
+            type
+        };
+    }
+    return Models.ApplicationExecution.findAll({
+        attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt'],
+        where: {
+            isActive: true,
+        },
+        include: [{
+            model: Models.Application,
+            where: {
+                isActive: true
+            },
+        }, {
+            model: Models.ApplicationExecutionWorkflow,
+            where: {
+                status: ApplicationExecutionStatus.DRAFT
+            },
+            include: [{
+                model: Models.ApplicationWorkflow,
+                where: innerWhere,
+                include: [{
+                    model: Models.ApplicationWorkflowPermission,
+                    where: {
+                        userId
+                    }
+                }]
+            }]
         }]
     });
 };

@@ -36,6 +36,15 @@ export const saveApplicationExecutionWorkflow =
         .then((res) => res[0]);
 };
 
+export const updateApplicationExecutionWorkflow =
+    async (status: string, applicationExecutionId: string, applicationWorkflowId: string) => {
+    return Models.ApplicationExecutionWorkflow.update({ status }, { where: {
+        applicationExecutionId,
+        applicationWorkflowId
+    }})
+        .then((res) => res[0]);
+};
+
 export const deleteApplicationExecutionWorkflowForm = async (id: string) => {
     return Models.ApplicationExecutionWorkflow.update({ isActive: false }, { where: { id }});
 };
