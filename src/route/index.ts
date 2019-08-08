@@ -12,6 +12,7 @@ import group from './group';
 import role from './role';
 import dashboard from './dashboard';
 import application from './application';
+import applicationExecution from './application-execution';
 import lookup from './lookup';
 
 const router = new Router({
@@ -38,6 +39,7 @@ const routesToExport = [
   role,
   dashboard,
   application,
+  applicationExecution,
   lookup
 ];
 

@@ -39,11 +39,7 @@ export const getByApplicationId = async (applicationId: string): Promise<IApplic
 };
 
 export const getExecutionByLoggedInUserId =
-    async (applicationId: string, loggedInUserId: string, type: string): Promise<IApplicationExecutionInstance[]> => {
-    const application = await applicationRepo.findById(applicationId);
-    if (!application) {
-        throw boom.badRequest('Invalid application id');
-    }
+    async (loggedInUserId: string, type: string): Promise<IApplicationExecutionInstance[]> => {
     return applicationExecutionRepo.getApplicationExecutionByLoggedInUser(loggedInUserId, type);
 };
 
@@ -111,6 +107,82 @@ export const publishApplicationExecution = async (applicationId: string,
         const payload: IApplicationExecutionWorkflowAttributes = {
             applicationExecutionId,
             applicationWorkflowId: workflows[0].id,
+            status: ApplicationExecutionStatus.DRAFT
+        };
+        await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(payload);
+    }
+    return { success: true };
+};
+
+export const saveApplicationExecutionWorkflow =
+    async (applicationId: string, payload: IApplicationExecutionWorkflowAttributes) => {
+    await validate({ applicationId, ...payload }, joiSchema.saveApplicationExecutionWorkflow);
+    const savedApp = await applicationRepo.findById(applicationId);
+    if (!savedApp) {
+        throw boom.badRequest('Invalid application id');
+    }
+    const savedApplicationExecution = await applicationExecutionRepo.findById(payload.applicationExecutionId);
+    if (!savedApplicationExecution) {
+        throw boom.badRequest('Invalid application execution id');
+    }
+    if (!payload.id) {
+        throw boom.badRequest('Invalid id');
+    }
+    const savedExecutionWorkflow = await applicationExecutionWorkflowRepo.findById(payload.id);
+    if (!savedExecutionWorkflow) {
+        throw boom.badRequest('Invalid id');
+    }
+    const toSave = savedExecutionWorkflow.get({ plain: true });
+    toSave.comments = payload.comments;
+    toSave.status = payload.status;
+    await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(toSave);
+    if (payload.status === ApplicationExecutionStatus.PUBLISHED) {
+        // move workflow to the next
+        const applicationWorkflows = await applicationWorkflowRepo.getByApplicationId(applicationId);
+        const indexOfWorkflow = applicationWorkflows.findIndex(col => col.id === toSave.applicationWorkflowId);
+        if (indexOfWorkflow > -1 && applicationWorkflows.length >= indexOfWorkflow + 1) {
+            const newExecutionWorkflow: IApplicationExecutionWorkflowAttributes = {
+                applicationExecutionId: payload.applicationExecutionId,
+                applicationWorkflowId: applicationWorkflows[indexOfWorkflow].id,
+                status: ApplicationExecutionStatus.DRAFT
+            };
+            await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(newExecutionWorkflow);
+        }
+    }
+    return { success: true };
+};
+
+export const publishApplicationExecutionWorkflow =
+    async (applicationId: string, applicationExecutionId: string, applicationExecutionWorkflowId: string) => {
+    await validate({
+        applicationId,
+        applicationExecutionId,
+        applicationExecutionWorkflowId }, joiSchema.publishApplicationExecutionWorkflow);
+    const savedApp = await applicationRepo.findById(applicationId);
+    if (!savedApp) {
+        throw boom.badRequest('Invalid application id');
+    }
+    const savedApplicationExecution = await applicationExecutionRepo.findById(applicationExecutionId);
+    if (!savedApplicationExecution) {
+        throw boom.badRequest('Invalid application execution id');
+    }
+    if (!applicationExecutionWorkflowId) {
+        throw boom.badRequest('Invalid id');
+    }
+    const savedExecutionWorkflow = await applicationExecutionWorkflowRepo.findById(applicationExecutionWorkflowId);
+    if (!savedExecutionWorkflow) {
+        throw boom.badRequest('Invalid id');
+    }
+    const toSave = savedExecutionWorkflow.get({ plain: true });
+    toSave.status = ApplicationExecutionStatus.PUBLISHED;
+    await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(toSave);
+    // move workflow to the next
+    const applicationWorkflows = await applicationWorkflowRepo.getByApplicationId(applicationId);
+    const indexOfWorkflow = applicationWorkflows.findIndex(col => col.id === toSave.applicationWorkflowId);
+    if (indexOfWorkflow > -1 && applicationWorkflows.length >= indexOfWorkflow + 1) {
+        const payload: IApplicationExecutionWorkflowAttributes = {
+            applicationExecutionId,
+            applicationWorkflowId: applicationWorkflows[indexOfWorkflow].id,
             status: ApplicationExecutionStatus.DRAFT
         };
         await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(payload);

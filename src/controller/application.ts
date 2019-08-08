@@ -67,10 +67,9 @@ export const getAllExecution = async (ctx: Context, next: () => void) => {
 };
 
 export const getExecutionByLoggedInUserId = async (ctx: Context, next: () => void) => {
-  const applicationId: string = ctx.params.applicationId;
   const type: string = ctx.request.query.type;
   const userId: string = ctx.state.user.userId;
-  ctx.state.data = await applicationExecutionService.getExecutionByLoggedInUserId(applicationId, userId, type);
+  ctx.state.data = await applicationExecutionService.getExecutionByLoggedInUserId(userId, type);
   await next();
 };
 
@@ -122,6 +121,28 @@ export const publishApplicationExecution = async (ctx: Context, next: () => void
   const applicationId: string = ctx.params.applicationId;
   const applicationExecutionId: string = ctx.params.applicationExecutionId;
   ctx.state.data = await applicationExecutionService.publishApplicationExecution(applicationId, applicationExecutionId);
+  await next();
+};
+
+export const saveApplicationExecutionWorkflow = async (ctx: Context, next: () => void) => {
+  const applicationId: string = ctx.params.applicationId;
+  const payload = {
+    id: ctx.params.applicationExecutionWorkflowId,
+    applicationExecutionId: ctx.params.applicationExecutionId,
+    comments: ctx.request.body.comments,
+    status: ctx.request.body.status
+  };
+  ctx.state.data = await applicationExecutionService.saveApplicationExecutionWorkflow(applicationId, payload);
+  await next();
+};
+
+// not in use
+export const publishApplicationExecutionWorkflow = async (ctx: Context, next: () => void) => {
+  const applicationId: string = ctx.params.applicationId;
+  const applicationExecutionId = ctx.params.applicationExecutionId;
+  const executionWorkflowId = ctx.params.applicationExecutionWorkflowId;
+  ctx.state.data = await applicationExecutionService.publishApplicationExecutionWorkflow(
+      applicationId, applicationExecutionId, executionWorkflowId);
   await next();
 };
 

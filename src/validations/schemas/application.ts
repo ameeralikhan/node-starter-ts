@@ -1,4 +1,5 @@
 import * as Joi from 'joi';
+import { ApplicationExecutionStatus } from '../../enum/application';
 
 export const saveApplication: Joi.SchemaMap = {
     id: Joi.string().uuid().allow([null, '']),
@@ -94,6 +95,20 @@ export const publishApplication: Joi.SchemaMap = {
 };
 
 export const publishApplicationExecution: Joi.SchemaMap = {
+    applicationId: Joi.string().uuid().required(),
+    applicationExecutionId: Joi.string().uuid().required(),
+};
+
+export const saveApplicationExecutionWorkflow: Joi.SchemaMap = {
+    id: Joi.string().uuid().required(),
+    applicationId: Joi.string().uuid().required(),
+    applicationExecutionId: Joi.string().uuid().required(),
+    comments: Joi.string().required(),
+    status: Joi.string().required().valid([ApplicationExecutionStatus.DRAFT, ApplicationExecutionStatus.PUBLISHED])
+};
+
+export const publishApplicationExecutionWorkflow: Joi.SchemaMap = {
+    applicationExecutionWorkflowId: Joi.string().uuid().required(),
     applicationId: Joi.string().uuid().required(),
     applicationExecutionId: Joi.string().uuid().required(),
 };

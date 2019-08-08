@@ -5,7 +5,7 @@ import { IModelFactory } from './index';
 export interface IApplicationExecutionWorkflowAttributes {
     id?: string;
     applicationExecutionId: string;
-    applicationWorkflowId: string;
+    applicationWorkflowId?: string;
     comments?: string;
     status?: string;
     isActive?: boolean;
@@ -21,7 +21,7 @@ export interface IApplicationExecutionWorkflowInstance
     extends Sequelize.Instance<IApplicationExecutionWorkflowAttributes> {
     id?: string;
     applicationExecutionId: string;
-    applicationWorkflowId: string;
+    applicationWorkflowId?: string;
     comments?: string;
     status?: string;
     isActive?: boolean;
