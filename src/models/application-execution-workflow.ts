@@ -6,7 +6,9 @@ export interface IApplicationExecutionWorkflowAttributes {
     id?: string;
     applicationExecutionId: string;
     applicationWorkflowId?: string;
-    comments?: string;
+    comments?: any;
+    rejectionDetails?: any;
+    clarificationDetails?: any;
     status?: string;
     isActive?: boolean;
     createdAt?: Date;
@@ -22,7 +24,9 @@ export interface IApplicationExecutionWorkflowInstance
     id?: string;
     applicationExecutionId: string;
     applicationWorkflowId?: string;
-    comments?: string;
+    comments?: any;
+    rejectionDetails?: any;
+    clarificationDetails?: any;
     status?: string;
     isActive?: boolean;
     createdAt?: Date;
@@ -61,7 +65,15 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationExecutionExe
         }
       },
       comments: {
-        type: Sequelize.STRING(1000),
+        type: Sequelize.JSONB,
+        allowNull: true
+      },
+      rejectionDetails: {
+        type: Sequelize.JSONB,
+        allowNull: true
+      },
+      clarificationDetails: {
+        type: Sequelize.JSONB,
         allowNull: true
       },
       status: {
@@ -111,7 +123,7 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationExecutionExe
         }
       }
     }, {
-        freezeTableName: true
+        freezeTableName: true,
     });
 
     model.associate = (models: IModelFactory) => {

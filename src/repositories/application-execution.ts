@@ -85,6 +85,11 @@ export const getApplicationExecutionByLoggedInUser = async (userId: string, type
                 isActive: true
             },
         }, {
+            model: Models.ApplicationExecutionForm,
+            where: {
+                isActive: true
+            }
+        }, {
             model: Models.ApplicationExecutionWorkflow,
             where: {
                 status: ApplicationExecutionStatus.DRAFT
@@ -103,6 +108,35 @@ export const getApplicationExecutionByLoggedInUser = async (userId: string, type
     });
 };
 
+export const getApplicationExecutionInProcess = async (userId: string, status: string) => {
+    return Models.ApplicationExecution.findAll({
+        attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt'],
+        where: {
+            isActive: true,
+            createdBy: userId
+        },
+        include: [{
+            model: Models.Application,
+            where: {
+                isActive: true
+            },
+        }, {
+            model: Models.ApplicationExecutionForm,
+            where: {
+                isActive: true
+            }
+        }, {
+            model: Models.ApplicationExecutionWorkflow,
+            where: {
+                status
+            },
+            include: [{
+                model: Models.ApplicationWorkflow,
+            }]
+        }]
+    });
+};
+
 export const findByIds = async (ids: string[]) => {
     return Models.ApplicationExecution.findAll({ where: { id: { [Sequelize.Op.in]: ids } }});
 };
@@ -112,6 +146,6 @@ export const saveApplicationExecution = async (applicationExecution: IApplicatio
         .then((res) => res[0]);
 };
 
-export const deleteApplicationExecution = async (id: string) => {
-    return Models.ApplicationExecution.update({ isActive: false }, { where: { id }});
+export const deleteApplicationExecution = async (id: string, updatedBy: string) => {
+    return Models.ApplicationExecution.update({ isActive: false, updatedBy }, { where: { id }});
 };

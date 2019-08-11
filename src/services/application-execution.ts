@@ -43,7 +43,14 @@ export const getExecutionByLoggedInUserId =
     return applicationExecutionRepo.getApplicationExecutionByLoggedInUser(loggedInUserId, type);
 };
 
+export const getExecutionInProcessLoggedInUserId =
+    async (loggedInUserId: string, status: string): Promise<IApplicationExecutionInstance[]> => {
+    await validate({ loggedInUserId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
+    return applicationExecutionRepo.getApplicationExecutionInProcess(loggedInUserId, status);
+};
+
 export const saveApplicationExecution = async (applicationId: string,
+                                               loggedInUserId: string,
                                                applicationExecution: IApplicationExecutionAttributes) => {
     await validate(applicationExecution, joiSchema.saveApplicationExecution);
     const savedApp = await applicationRepo.findById(applicationId);
@@ -55,14 +62,16 @@ export const saveApplicationExecution = async (applicationId: string,
         if (!savedApplicationExecution) {
             throw boom.badRequest('Invalid application execution id');
         }
-        if (savedApplicationExecution.status === ApplicationExecutionStatus.PUBLISHED) {
+        if (savedApplicationExecution.status === ApplicationExecutionStatus.APPROVED) {
             throw boom.badRequest('Application execution is already published');
         }
         applicationExecution.startedAt = savedApplicationExecution.startedAt;
         applicationExecution.status = savedApplicationExecution.status;
+        applicationExecution.updatedBy = loggedInUserId;
     } else {
         applicationExecution.startedAt = new Date();
         applicationExecution.status = ApplicationExecutionStatus.DRAFT;
+        applicationExecution.createdBy = loggedInUserId;
     }
     let formFieldIds = _.pick(applicationExecution.applicationExecutionForms, 'applicationFormFieldId') as string[];
     formFieldIds = _.reject(formFieldIds, helper.rejectUndefinedOrNull);
@@ -84,6 +93,7 @@ export const saveApplicationExecution = async (applicationId: string,
 };
 
 export const publishApplicationExecution = async (applicationId: string,
+                                                  loggedInUserId: string,
                                                   applicationExecutionId: string) => {
     await validate({ applicationId, applicationExecutionId }, joiSchema.publishApplicationExecution);
     const savedApp = await applicationRepo.findById(applicationId);
@@ -94,20 +104,23 @@ export const publishApplicationExecution = async (applicationId: string,
     if (!savedApplicationExecution) {
         throw boom.badRequest('Invalid application execution id');
     }
-    if (savedApplicationExecution.status === ApplicationExecutionStatus.PUBLISHED) {
+    if (savedApplicationExecution.status === ApplicationExecutionStatus.APPROVED) {
         throw boom.badRequest('Application execution is already published');
     }
     await applicationExecutionRepo.saveApplicationExecution({
         id: savedApplicationExecution.id,
         applicationId: savedApplicationExecution.applicationId,
         startedAt: savedApplicationExecution.startedAt,
-        status: ApplicationExecutionStatus.PUBLISHED });
+        status: ApplicationExecutionStatus.APPROVED,
+        updatedBy: loggedInUserId
+     });
     const workflows = await applicationWorkflowRepo.getByApplicationId(applicationId);
     if (workflows && workflows.length) {
         const payload: IApplicationExecutionWorkflowAttributes = {
             applicationExecutionId,
             applicationWorkflowId: workflows[0].id,
-            status: ApplicationExecutionStatus.DRAFT
+            status: ApplicationExecutionStatus.DRAFT,
+            createdBy: loggedInUserId
         };
         await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(payload);
     }
@@ -115,7 +128,7 @@ export const publishApplicationExecution = async (applicationId: string,
 };
 
 export const saveApplicationExecutionWorkflow =
-    async (applicationId: string, payload: IApplicationExecutionWorkflowAttributes) => {
+    async (applicationId: string, loggedInUserId: string, payload: IApplicationExecutionWorkflowAttributes) => {
     await validate({ applicationId, ...payload }, joiSchema.saveApplicationExecutionWorkflow);
     const savedApp = await applicationRepo.findById(applicationId);
     if (!savedApp) {
@@ -132,11 +145,39 @@ export const saveApplicationExecutionWorkflow =
     if (!savedExecutionWorkflow) {
         throw boom.badRequest('Invalid id');
     }
-    const toSave = savedExecutionWorkflow.get({ plain: true });
-    toSave.comments = payload.comments;
-    toSave.status = payload.status;
+    let toSave = savedExecutionWorkflow.get({ plain: true });
+    const user = await userRepo.findById(loggedInUserId);
+    if (!user) {
+        throw boom.badRequest('Invalid user');
+    }
+    if (toSave.status === ApplicationExecutionStatus.APPROVED ||
+        toSave.status === ApplicationExecutionStatus.REJECT) {
+        throw boom.badRequest('Execution is already approved or reject, cannot be modified now');
+    }
+    if (payload.comments) {
+        for (const comment of payload.comments) {
+            comment.userId = comment.userId || user.id;
+            comment.userName = comment.userName || `${user.firstName} ${user.lastName}`;
+        }
+    }
+    if (payload.status === ApplicationExecutionStatus.REJECT) {
+        payload.comments = payload.comments || [];
+        payload.comments.unshift({
+            userId: user.id,
+            time: new Date(),
+            comment: payload.rejectionDetails.comment,
+            userName: `${user.firstName} ${user.lastName}`
+        });
+    }
+    toSave = {
+        id: toSave.id,
+        applicationExecutionId: toSave.applicationExecutionId,
+        applicationWorkflowId: toSave.applicationWorkflowId,
+        updatedBy: loggedInUserId,
+        ...payload
+    };
     await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(toSave);
-    if (payload.status === ApplicationExecutionStatus.PUBLISHED) {
+    if (payload.status === ApplicationExecutionStatus.APPROVED) {
         // move workflow to the next
         const applicationWorkflows = await applicationWorkflowRepo.getByApplicationId(applicationId);
         const indexOfWorkflow = applicationWorkflows.findIndex(col => col.id === toSave.applicationWorkflowId);
@@ -144,7 +185,8 @@ export const saveApplicationExecutionWorkflow =
             const newExecutionWorkflow: IApplicationExecutionWorkflowAttributes = {
                 applicationExecutionId: payload.applicationExecutionId,
                 applicationWorkflowId: applicationWorkflows[indexOfWorkflow].id,
-                status: ApplicationExecutionStatus.DRAFT
+                status: ApplicationExecutionStatus.DRAFT,
+                createdBy: loggedInUserId
             };
             await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(newExecutionWorkflow);
         }
@@ -174,7 +216,7 @@ export const publishApplicationExecutionWorkflow =
         throw boom.badRequest('Invalid id');
     }
     const toSave = savedExecutionWorkflow.get({ plain: true });
-    toSave.status = ApplicationExecutionStatus.PUBLISHED;
+    toSave.status = ApplicationExecutionStatus.APPROVED;
     await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(toSave);
     // move workflow to the next
     const applicationWorkflows = await applicationWorkflowRepo.getByApplicationId(applicationId);
@@ -190,11 +232,11 @@ export const publishApplicationExecutionWorkflow =
     return { success: true };
 };
 
-export const deleteApplicationExecution = async (id: string) => {
+export const deleteApplicationExecution = async (id: string, loggedInUserId: string) => {
     const applicationExecution = await applicationExecutionRepo.findById(id);
     if (!applicationExecution) {
         throw boom.badRequest('Invalid application execution id');
     }
-    await applicationExecutionRepo.deleteApplicationExecution(id);
+    await applicationExecutionRepo.deleteApplicationExecution(id, loggedInUserId);
     return { success: true };
 };

@@ -103,12 +103,44 @@ export const saveApplicationExecutionWorkflow: Joi.SchemaMap = {
     id: Joi.string().uuid().required(),
     applicationId: Joi.string().uuid().required(),
     applicationExecutionId: Joi.string().uuid().required(),
-    comments: Joi.string().required(),
-    status: Joi.string().required().valid([ApplicationExecutionStatus.DRAFT, ApplicationExecutionStatus.PUBLISHED])
+    comments: Joi.array().items(Joi.object({
+        userId: Joi.string().uuid(),
+        userName: Joi.string(),
+        time: Joi.date().required(),
+        comment: Joi.string().required()
+    })),
+    status: Joi.string().required().valid([
+        ApplicationExecutionStatus.DRAFT,
+        ApplicationExecutionStatus.CLARITY,
+        ApplicationExecutionStatus.REJECT,
+        ApplicationExecutionStatus.APPROVED]),
+    rejectionDetails: Joi.when('status', {
+        is: ApplicationExecutionStatus.REJECT,
+        then: Joi.object({
+            userId: Joi.string().uuid().required(),
+            comment: Joi.string().required()
+        }).required()
+    }),
+    clarificationDetails: Joi.when('status', {
+        is: ApplicationExecutionStatus.CLARITY,
+        then: Joi.object({
+            userId: Joi.string().uuid().required(),
+            comment: Joi.string().required()
+        }).required()
+    })
 };
 
 export const publishApplicationExecutionWorkflow: Joi.SchemaMap = {
     applicationExecutionWorkflowId: Joi.string().uuid().required(),
     applicationId: Joi.string().uuid().required(),
     applicationExecutionId: Joi.string().uuid().required(),
+};
+
+export const getExecutionInProcessLoggedInUserId: Joi.SchemaMap = {
+    loggedInUserId: Joi.string().uuid().required(),
+    status: Joi.string().required().valid([
+        ApplicationExecutionStatus.APPROVED,
+        ApplicationExecutionStatus.REJECT,
+        ApplicationExecutionStatus.CLARITY,
+    ])
 };

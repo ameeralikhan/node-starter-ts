@@ -13,11 +13,13 @@ router.use(authentication);
 
 router.get('/all', authorization(false, [Role.SUPER_ADMIN]), ctrl.getAllExecution);
 
-router.get('/:executionId', ctrl.getExecutionById);
-
 router.get('/:applicationId/execution', ctrl.getApplicationExecution);
 
 router.get('/workflow', ctrl.getExecutionByLoggedInUserId);
+
+router.get('/workflow/action', ctrl.getExecutionInProcessLoggedInUserId);
+
+router.get('/:executionId/detail', ctrl.getExecutionById);
 
 router.post('/:applicationId/execution', ctrl.saveApplicationExecution);
 

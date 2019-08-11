@@ -23,6 +23,7 @@ export const getByApplicationId = async (applicationId: string): Promise<IApplic
 };
 
 export const saveApplicationWorkflow = async (applicationId: string,
+                                              loggedInUserId: string,
                                               applicationWorkflows: IApplicationWorkflowAttributes[]) => {
     await validate({ payload: applicationWorkflows }, joiSchema.saveApplicationWorkflowArray);
     const savedApp = await applicationRepo.findById(applicationId);
@@ -46,6 +47,9 @@ export const saveApplicationWorkflow = async (applicationId: string,
         workflow.order = workflowIndex;
         if (workflow.id) {
             await applicationWorkflowPermissionRepo.hardDeleteWorkflowPermissionByWorkflowId(workflow.id);
+            workflow.updatedBy = loggedInUserId;
+        } else {
+            workflow.createdBy = loggedInUserId;
         }
         const savedWorkflow = await applicationWorkflowRepo.saveApplicationWorkflow(workflow);
         if (!workflow.userIds) {
