@@ -67,13 +67,7 @@ export const findById = async (id: string) => {
     });
 };
 
-export const getApplicationExecutionByLoggedInUser = async (userId: string, type: string) => {
-    let innerWhere = {};
-    if (type) {
-        innerWhere = {
-            type
-        };
-    }
+export const getApplicationExecutionsForApproval = async (userId: string) => {
     return Models.ApplicationExecution.findAll({
         attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt'],
         where: {
@@ -96,13 +90,39 @@ export const getApplicationExecutionByLoggedInUser = async (userId: string, type
             },
             include: [{
                 model: Models.ApplicationWorkflow,
-                where: innerWhere,
                 include: [{
                     model: Models.ApplicationWorkflowPermission,
                     where: {
                         userId
                     }
                 }]
+            }]
+        }]
+    });
+};
+
+export const getDraftApplicationExecutions = async (userId: string) => {
+    return Models.ApplicationExecution.findAll({
+        attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt'],
+        where: {
+            isActive: true,
+            createdBy: userId,
+            status: ApplicationExecutionStatus.DRAFT
+        },
+        include: [{
+            model: Models.Application,
+            where: {
+                isActive: true
+            },
+        }, {
+            model: Models.ApplicationExecutionForm,
+            where: {
+                isActive: true
+            }
+        }, {
+            model: Models.ApplicationExecutionWorkflow,
+            include: [{
+                model: Models.ApplicationWorkflow,
             }]
         }]
     });

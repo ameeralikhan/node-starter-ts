@@ -39,8 +39,13 @@ export const getByApplicationId = async (applicationId: string): Promise<IApplic
 };
 
 export const getExecutionByLoggedInUserId =
-    async (loggedInUserId: string, type: string): Promise<IApplicationExecutionInstance[]> => {
-    return applicationExecutionRepo.getApplicationExecutionByLoggedInUser(loggedInUserId, type);
+    async (loggedInUserId: string, status?: string): Promise<IApplicationExecutionInstance[]> => {
+    await validate({ loggedInUserId, status }, joiSchema.getExecutionByLoggedInUserId);
+    if (status === ApplicationExecutionStatus.DRAFT) {
+        return applicationExecutionRepo.getDraftApplicationExecutions(loggedInUserId);
+    } else {
+        return applicationExecutionRepo.getApplicationExecutionsForApproval(loggedInUserId);
+    }
 };
 
 export const getExecutionInProcessLoggedInUserId =

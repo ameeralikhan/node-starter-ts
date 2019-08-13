@@ -15,8 +15,10 @@ router.get('/all', authorization(false, [Role.SUPER_ADMIN]), ctrl.getAllExecutio
 
 router.get('/:applicationId/execution', ctrl.getApplicationExecution);
 
+// for approvals
 router.get('/workflow', ctrl.getExecutionByLoggedInUserId);
 
+// for draft, reject, clarity
 router.get('/workflow/action', ctrl.getExecutionInProcessLoggedInUserId);
 
 router.get('/:executionId/detail', ctrl.getExecutionById);

@@ -136,6 +136,13 @@ export const publishApplicationExecutionWorkflow: Joi.SchemaMap = {
     applicationExecutionId: Joi.string().uuid().required(),
 };
 
+export const getExecutionByLoggedInUserId: Joi.SchemaMap = {
+    loggedInUserId: Joi.string().uuid().required(),
+    status: Joi.string().valid([
+        ApplicationExecutionStatus.DRAFT,
+    ]).optional()
+};
+
 export const getExecutionInProcessLoggedInUserId: Joi.SchemaMap = {
     loggedInUserId: Joi.string().uuid().required(),
     status: Joi.string().required().valid([
