@@ -69,7 +69,7 @@ export const findById = async (id: string) => {
 
 export const getApplicationExecutionsForApproval = async (userId: string, type: string) => {
     return Models.ApplicationExecution.findAll({
-        attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt', 'createdBy'],
         where: {
             isActive: true,
         },
@@ -143,7 +143,7 @@ export const getApplicationExecutionsForApprovalCount = async (userId: string, t
 
 export const getDraftApplicationExecutions = async (userId: string) => {
     return Models.ApplicationExecution.findAll({
-        attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt', 'createdBy'],
         where: {
             isActive: true,
             createdBy: userId,
@@ -197,7 +197,7 @@ export const getDraftApplicationExecutionsCount = async (userId: string) => {
 
 export const getApplicationExecutionInProcess = async (userId: string, status: string) => {
     return Models.ApplicationExecution.findAll({
-        attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt', 'createdBy'],
         where: {
             isActive: true,
             createdBy: userId
