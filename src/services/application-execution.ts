@@ -15,8 +15,9 @@ import { IApplicationInstance, IApplicationAttributes } from '../models/applicat
 import { IApplicationExecutionInstance, IApplicationExecutionAttributes } from '../models/application-execution';
 import { IApplicationFormFieldInstance } from '../models/application-form-field';
 import { Role } from '../enum/role';
-import { ApplicationExecutionStatus } from '../enum/application';
+import { ApplicationExecutionStatus, ApplicationWorkflowType } from '../enum/application';
 import { IApplicationExecutionWorkflowAttributes } from '../models/application-execution-workflow';
+import { IExecutionWorkflowCount } from '../interface/application';
 
 export const getAll = async (): Promise<IApplicationExecutionInstance[]> => {
     return applicationExecutionRepo.getAll();
@@ -48,26 +49,44 @@ export const getExecutionByLoggedInUserId =
     }
 };
 
-export const getExecutionByLoggedInUserIdCount =
-    async (loggedInUserId: string, type: string, status?: string): Promise<number> => {
-    await validate({ loggedInUserId, type, status }, joiSchema.getExecutionByLoggedInUserId);
-    if (status === ApplicationExecutionStatus.DRAFT) {
-        return applicationExecutionRepo.getDraftApplicationExecutionsCount(loggedInUserId);
-    } else {
-        return applicationExecutionRepo.getApplicationExecutionsForApprovalCount(loggedInUserId, type);
-    }
-};
-
 export const getExecutionInProcessLoggedInUserId =
     async (loggedInUserId: string, status: string): Promise<IApplicationExecutionInstance[]> => {
     await validate({ loggedInUserId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
     return applicationExecutionRepo.getApplicationExecutionInProcess(loggedInUserId, status);
 };
 
-export const getExecutionInProcessLoggedInUserIdCount =
-    async (loggedInUserId: string, status: string): Promise<number> => {
-    await validate({ loggedInUserId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
-    return applicationExecutionRepo.getApplicationExecutionInProcessCount(loggedInUserId, status);
+export const getExecutionWorkflowsCount =
+    async (loggedInUserId: string): Promise<IExecutionWorkflowCount> => {
+    let resp: IExecutionWorkflowCount = {
+        approval: 0,
+        inputRequest: 0,
+        clarification: 0,
+        draft: 0,
+        approved: 0,
+        reject: 0
+    };
+    const response = await Promise.all([
+        applicationExecutionRepo.getApplicationExecutionInProcessCount(loggedInUserId,
+            ApplicationExecutionStatus.APPROVED),
+        applicationExecutionRepo.getApplicationExecutionInProcessCount(loggedInUserId,
+            ApplicationExecutionStatus.REJECT),
+        applicationExecutionRepo.getApplicationExecutionInProcessCount(loggedInUserId,
+                ApplicationExecutionStatus.CLARITY),
+        applicationExecutionRepo.getApplicationExecutionsForApprovalCount(loggedInUserId,
+            ApplicationWorkflowType.APPROVAL),
+        applicationExecutionRepo.getApplicationExecutionsForApprovalCount(loggedInUserId,
+            ApplicationWorkflowType.INPUT),
+        applicationExecutionRepo.getDraftApplicationExecutionsCount(loggedInUserId)
+    ]);
+    resp = {
+        approval: response[3],
+        inputRequest: response[4],
+        clarification: response[2],
+        draft: response[5],
+        approved: response[0],
+        reject: response[1]
+    }
+    return resp;
 };
 
 export const saveApplicationExecution = async (applicationId: string,

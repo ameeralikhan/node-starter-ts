@@ -19,3 +19,12 @@ export interface ISaveApplicationFormField {
     order: number;
     isRequired: boolean;
 }
+
+export interface IExecutionWorkflowCount {
+    approval: number;
+    inputRequest: number;
+    clarification: number;
+    draft: number;
+    approved: number;
+    reject: number;
+}

@@ -18,12 +18,10 @@ router.get('/:applicationId/execution', ctrl.getApplicationExecution);
 // for approvals
 router.get('/workflow', ctrl.getExecutionByLoggedInUserId);
 
-router.get('/workflow/count', ctrl.getExecutionByLoggedInUserIdCount);
-
 // for draft, reject, clarity
 router.get('/workflow/action', ctrl.getExecutionInProcessLoggedInUserId);
 
-router.get('/workflow/action/count', ctrl.getExecutionInProcessLoggedInUserIdCount);
+router.get('/workflow/action/count', ctrl.getExecutionWorkflowsCount);
 
 router.get('/:executionId/detail', ctrl.getExecutionById);
 

@@ -74,14 +74,6 @@ export const getExecutionByLoggedInUserId = async (ctx: Context, next: () => voi
   await next();
 };
 
-export const getExecutionByLoggedInUserIdCount = async (ctx: Context, next: () => void) => {
-  const status: string = ctx.request.query.status === 'undefined' ? undefined : ctx.request.query.status;
-  const type: string = ctx.request.query.type;
-  const userId: string = ctx.state.user.userId;
-  ctx.state.data = await applicationExecutionService.getExecutionByLoggedInUserIdCount(userId, type, status);
-  await next();
-};
-
 export const getExecutionInProcessLoggedInUserId = async (ctx: Context, next: () => void) => {
   const status: string = ctx.request.query.status;
   const userId: string = ctx.state.user.userId;
@@ -89,10 +81,9 @@ export const getExecutionInProcessLoggedInUserId = async (ctx: Context, next: ()
   await next();
 };
 
-export const getExecutionInProcessLoggedInUserIdCount = async (ctx: Context, next: () => void) => {
-  const status: string = ctx.request.query.status;
+export const getExecutionWorkflowsCount = async (ctx: Context, next: () => void) => {
   const userId: string = ctx.state.user.userId;
-  ctx.state.data = await applicationExecutionService.getExecutionInProcessLoggedInUserIdCount(userId, status);
+  ctx.state.data = await applicationExecutionService.getExecutionWorkflowsCount(userId);
   await next();
 };
 
