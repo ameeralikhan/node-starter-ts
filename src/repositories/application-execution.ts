@@ -104,6 +104,43 @@ export const getApplicationExecutionsForApproval = async (userId: string, type: 
     });
 };
 
+export const getApplicationExecutionsForApprovalCount = async (userId: string, type: string) => {
+    return Models.ApplicationExecution.count({
+        attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt'],
+        where: {
+            isActive: true,
+        },
+        include: [{
+            model: Models.Application,
+            where: {
+                isActive: true
+            },
+        }, {
+            model: Models.ApplicationExecutionForm,
+            where: {
+                isActive: true
+            }
+        }, {
+            model: Models.ApplicationExecutionWorkflow,
+            where: {
+                status: ApplicationExecutionStatus.DRAFT
+            },
+            include: [{
+                model: Models.ApplicationWorkflow,
+                where: {
+                    type
+                },
+                include: [{
+                    model: Models.ApplicationWorkflowPermission,
+                    where: {
+                        userId
+                    }
+                }]
+            }]
+        }]
+    });
+};
+
 export const getDraftApplicationExecutions = async (userId: string) => {
     return Models.ApplicationExecution.findAll({
         attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt'],
@@ -131,8 +168,64 @@ export const getDraftApplicationExecutions = async (userId: string) => {
     });
 };
 
+export const getDraftApplicationExecutionsCount = async (userId: string) => {
+    return Models.ApplicationExecution.count({
+        attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt'],
+        where: {
+            isActive: true,
+            createdBy: userId,
+            status: ApplicationExecutionStatus.DRAFT
+        },
+        include: [{
+            model: Models.Application,
+            where: {
+                isActive: true
+            },
+        }, {
+            model: Models.ApplicationExecutionForm,
+            where: {
+                isActive: true
+            }
+        }, {
+            model: Models.ApplicationExecutionWorkflow,
+            include: [{
+                model: Models.ApplicationWorkflow,
+            }]
+        }]
+    });
+};
+
 export const getApplicationExecutionInProcess = async (userId: string, status: string) => {
     return Models.ApplicationExecution.findAll({
+        attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt'],
+        where: {
+            isActive: true,
+            createdBy: userId
+        },
+        include: [{
+            model: Models.Application,
+            where: {
+                isActive: true
+            },
+        }, {
+            model: Models.ApplicationExecutionForm,
+            where: {
+                isActive: true
+            }
+        }, {
+            model: Models.ApplicationExecutionWorkflow,
+            where: {
+                status
+            },
+            include: [{
+                model: Models.ApplicationWorkflow,
+            }]
+        }]
+    });
+};
+
+export const getApplicationExecutionInProcessCount = async (userId: string, status: string) => {
+    return Models.ApplicationExecution.count({
         attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt'],
         where: {
             isActive: true,

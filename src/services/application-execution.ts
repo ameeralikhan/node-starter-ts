@@ -48,10 +48,26 @@ export const getExecutionByLoggedInUserId =
     }
 };
 
+export const getExecutionByLoggedInUserIdCount =
+    async (loggedInUserId: string, type: string, status?: string): Promise<number> => {
+    await validate({ loggedInUserId, type, status }, joiSchema.getExecutionByLoggedInUserId);
+    if (status === ApplicationExecutionStatus.DRAFT) {
+        return applicationExecutionRepo.getDraftApplicationExecutionsCount(loggedInUserId);
+    } else {
+        return applicationExecutionRepo.getApplicationExecutionsForApprovalCount(loggedInUserId, type);
+    }
+};
+
 export const getExecutionInProcessLoggedInUserId =
     async (loggedInUserId: string, status: string): Promise<IApplicationExecutionInstance[]> => {
     await validate({ loggedInUserId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
     return applicationExecutionRepo.getApplicationExecutionInProcess(loggedInUserId, status);
+};
+
+export const getExecutionInProcessLoggedInUserIdCount =
+    async (loggedInUserId: string, status: string): Promise<number> => {
+    await validate({ loggedInUserId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
+    return applicationExecutionRepo.getApplicationExecutionInProcessCount(loggedInUserId, status);
 };
 
 export const saveApplicationExecution = async (applicationId: string,
