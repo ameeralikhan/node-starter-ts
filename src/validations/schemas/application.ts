@@ -1,5 +1,5 @@
 import * as Joi from 'joi';
-import { ApplicationExecutionStatus } from '../../enum/application';
+import { ApplicationExecutionStatus, ApplicationWorkflowType } from '../../enum/application';
 
 export const saveApplication: Joi.SchemaMap = {
     id: Joi.string().uuid().allow([null, '']),
@@ -138,6 +138,10 @@ export const publishApplicationExecutionWorkflow: Joi.SchemaMap = {
 
 export const getExecutionByLoggedInUserId: Joi.SchemaMap = {
     loggedInUserId: Joi.string().uuid().required(),
+    type: Joi.string().valid([
+        ApplicationWorkflowType.APPROVAL,
+        ApplicationWorkflowType.INPUT,
+    ]).required(),
     status: Joi.string().valid([
         ApplicationExecutionStatus.DRAFT,
     ]).optional()

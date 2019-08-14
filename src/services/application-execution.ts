@@ -39,12 +39,12 @@ export const getByApplicationId = async (applicationId: string): Promise<IApplic
 };
 
 export const getExecutionByLoggedInUserId =
-    async (loggedInUserId: string, status?: string): Promise<IApplicationExecutionInstance[]> => {
-    await validate({ loggedInUserId, status }, joiSchema.getExecutionByLoggedInUserId);
+    async (loggedInUserId: string, type: string, status?: string): Promise<IApplicationExecutionInstance[]> => {
+    await validate({ loggedInUserId, type, status }, joiSchema.getExecutionByLoggedInUserId);
     if (status === ApplicationExecutionStatus.DRAFT) {
         return applicationExecutionRepo.getDraftApplicationExecutions(loggedInUserId);
     } else {
-        return applicationExecutionRepo.getApplicationExecutionsForApproval(loggedInUserId);
+        return applicationExecutionRepo.getApplicationExecutionsForApproval(loggedInUserId, type);
     }
 };
 
@@ -171,6 +171,14 @@ export const saveApplicationExecutionWorkflow =
             userId: user.id,
             time: new Date(),
             comment: payload.rejectionDetails.comment,
+            userName: `${user.firstName} ${user.lastName}`
+        });
+    } else if (payload.status === ApplicationExecutionStatus.CLARITY) {
+        payload.comments = payload.comments || [];
+        payload.comments.unshift({
+            userId: user.id,
+            time: new Date(),
+            comment: payload.clarificationDetails.comment,
             userName: `${user.firstName} ${user.lastName}`
         });
     }

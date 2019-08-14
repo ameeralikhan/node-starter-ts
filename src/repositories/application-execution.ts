@@ -67,7 +67,7 @@ export const findById = async (id: string) => {
     });
 };
 
-export const getApplicationExecutionsForApproval = async (userId: string) => {
+export const getApplicationExecutionsForApproval = async (userId: string, type: string) => {
     return Models.ApplicationExecution.findAll({
         attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt'],
         where: {
@@ -90,6 +90,9 @@ export const getApplicationExecutionsForApproval = async (userId: string) => {
             },
             include: [{
                 model: Models.ApplicationWorkflow,
+                where: {
+                    type
+                },
                 include: [{
                     model: Models.ApplicationWorkflowPermission,
                     where: {
