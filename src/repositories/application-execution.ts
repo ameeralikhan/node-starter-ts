@@ -80,6 +80,9 @@ export const getApplicationExecutionsForApproval = async (userId: string, type: 
             },
         }, {
             model: Models.ApplicationExecutionForm,
+            include: [{
+                model: Models.ApplicationFormField
+            }],
             where: {
                 isActive: true
             }
@@ -156,6 +159,9 @@ export const getDraftApplicationExecutions = async (userId: string) => {
             },
         }, {
             model: Models.ApplicationExecutionForm,
+            include: [{
+                model: Models.ApplicationFormField
+            }],
             where: {
                 isActive: true
             }
@@ -209,6 +215,9 @@ export const getApplicationExecutionInProcess = async (userId: string, status: s
             },
         }, {
             model: Models.ApplicationExecutionForm,
+            include: [{
+                model: Models.ApplicationFormField
+            }],
             where: {
                 isActive: true
             }
