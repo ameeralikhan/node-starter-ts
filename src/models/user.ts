@@ -96,6 +96,7 @@ export const define = (sequelize: Sequelize.Sequelize): IUserModel => {
     },
     {
       freezeTableName: true,
+      timestamps: true
     },
   );
 

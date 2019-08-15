@@ -85,7 +85,7 @@ export const getExecutionWorkflowsCount =
         draft: response[5],
         approved: response[0],
         reject: response[1]
-    }
+    };
     return resp;
 };
 

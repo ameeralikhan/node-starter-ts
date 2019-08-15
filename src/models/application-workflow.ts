@@ -84,16 +84,6 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationWorkflowMode
         type: Sequelize.BOOLEAN,
         defaultValue: true
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
-      },
       createdBy: {
         type: Sequelize.UUID,
         allowNull: true,
@@ -123,7 +113,8 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationWorkflowMode
         }
       }
     }, {
-        freezeTableName: true
+        freezeTableName: true,
+        timestamps: true
     });
 
     model.associate = (models: IModelFactory) => {
