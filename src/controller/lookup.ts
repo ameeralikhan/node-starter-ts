@@ -26,6 +26,12 @@ export const findByLookupId = async (ctx: Context, next: () => void) => {
   await next();
 };
 
+export const findLookupDataById = async (ctx: Context, next: () => void) => {
+  const lookupDataId: number = +ctx.params.lookupDataId;
+  ctx.state.data = await lookupDataService.findLookupDataById(lookupDataId);
+  await next();
+};
+
 export const saveLookupData = async (ctx: Context, next: () => void) => {
   const userId: string = ctx.state.user.userId;
   const lookupId: number = +ctx.params.lookupId;

@@ -13,6 +13,16 @@ export const findByLookupId = async (lookupId: number) => {
     });
 };
 
+export const findLookupDataById = async (id: number) => {
+    return Models.LookupData.findOne({
+        where: {
+            id,
+            isActive: true
+        },
+        attributes: ['id', 'lookupId', 'display', 'value']
+    });
+};
+
 export const findById = async (id: number) => {
     return Models.LookupData.findOne({ where: { id }});
 };

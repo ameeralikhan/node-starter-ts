@@ -16,6 +16,8 @@ router.get('/', ctrl.getAll);
 
 router.get('/:lookupId/data', ctrl.findByLookupId);
 
+router.get('/lookup-data/:lookupDataId', ctrl.findLookupDataById);
+
 router.post('/', ctrl.saveLookup);
 
 router.post('/:lookupId/data', ctrl.saveLookupData);

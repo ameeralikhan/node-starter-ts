@@ -11,6 +11,10 @@ export const findByLookupId = async (lookupId: number): Promise<ILookupDataInsta
     return lookupDataRepo.findByLookupId(lookupId);
 };
 
+export const findLookupDataById = async (id: number): Promise<ILookupDataInstance | null> => {
+    return lookupDataRepo.findLookupDataById(id);
+};
+
 export const saveLookupData = async (userId: string, lookupId: number, lookupData: ILookupDataAttributes) => {
     await validate({ ...lookupData, lookupId }, joiSchema.saveLookupData);
     const savedLookup = await lookupRepo.findById(lookupId);
