@@ -13,7 +13,7 @@ router.use(authentication);
 
 router.get('/', ctrl.getCurrentLoggedInUserApplications);
 
-router.get('/:applicationId', authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.getApplicationById);
+router.get('/:applicationId', ctrl.getApplicationById);
 
 router.put('/:applicationId/publish',
 authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.publishApplication);
@@ -24,7 +24,7 @@ authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.getApplicationF
 router.get('/:applicationId/field/:fieldId',
 authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.getApplicationFormFieldById);
 
-router.get('/:applicationId/form', authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.getApplicationForm);
+router.get('/:applicationId/form', ctrl.getApplicationForm);
 
 router.get('/:applicationId/workflow',
 authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.getApplicationWorkflow);

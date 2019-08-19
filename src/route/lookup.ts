@@ -10,7 +10,6 @@ const router = new Router({
 });
 
 router.use(authentication);
-router.use(authorization(false, [Role.SUPER_ADMIN]));
 
 router.get('/', ctrl.getAll);
 
@@ -18,12 +17,12 @@ router.get('/:lookupId/data', ctrl.findByLookupId);
 
 router.get('/lookup-data/:lookupDataId', ctrl.findLookupDataById);
 
-router.post('/', ctrl.saveLookup);
+router.post('/', authorization(false, [Role.SUPER_ADMIN]), ctrl.saveLookup);
 
-router.post('/:lookupId/data', ctrl.saveLookupData);
+router.post('/:lookupId/data', authorization(false, [Role.SUPER_ADMIN]), ctrl.saveLookupData);
 
-router.delete('/:id', ctrl.deleteLookup);
+router.delete('/:id', authorization(false, [Role.SUPER_ADMIN]), ctrl.deleteLookup);
 
-router.delete('/:lookupId/data/:id', ctrl.deleteLookupData);
+router.delete('/:lookupId/data/:id', authorization(false, [Role.SUPER_ADMIN]), ctrl.deleteLookupData);
 
 export default router.routes();

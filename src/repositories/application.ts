@@ -17,14 +17,14 @@ export const getAll = async () => {
 export const getByUserId = async (userId: string) => {
     return Models.Application.findAll({
         attributes: ['id', 'name', 'shortDescription', 'userIds', 'canAllStart', 'canAllEdits', 'editableUserIds',
-         'isPublished', 'createdAt', 'updatedAt'],
+         'isPublished', 'createdBy', 'createdAt', 'updatedAt'],
         where: {
             isActive: true,
             deletedAt: null,
             [Sequelize.Op.or]: {
                 canAllStart: true,
                 createdBy: userId,
-                editableUserIds: {
+                userIds: {
                     [Sequelize.Op.like]: `%${userId}%`
                 }
             },

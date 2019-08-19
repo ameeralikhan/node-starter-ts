@@ -229,10 +229,11 @@ export const saveApplicationExecutionWorkflow =
         // move workflow to the next
         const applicationWorkflows = await applicationWorkflowRepo.getByApplicationId(applicationId);
         const indexOfWorkflow = applicationWorkflows.findIndex(col => col.id === toSave.applicationWorkflowId);
-        if (indexOfWorkflow > -1 && applicationWorkflows.length >= indexOfWorkflow + 1) {
+        if (indexOfWorkflow > -1 && applicationWorkflows.length >= indexOfWorkflow + 2) {
             const newExecutionWorkflow: IApplicationExecutionWorkflowAttributes = {
                 applicationExecutionId: payload.applicationExecutionId,
-                applicationWorkflowId: applicationWorkflows[indexOfWorkflow].id,
+                applicationWorkflowId: applicationWorkflows[indexOfWorkflow + 1].id,
+                comments: toSave.comments,
                 status: ApplicationExecutionStatus.DRAFT,
                 createdBy: loggedInUserId
             };

@@ -7,8 +7,18 @@ import * as userRepo from '../repositories/user';
 import { IApplicationInstance, IApplicationAttributes } from '../models/application';
 import { Role } from '../enum/role';
 
-export const getCurrentLoggedInUserApplications = async (loggedInUserId: string): Promise<IApplicationInstance[]> => {
-    return applicationRepo.getByUserId(loggedInUserId);
+export const getCurrentLoggedInUserApplications = async (loggedInUserId: string) => {
+    const applications = await applicationRepo.getByUserId(loggedInUserId);
+    const returnApplications = [];
+    for (const application of applications) {
+        const canEdit = application.canAllEdits || application.createdBy === loggedInUserId ||
+            (application.editableUserIds ? application.editableUserIds.includes(loggedInUserId) : false);
+        returnApplications.push({
+            canEdit,
+            ...application.get({ plain: true })
+        });
+    }
+    return returnApplications;
 };
 
 export const getById = async (applicationId: string) => {
