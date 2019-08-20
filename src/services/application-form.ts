@@ -65,8 +65,8 @@ export const saveApplicationForm = async (applicationId: string,
     if (savedApplicationForms.length !== formIds.length) {
         throw boom.badRequest('Invalid application form id');
     }
-    let formSectionIndex = 0;
-    let formFieldIndex = 0;
+    let formSectionIndex = 1;
+    let formFieldIndex = 1;
     for (const form of applicationForms) {
         form.applicationId = applicationId;
         form.order = formSectionIndex;
@@ -78,9 +78,9 @@ export const saveApplicationForm = async (applicationId: string,
             field.applicationFormSectionId = section.id;
             field.order = formFieldIndex;
             await applicationFormFieldRepo.saveApplicationFormField(field);
+            formFieldIndex += 1;
         }
         formSectionIndex += 1;
-        formFieldIndex += 1;
     }
     return getByApplicationId(applicationId);
 };
