@@ -10,6 +10,7 @@ import * as applicationFormFieldRepo from '../repositories/application-form-fiel
 import * as applicationExecutionRepo from '../repositories/application-execution';
 import * as applicationExecutionFormRepo from '../repositories/application-execution-form';
 import * as applicationExecutionWorkflowRepo from '../repositories/application-execution-workflow';
+import * as applicationSectionRepo from '../repositories/application-form-section';
 import * as userRepo from '../repositories/user';
 import { IApplicationInstance, IApplicationAttributes } from '../models/application';
 import { IApplicationExecutionInstance, IApplicationExecutionAttributes } from '../models/application-execution';
@@ -40,19 +41,38 @@ export const getByApplicationId = async (applicationId: string): Promise<IApplic
 };
 
 export const getExecutionByLoggedInUserId =
-    async (loggedInUserId: string, type: string, status?: string): Promise<IApplicationExecutionInstance[]> => {
+    async (loggedInUserId: string, type: string, status?: string): Promise<IApplicationExecutionAttributes[]> => {
     await validate({ loggedInUserId, type, status }, joiSchema.getExecutionByLoggedInUserId);
+    let dbApplicationExecutions: IApplicationExecutionInstance[] = [];
     if (status === ApplicationExecutionStatus.DRAFT) {
-        return applicationExecutionRepo.getDraftApplicationExecutions(loggedInUserId);
+        dbApplicationExecutions = await applicationExecutionRepo.getDraftApplicationExecutions(loggedInUserId);
     } else {
-        return applicationExecutionRepo.getApplicationExecutionsForApproval(loggedInUserId, type);
+        dbApplicationExecutions = await applicationExecutionRepo.
+            getApplicationExecutionsForApproval(loggedInUserId, type);
     }
+    return transformExecutionData(dbApplicationExecutions);
 };
 
 export const getExecutionInProcessLoggedInUserId =
-    async (loggedInUserId: string, status: string): Promise<IApplicationExecutionInstance[]> => {
+    async (loggedInUserId: string, status: string): Promise<IApplicationExecutionAttributes[]> => {
     await validate({ loggedInUserId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
-    return applicationExecutionRepo.getApplicationExecutionInProcess(loggedInUserId, status);
+    const dbApplicationExecutions = await
+        applicationExecutionRepo.getApplicationExecutionInProcess(loggedInUserId, status);
+    return transformExecutionData(dbApplicationExecutions);
+};
+
+const transformExecutionData = async (dbApplicationExecutions: IApplicationExecutionInstance[]) => {
+    const applicationExecutions: IApplicationExecutionAttributes[] = [];
+    for (const execution of dbApplicationExecutions) {
+        const plainExecution = execution.get({ plain: true });
+        if (!plainExecution.application) {
+            continue;
+        }
+        const sections = await applicationSectionRepo.getByApplicationId(execution.applicationId);
+        plainExecution.application.applicationFormSections = sections;
+        applicationExecutions.push(plainExecution);
+    }
+    return applicationExecutions;
 };
 
 export const getExecutionWorkflowsCount =

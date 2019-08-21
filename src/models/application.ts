@@ -1,6 +1,7 @@
 import * as Sequelize from 'sequelize';
 
 import { IModelFactory } from './index';
+import { IApplicationFormSectionAttributes, IApplicationFormSectionInstance } from './application-form-section';
 
 export interface IApplicationAttributes {
     id: string;
@@ -17,6 +18,7 @@ export interface IApplicationAttributes {
     updatedAt?: Date;
     deletedAt?: Date;
     deletedBy?: string;
+    applicationFormSections?: IApplicationFormSectionAttributes[];
 }
 
 export interface IApplicationInstance extends Sequelize.Instance<IApplicationAttributes> {
@@ -34,6 +36,7 @@ export interface IApplicationInstance extends Sequelize.Instance<IApplicationAtt
     updatedAt?: Date;
     deletedAt?: Date;
     deletedBy?: string;
+    applicationFormSections?: IApplicationFormSectionInstance[];
 }
 
 export interface IApplicationModel extends Sequelize.Model<IApplicationInstance, IApplicationAttributes> { }

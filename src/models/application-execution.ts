@@ -5,6 +5,7 @@ import {
   IApplicationExecutionFormAttributes,
   IApplicationExecutionFormInstance
 } from './application-execution-form';
+import { IApplicationAttributes, IApplicationInstance } from './application';
 
 export interface IApplicationExecutionAttributes {
     id?: string;
@@ -18,6 +19,7 @@ export interface IApplicationExecutionAttributes {
     updatedBy?: string;
     deletedAt?: Date;
     deletedBy?: string;
+    application?: IApplicationAttributes;
     applicationExecutionForms?: IApplicationExecutionFormAttributes[];
 }
 
@@ -33,6 +35,7 @@ export interface IApplicationExecutionInstance extends Sequelize.Instance<IAppli
     updatedBy?: string;
     deletedAt?: Date;
     deletedBy?: string;
+    application?: IApplicationInstance;
     applicationExecutionForms?: IApplicationExecutionFormInstance[];
 }
 
