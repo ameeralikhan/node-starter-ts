@@ -37,11 +37,11 @@ export interface IApplicationExecutionWorkflowInstance
     deletedBy?: string;
 }
 
-export interface IApplicationExecutionExecutionModel
+export interface IApplicationExecutionWorkflowModel
     extends Sequelize.Model<IApplicationExecutionWorkflowInstance, IApplicationExecutionWorkflowAttributes> { }
 
-export const define = (sequelize: Sequelize.Sequelize): IApplicationExecutionExecutionModel => {
-    const model: IApplicationExecutionExecutionModel = sequelize.define('applicationExecutionWorkflow', {
+export const define = (sequelize: Sequelize.Sequelize): IApplicationExecutionWorkflowModel => {
+    const model: IApplicationExecutionWorkflowModel = sequelize.define('applicationExecutionWorkflow', {
       id: {
         type: Sequelize.UUID,
         primaryKey: true,

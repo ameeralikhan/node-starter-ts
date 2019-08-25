@@ -11,14 +11,20 @@ import * as applicationExecutionRepo from '../repositories/application-execution
 import * as applicationExecutionFormRepo from '../repositories/application-execution-form';
 import * as applicationExecutionWorkflowRepo from '../repositories/application-execution-workflow';
 import * as applicationSectionRepo from '../repositories/application-form-section';
+import * as applicationWorkflowFieldPermissionRepo from '../repositories/application-workflow-field-permission';
 import * as userRepo from '../repositories/user';
 import { IApplicationInstance, IApplicationAttributes } from '../models/application';
 import { IApplicationExecutionInstance, IApplicationExecutionAttributes } from '../models/application-execution';
 import { IApplicationFormFieldInstance } from '../models/application-form-field';
 import { Role } from '../enum/role';
-import { ApplicationExecutionStatus, ApplicationWorkflowType } from '../enum/application';
+import { ApplicationExecutionStatus,
+    ApplicationWorkflowType,
+    ApplicationWorkflowPermissionType,
+    ApplicationWorkflowFieldPermission
+} from '../enum/application';
 import { IApplicationExecutionWorkflowAttributes } from '../models/application-execution-workflow';
 import { IExecutionWorkflowCount } from '../interface/application';
+import { PERMISSION_STATUS_MAPPING } from '../constants/application';
 
 export const getAll = async (): Promise<IApplicationExecutionInstance[]> => {
     return applicationExecutionRepo.getAll();
@@ -50,7 +56,7 @@ export const getExecutionByLoggedInUserId =
         dbApplicationExecutions = await applicationExecutionRepo.
             getApplicationExecutionsForApproval(loggedInUserId, type);
     }
-    return transformExecutionData(dbApplicationExecutions);
+    return transformExecutionData(dbApplicationExecutions, status);
 };
 
 export const getExecutionInProcessLoggedInUserId =
@@ -58,10 +64,10 @@ export const getExecutionInProcessLoggedInUserId =
     await validate({ loggedInUserId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
     const dbApplicationExecutions = await
         applicationExecutionRepo.getApplicationExecutionInProcess(loggedInUserId, status);
-    return transformExecutionData(dbApplicationExecutions);
+    return transformExecutionData(dbApplicationExecutions, status);
 };
 
-const transformExecutionData = async (dbApplicationExecutions: IApplicationExecutionInstance[]) => {
+const transformExecutionData = async (dbApplicationExecutions: IApplicationExecutionInstance[], status?: string) => {
     const applicationExecutions: IApplicationExecutionAttributes[] = [];
     for (const execution of dbApplicationExecutions) {
         const plainExecution = execution.get({ plain: true });
@@ -69,7 +75,48 @@ const transformExecutionData = async (dbApplicationExecutions: IApplicationExecu
             continue;
         }
         const sections = await applicationSectionRepo.getByApplicationId(execution.applicationId);
-        plainExecution.application.applicationFormSections = sections;
+        plainExecution.application.applicationFormSections = [];
+        const fieldPermissions = await applicationWorkflowFieldPermissionRepo.
+            getByApplicationId(execution.applicationId);
+        const latestWorkflowId = plainExecution.applicationExecutionWorkflows ?
+             plainExecution.applicationExecutionWorkflows[0].applicationWorkflowId : null;
+        for (const sectionInstance of sections) {
+            const section = sectionInstance.get({ plain: true });
+            const type = status ? PERMISSION_STATUS_MAPPING[status]
+             || ApplicationWorkflowPermissionType.WORKFLOW : ApplicationWorkflowPermissionType.WORKFLOW;
+            const applicationWorkflowId = type !== ApplicationWorkflowPermissionType.WORKFLOW
+                ? null : latestWorkflowId;
+            if (!fieldPermissions || !fieldPermissions.length) {
+                continue;
+            }
+            const workflowPermission = fieldPermissions.find(
+                per => per.type === type && per.applicationFormSectionId === section.id &&
+                    per.applicationWorkflowId === applicationWorkflowId
+            );
+            if (workflowPermission && workflowPermission.permission === ApplicationWorkflowFieldPermission.HIDDEN) {
+                continue;
+            }
+            if (section.applicationFormFields && section.applicationFormFields.length) {
+                section.applicationFormFields = section.applicationFormFields.filter((field) => {
+                    if (!plainExecution ||
+                        !plainExecution.application ||
+                        !fieldPermissions) {
+                        return true;
+                    }
+                    const workflowPermission = fieldPermissions.find(
+                        per => per.type === type && per.applicationFormFieldId === field.id &&
+                            per.applicationWorkflowId === applicationWorkflowId
+                    );
+                    if (workflowPermission &&
+                        workflowPermission.permission === ApplicationWorkflowFieldPermission.HIDDEN) {
+                        return false;
+                    }
+                    field.permission = workflowPermission ? workflowPermission.permission : undefined;
+                    return true;
+                });
+            }
+            plainExecution.application.applicationFormSections.push(section);
+        }
         applicationExecutions.push(plainExecution);
     }
     return applicationExecutions;

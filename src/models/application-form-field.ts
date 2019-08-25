@@ -19,6 +19,8 @@ export interface IApplicationFormFieldAttributes {
     isActive: boolean;
     createdAt?: Date;
     updatedAt?: Date;
+    // custom
+    permission?: string;
 }
 
 export interface IApplicationFormFieldInstance extends Sequelize.Instance<IApplicationFormFieldAttributes> {

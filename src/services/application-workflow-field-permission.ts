@@ -47,6 +47,7 @@ export const saveApplicationWorkflowFieldPermission =
     if (savedApplicationForms.length !== _.uniq(formIds).length) {
         throw boom.badRequest('Invalid application section field id');
     }
+    await applicationWorkflowFieldPermissionRepo.hardDeleteApplicationWorkflowFieldPermission(applicationId);
     for (const form of payload) {
         form.applicationId = applicationId;
         await applicationWorkflowFieldPermissionRepo.saveApplicationWorkflowFieldPermission(form);

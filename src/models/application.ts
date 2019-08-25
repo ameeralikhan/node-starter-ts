@@ -2,6 +2,10 @@ import * as Sequelize from 'sequelize';
 
 import { IModelFactory } from './index';
 import { IApplicationFormSectionAttributes, IApplicationFormSectionInstance } from './application-form-section';
+import {
+  IApplicationWorkflowFieldPermissionAttributes,
+  IApplicationWorkflowFieldPermissionInstance
+} from './application-workflow-field-permission';
 
 export interface IApplicationAttributes {
     id: string;
@@ -19,6 +23,7 @@ export interface IApplicationAttributes {
     deletedAt?: Date;
     deletedBy?: string;
     applicationFormSections?: IApplicationFormSectionAttributes[];
+    applicationWorkflowFieldPermissions?: IApplicationWorkflowFieldPermissionAttributes[];
 }
 
 export interface IApplicationInstance extends Sequelize.Instance<IApplicationAttributes> {
@@ -37,6 +42,7 @@ export interface IApplicationInstance extends Sequelize.Instance<IApplicationAtt
     deletedAt?: Date;
     deletedBy?: string;
     applicationFormSections?: IApplicationFormSectionInstance[];
+    applicationWorkflowFieldPermission?: IApplicationWorkflowFieldPermissionInstance[];
 }
 
 export interface IApplicationModel extends Sequelize.Model<IApplicationInstance, IApplicationAttributes> { }

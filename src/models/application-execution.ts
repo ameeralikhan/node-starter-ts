@@ -6,6 +6,9 @@ import {
   IApplicationExecutionFormInstance
 } from './application-execution-form';
 import { IApplicationAttributes, IApplicationInstance } from './application';
+import {
+  IApplicationExecutionWorkflowAttributes,
+  IApplicationExecutionWorkflowInstance } from './application-execution-workflow';
 
 export interface IApplicationExecutionAttributes {
     id?: string;
@@ -21,6 +24,7 @@ export interface IApplicationExecutionAttributes {
     deletedBy?: string;
     application?: IApplicationAttributes;
     applicationExecutionForms?: IApplicationExecutionFormAttributes[];
+    applicationExecutionWorkflows?: IApplicationExecutionWorkflowAttributes[];
 }
 
 export interface IApplicationExecutionInstance extends Sequelize.Instance<IApplicationExecutionAttributes> {
@@ -37,6 +41,7 @@ export interface IApplicationExecutionInstance extends Sequelize.Instance<IAppli
     deletedBy?: string;
     application?: IApplicationInstance;
     applicationExecutionForms?: IApplicationExecutionFormInstance[];
+    applicationExecutionWorkflows?: IApplicationExecutionWorkflowInstance[];
 }
 
 export interface IApplicationExecutionModel

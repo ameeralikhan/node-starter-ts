@@ -39,7 +39,7 @@ export interface IModelFactory extends Sequelize.Models {
   ApplicationWorkflowFieldPermission: ApplicationWorkflowFieldPermission.IApplicationWorkflowFieldPermissionModel;
   ApplicationExecution: ApplicationExecution.IApplicationExecutionModel;
   ApplicationExecutionForm: ApplicationExecutionForm.IApplicationExecutionFormModel;
-  ApplicationExecutionWorkflow: ApplicationExecutionWorkflow.IApplicationExecutionExecutionModel;
+  ApplicationExecutionWorkflow: ApplicationExecutionWorkflow.IApplicationExecutionWorkflowModel;
   Lookup: Lookup.ILookupModel;
   LookupData: LookupData.ILookupDataModel;
 }

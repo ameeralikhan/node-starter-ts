@@ -26,3 +26,7 @@ export const saveApplicationWorkflowFieldPermission =
 export const deleteApplicationWorkflowFieldPermission = async (id: string) => {
     return Models.ApplicationWorkflowFieldPermission.update({ isActive: false }, { where: { id }});
 };
+
+export const hardDeleteApplicationWorkflowFieldPermission = async (applicationId: string) => {
+    return Models.ApplicationWorkflowFieldPermission.destroy({ where: { applicationId }});
+};
