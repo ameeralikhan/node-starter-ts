@@ -81,6 +81,15 @@ export const saveApplicationExecution: Joi.SchemaMap = {
     }))
 };
 
+export const saveApplicationExecutionForm: Joi.SchemaMap = {
+    id: Joi.string().uuid().required(),
+    applicationExecutionForms: Joi.array().items(Joi.object({
+        id: Joi.string().uuid().allow([null, '']),
+        applicationFormFieldId: Joi.string().uuid().required(),
+        value: Joi.any().required()
+    }))
+};
+
 export const saveApplicationExecutionArray: Joi.SchemaMap = {
     payload: Joi.array().items(Joi.object({
         ...saveApplicationExecution

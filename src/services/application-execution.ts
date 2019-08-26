@@ -78,7 +78,8 @@ const transformExecutionData = async (dbApplicationExecutions: IApplicationExecu
         plainExecution.application.applicationFormSections = [];
         const fieldPermissions = await applicationWorkflowFieldPermissionRepo.
             getByApplicationId(execution.applicationId);
-        const latestWorkflowId = plainExecution.applicationExecutionWorkflows ?
+        const latestWorkflowId = plainExecution.applicationExecutionWorkflows &&
+            plainExecution.applicationExecutionWorkflows.length ?
              plainExecution.applicationExecutionWorkflows[0].applicationWorkflowId : null;
         for (const sectionInstance of sections) {
             const section = sectionInstance.get({ plain: true });
@@ -179,6 +180,42 @@ export const saveApplicationExecution = async (applicationId: string,
         applicationExecution.startedAt = new Date();
         applicationExecution.status = ApplicationExecutionStatus.DRAFT;
         applicationExecution.createdBy = loggedInUserId;
+    }
+    let formFieldIds = _.pick(applicationExecution.applicationExecutionForms, 'applicationFormFieldId') as string[];
+    formFieldIds = _.reject(formFieldIds, helper.rejectUndefinedOrNull);
+    const savedApplicationFormFields = await applicationFormFieldRepo.findByIds(formFieldIds);
+    if (savedApplicationFormFields.length !== _.uniq(formFieldIds).length) {
+        throw boom.badRequest('Invalid application form field id');
+    }
+    // validation for required in form fields
+    applicationExecution.applicationId = applicationId;
+    const execution = await applicationExecutionRepo.saveApplicationExecution(applicationExecution);
+    if (!applicationExecution.applicationExecutionForms) {
+        return getByApplicationId(applicationId);
+    }
+    for (const field of applicationExecution.applicationExecutionForms) {
+        field.applicationExecutionId = execution.id;
+        await applicationExecutionFormRepo.saveApplicationExecutionForm(field);
+    }
+    return getByApplicationId(applicationId);
+};
+
+export const saveApplicationExecutionForm = async (applicationId: string,
+                                                   loggedInUserId: string,
+                                                   applicationExecution: IApplicationExecutionAttributes) => {
+    await validate(applicationExecution, joiSchema.saveApplicationExecutionForm);
+    const savedApp = await applicationRepo.findById(applicationId);
+    if (!savedApp) {
+        throw boom.badRequest('Invalid application id');
+    }
+    if (applicationExecution.id) {
+        const savedApplicationExecution = await applicationExecutionRepo.findById(applicationExecution.id);
+        if (!savedApplicationExecution) {
+            throw boom.badRequest('Invalid application execution id');
+        }
+        applicationExecution.updatedBy = loggedInUserId;
+        applicationExecution.startedAt = savedApplicationExecution.startedAt;
+        applicationExecution.status = savedApplicationExecution.status;
     }
     let formFieldIds = _.pick(applicationExecution.applicationExecutionForms, 'applicationFormFieldId') as string[];
     formFieldIds = _.reject(formFieldIds, helper.rejectUndefinedOrNull);

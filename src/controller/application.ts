@@ -33,7 +33,8 @@ export const getApplicationFormFieldById = async (ctx: Context, next: () => void
 
 export const getApplicationForm = async (ctx: Context, next: () => void) => {
   const applicationId: string = ctx.params.applicationId;
-  ctx.state.data = await applicationFormService.getByApplicationId(applicationId);
+  const forExecution: boolean = ctx.query.forExecution === 'true' ? true : false;
+  ctx.state.data = await applicationFormService.getByApplicationId(applicationId, forExecution);
   await next();
 };
 
@@ -131,6 +132,14 @@ export const saveApplicationExecution = async (ctx: Context, next: () => void) =
   const userId: string = ctx.state.user.userId;
   const payload = ctx.request.body;
   ctx.state.data = await applicationExecutionService.saveApplicationExecution(applicationId, userId, payload);
+  await next();
+};
+
+export const saveApplicationExecutionForm = async (ctx: Context, next: () => void) => {
+  const applicationId: string = ctx.params.applicationId;
+  const userId: string = ctx.state.user.userId;
+  const payload = ctx.request.body;
+  ctx.state.data = await applicationExecutionService.saveApplicationExecutionForm(applicationId, userId, payload);
   await next();
 };
 

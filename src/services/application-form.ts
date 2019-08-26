@@ -8,17 +8,79 @@ import * as applicationRepo from '../repositories/application';
 import * as applicationFormSectionRepo from '../repositories/application-form-section';
 import * as applicationFormFieldRepo from '../repositories/application-form-field';
 import * as userRepo from '../repositories/user';
+import * as applicationWorkflowFieldPermissionRepo from '../repositories/application-workflow-field-permission';
 import { IApplicationInstance, IApplicationAttributes } from '../models/application';
 import { IApplicationFormSectionInstance, IApplicationFormSectionAttributes } from '../models/application-form-section';
 import { IApplicationFormFieldInstance } from '../models/application-form-field';
 import { Role } from '../enum/role';
+import { ApplicationExecutionStatus,
+    ApplicationWorkflowType,
+    ApplicationWorkflowPermissionType,
+    ApplicationWorkflowFieldPermission
+} from '../enum/application';
 
-export const getByApplicationId = async (applicationId: string): Promise<IApplicationFormSectionInstance[]> => {
+export const getByApplicationId = async (applicationId: string, forExecution = false) => {
     const application = await applicationRepo.findById(applicationId);
     if (!application) {
         throw boom.badRequest('Invalid application id');
     }
-    return applicationFormSectionRepo.getByApplicationId(applicationId);
+    const sections = await applicationFormSectionRepo.getByApplicationId(applicationId);
+    if (!forExecution) {
+        return sections;
+    } else {
+        return transformExecutionData(applicationId, sections);
+    }
+};
+
+export const getByApplicationIdForExecution = async (applicationId: string):
+    Promise<IApplicationFormSectionAttributes[]> => {
+    const application = await applicationRepo.findById(applicationId);
+    if (!application) {
+        throw boom.badRequest('Invalid application id');
+    }
+    const sections = await applicationFormSectionRepo.getByApplicationId(applicationId);
+    return transformExecutionData(applicationId, sections);
+};
+
+const transformExecutionData = async (applicationId: string, sections: IApplicationFormSectionInstance[]) => {
+    const sectionsAttr: IApplicationFormSectionAttributes[] = [];
+    const fieldPermissions = await applicationWorkflowFieldPermissionRepo.
+            getByApplicationId(applicationId);
+    const latestWorkflowId = null;
+    for (const sectionInstance of sections) {
+        const section = sectionInstance.get({ plain: true });
+        const type = ApplicationWorkflowPermissionType.NEW;
+        if (!fieldPermissions || !fieldPermissions.length) {
+            continue;
+        }
+        const workflowPermission = fieldPermissions.find(
+            per => per.type === type && per.applicationFormSectionId === section.id &&
+                per.applicationFormFieldId === null &&
+                per.applicationWorkflowId === null
+        );
+        if (workflowPermission && workflowPermission.permission === ApplicationWorkflowFieldPermission.HIDDEN) {
+            continue;
+        }
+        if (section.applicationFormFields && section.applicationFormFields.length) {
+            section.applicationFormFields = section.applicationFormFields.filter((field) => {
+                if (!fieldPermissions || !fieldPermissions.length) {
+                    return true;
+                }
+                const workflowPermission = fieldPermissions.find(
+                    per => per.type === type && per.applicationFormFieldId === field.id &&
+                        per.applicationWorkflowId === null
+                );
+                if (workflowPermission &&
+                    workflowPermission.permission === ApplicationWorkflowFieldPermission.HIDDEN) {
+                    return false;
+                }
+                field.permission = workflowPermission ? workflowPermission.permission : undefined;
+                return true;
+            });
+        }
+        sectionsAttr.push(section);
+    }
+    return sectionsAttr;
 };
 
 export const getApplicationSectionById =
