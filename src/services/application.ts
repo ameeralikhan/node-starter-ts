@@ -49,7 +49,7 @@ export const saveApplication = async (loggedInUserId: string, application: IAppl
     return applicationRepo.saveApplication(application);
 };
 
-export const publishApplication = async (id: string, userIds: string, canAllEdits: boolean) => {
+export const publishApplication = async (id: string, userIds: string, canAllEdits: boolean, subject: string) => {
     let editableUserIds: string[] = [];
     if (userIds) {
         editableUserIds = userIds.split(',');
@@ -65,7 +65,7 @@ export const publishApplication = async (id: string, userIds: string, canAllEdit
             throw boom.badRequest('Invalid User');
         }
     }
-    await applicationRepo.publishApplication(id, editableUserIds.join(','), canAllEdits);
+    await applicationRepo.publishApplication(id, editableUserIds.join(','), canAllEdits, subject);
     return { success: true };
 };
 

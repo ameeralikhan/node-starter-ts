@@ -109,6 +109,25 @@ export const getApplicationFormFieldById =
     return formFeild;
 };
 
+export const getApplicationFieldTitles = async (applicationId: string) => {
+    const application = await applicationRepo.findById(applicationId);
+    if (!application) {
+        throw boom.badRequest('Invalid application id');
+    }
+    const sections = await applicationFormSectionRepo.getByApplicationId(applicationId);
+    const fields = sections.map(section => section.applicationFormFields);
+    const flatfields = _.flatten(fields.map(field => _.flatten(field)));
+    const fieldHashMap = {};
+    const fieldIdsAndName = flatfields.map(field => {
+        fieldHashMap[field.key] = field.name;
+        return {
+            id: field.key,
+            name: field.name
+        };
+    });
+    return { fieldHashMap, fieldIdsAndName };
+};
+
 export const saveApplicationForm = async (applicationId: string,
                                           applicationForms: IApplicationFormSectionAttributes[]) => {
     await validate({ payload: applicationForms }, joiSchema.saveApplicationFormArray);

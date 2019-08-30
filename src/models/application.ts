@@ -11,6 +11,7 @@ export interface IApplicationAttributes {
     id: string;
     name: string;
     shortDescription: string;
+    subject: string;
     userIds: string;
     canAllStart: boolean;
     canAllEdits: boolean;
@@ -30,6 +31,7 @@ export interface IApplicationInstance extends Sequelize.Instance<IApplicationAtt
     id: string;
     name: string;
     shortDescription: string;
+    subject: string;
     userIds: string;
     canAllStart: boolean;
     canAllEdits: boolean;
@@ -61,6 +63,10 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationModel => {
       },
       shortDescription: {
         type: Sequelize.STRING(1000),
+        allowNull: true,
+      },
+      subject: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
       userIds: {

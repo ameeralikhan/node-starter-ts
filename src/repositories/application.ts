@@ -6,7 +6,7 @@ import { IApplicationInstance, IApplicationAttributes } from '../models/applicat
 export const getAll = async () => {
     return Models.Application.findAll({
         attributes: ['id', 'name', 'shortDescription', 'userIds', 'canAllStart', 'canAllEdits', 'editableUserIds',
-        'isPublished', 'createdAt', 'updatedAt'],
+        'isPublished', 'subject', 'createdAt', 'updatedAt'],
         where: {
             isActive: true,
             deletedAt: null
@@ -17,7 +17,7 @@ export const getAll = async () => {
 export const getByUserId = async (userId: string) => {
     return Models.Application.findAll({
         attributes: ['id', 'name', 'shortDescription', 'userIds', 'canAllStart', 'canAllEdits', 'editableUserIds',
-         'isPublished', 'createdBy', 'createdAt', 'updatedAt'],
+         'isPublished', 'subject', 'createdBy', 'createdAt', 'updatedAt'],
         where: {
             isActive: true,
             deletedAt: null,
@@ -49,8 +49,10 @@ export const saveApplication = async (application: IApplicationAttributes) => {
         .then((res) => res[0]);
 };
 
-export const publishApplication = async (id: string, editableUserIds: string, canAllEdits: boolean) => {
-    return Models.Application.update({ isPublished: true, editableUserIds, canAllEdits }, { where: { id }})
+export const publishApplication = async (
+    id: string, editableUserIds: string,
+    canAllEdits: boolean, subject: string) => {
+    return Models.Application.update({ isPublished: true, editableUserIds, canAllEdits, subject }, { where: { id }})
         .then((res) => res[0]);
 };
 

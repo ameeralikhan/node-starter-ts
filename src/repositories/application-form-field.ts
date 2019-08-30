@@ -23,6 +23,11 @@ export const findByIds = async (ids: string[]) => {
     return Models.ApplicationFormField.findAll({ where: { id: { [Sequelize.Op.in]: ids } }});
 };
 
+export const findBySectionIds = async (sectionIds: string[]) => {
+    return Models.ApplicationFormField.findAll({ where: { applicationFormSectionId:
+        { [Sequelize.Op.in]: sectionIds } }});
+};
+
 export const saveApplicationFormField = async (applicationFormField: IApplicationFormFieldAttributes) => {
     return Models.ApplicationFormField.upsert(applicationFormField, { returning: true })
         .then((res) => res[0]);

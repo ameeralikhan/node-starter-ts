@@ -32,6 +32,8 @@ authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.getApplicationW
 router.get('/:applicationId/field-permission',
 authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.getApplicationWorkflowFieldPermission);
 
+router.get('/:applicationId/form-field-titles', ctrl.getApplicationFieldTitles);
+
 router.post('/', authorization(false, [Role.SUPER_ADMIN, Role.APP_CREATOR]), ctrl.saveApplication);
 
 router.post('/:applicationId/form',

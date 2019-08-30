@@ -88,6 +88,12 @@ export const getExecutionWorkflowsCount = async (ctx: Context, next: () => void)
   await next();
 };
 
+export const getApplicationFieldTitles = async (ctx: Context, next: () => void) => {
+  const applicationId: string = ctx.params.applicationId;
+  ctx.state.data = await applicationFormService.getApplicationFieldTitles(applicationId);
+  await next();
+};
+
 export const saveApplication = async (ctx: Context, next: () => void) => {
   const userId: string = ctx.state.user.userId;
   const payload = ctx.request.body;
@@ -100,7 +106,8 @@ export const publishApplication = async (ctx: Context, next: () => void) => {
   const userId: string = ctx.state.user.userId;
   const editableUserIds: string = ctx.request.body.editableUserIds;
   const canAllEdits: boolean = ctx.request.body.canAllEdits;
-  ctx.state.data = await applicationService.publishApplication(id, editableUserIds, canAllEdits);
+  const subject: string = ctx.request.body.subject;
+  ctx.state.data = await applicationService.publishApplication(id, editableUserIds, canAllEdits, subject);
   await next();
 };
 

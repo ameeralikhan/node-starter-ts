@@ -15,6 +15,7 @@ export interface IApplicationExecutionAttributes {
     applicationId?: string;
     startedAt?: Date;
     status?: string;
+    title?: string;
     isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -32,6 +33,7 @@ export interface IApplicationExecutionInstance extends Sequelize.Instance<IAppli
     applicationId: string;
     startedAt: Date;
     status: string;
+    title: string;
     isActive: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -69,6 +71,10 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationExecutionMod
       status: {
         type: Sequelize.STRING,
         allowNull: false
+      },
+      title: {
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       isActive: {
         type: Sequelize.BOOLEAN,

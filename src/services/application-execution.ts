@@ -81,6 +81,7 @@ const transformExecutionData = async (dbApplicationExecutions: IApplicationExecu
         const latestWorkflowId = plainExecution.applicationExecutionWorkflows &&
             plainExecution.applicationExecutionWorkflows.length ?
              plainExecution.applicationExecutionWorkflows[0].applicationWorkflowId : null;
+        let title = plainExecution.application.subject;
         for (const sectionInstance of sections) {
             const section = sectionInstance.get({ plain: true });
             const type = status ? PERMISSION_STATUS_MAPPING[status]
@@ -99,6 +100,13 @@ const transformExecutionData = async (dbApplicationExecutions: IApplicationExecu
             }
             if (section.applicationFormFields && section.applicationFormFields.length) {
                 section.applicationFormFields = section.applicationFormFields.filter((field) => {
+                    if (plainExecution.applicationExecutionForms && title) {
+                        // setting title
+                        const formField = plainExecution.applicationExecutionForms
+                        .find(f => f.applicationFormFieldId === field.id);
+                        title = title.replace(`{${field.fieldId}}`, formField ? formField.value : '');
+                        plainExecution.title = title;
+                    }
                     if (!plainExecution ||
                         !plainExecution.application ||
                         !fieldPermissions) {
@@ -181,7 +189,8 @@ export const saveApplicationExecution = async (applicationId: string,
         applicationExecution.status = ApplicationExecutionStatus.DRAFT;
         applicationExecution.createdBy = loggedInUserId;
     }
-    let formFieldIds = _.pick(applicationExecution.applicationExecutionForms, 'applicationFormFieldId') as string[];
+    let formFieldIds = applicationExecution.applicationExecutionForms ?
+        applicationExecution.applicationExecutionForms.map(ex => ex.applicationFormFieldId) : [];
     formFieldIds = _.reject(formFieldIds, helper.rejectUndefinedOrNull);
     const savedApplicationFormFields = await applicationFormFieldRepo.findByIds(formFieldIds);
     if (savedApplicationFormFields.length !== _.uniq(formFieldIds).length) {
@@ -193,10 +202,16 @@ export const saveApplicationExecution = async (applicationId: string,
     if (!applicationExecution.applicationExecutionForms) {
         return getByApplicationId(applicationId);
     }
+    const title = savedApp.subject;
     for (const field of applicationExecution.applicationExecutionForms) {
         field.applicationExecutionId = execution.id;
+        // setting title = logic has been moved when getting execution
+        // const formField = savedApplicationFormFields.find(f => f.id === field.applicationFormFieldId);
+        // title = title.replace(`{${formField ? formField.fieldId : ''}}`, field.value);
         await applicationExecutionFormRepo.saveApplicationExecutionForm(field);
     }
+    applicationExecution.title = title;
+    await applicationExecutionRepo.saveApplicationExecution(applicationExecution);
     return getByApplicationId(applicationId);
 };
 
