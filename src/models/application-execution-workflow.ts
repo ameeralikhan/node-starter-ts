@@ -1,6 +1,7 @@
 import * as Sequelize from 'sequelize';
 
 import { IModelFactory } from './index';
+import { IApplicationWorkflowAttributes, IApplicationWorkflowInstance } from './application-workflow';
 
 export interface IApplicationExecutionWorkflowAttributes {
     id?: string;
@@ -17,6 +18,7 @@ export interface IApplicationExecutionWorkflowAttributes {
     updatedBy?: string;
     deletedAt?: Date;
     deletedBy?: string;
+    applicationWorkflow?: IApplicationWorkflowAttributes;
 }
 
 export interface IApplicationExecutionWorkflowInstance
@@ -35,6 +37,7 @@ export interface IApplicationExecutionWorkflowInstance
     updatedBy?: string;
     deletedAt?: Date;
     deletedBy?: string;
+    applicationWorkflow?: IApplicationWorkflowInstance;
 }
 
 export interface IApplicationExecutionWorkflowModel

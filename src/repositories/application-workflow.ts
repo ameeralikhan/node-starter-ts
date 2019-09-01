@@ -5,7 +5,8 @@ import { IApplicationWorkflowInstance, IApplicationWorkflowAttributes } from '..
 
 export const getByApplicationId = async (applicationId: string) => {
     return Models.ApplicationWorkflow.findAll({
-        attributes: ['id', 'applicationId', 'name', 'type', 'stepId', 'order', 'isActive', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'applicationId', 'name', 'type', 'stepId', 'order', 'assignTo',
+            'isActive', 'createdAt', 'updatedAt'],
         where: {
             isActive: true,
             applicationId
@@ -21,7 +22,15 @@ export const getByApplicationId = async (applicationId: string) => {
 };
 
 export const findById = async (id: string) => {
-    return Models.ApplicationWorkflow.findOne({ where: { id }});
+    return Models.ApplicationWorkflow.findOne({
+        where: { id },
+        include: [{
+            model: Models.ApplicationWorkflowPermission,
+            where: {
+                isActive: true
+            }
+        }]
+    });
 };
 
 export const findByIds = async (ids: string[]) => {

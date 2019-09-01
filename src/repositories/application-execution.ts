@@ -67,13 +67,16 @@ export const findById = async (id: string) => {
     });
 };
 
-export const getApplicationExecutionsForApproval = async (userId: string, type: string) => {
+export const getApplicationExecutionsForApproval = async (type: string) => {
     return Models.ApplicationExecution.findAll({
         attributes: ['id', 'applicationId', 'title', 'startedAt', 'status', 'createdAt', 'updatedAt', 'createdBy'],
         where: {
             isActive: true,
         },
         include: [{
+            model: Models.User,
+            as: 'createdByUser'
+        }, {
             model: Models.Application,
             where: {
                 isActive: true
@@ -98,9 +101,6 @@ export const getApplicationExecutionsForApproval = async (userId: string, type: 
                 },
                 include: [{
                     model: Models.ApplicationWorkflowPermission,
-                    where: {
-                        userId
-                    }
                 }]
             }]
         }]
@@ -113,6 +113,9 @@ export const getApplicationExecutionsForApprovalCount = async (userId: string, t
             isActive: true,
         },
         include: [{
+            model: Models.User,
+            as: 'createdByUser'
+        }, {
             model: Models.ApplicationExecutionWorkflow,
             where: {
                 status: ApplicationExecutionStatus.DRAFT
@@ -170,6 +173,17 @@ export const getDraftApplicationExecutionsCount = async (userId: string) => {
             createdBy: userId,
             status: ApplicationExecutionStatus.DRAFT
         },
+        include: [{
+            model: Models.Application,
+            where: {
+                isActive: true
+            },
+        }, {
+            model: Models.ApplicationExecutionForm,
+            where: {
+                isActive: true
+            }
+        }]
     });
 };
 

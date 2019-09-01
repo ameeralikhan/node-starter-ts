@@ -13,6 +13,7 @@ import * as userRepo from '../repositories/user';
 import { IApplicationInstance, IApplicationAttributes } from '../models/application';
 import { IApplicationWorkflowInstance, IApplicationWorkflowAttributes } from '../models/application-workflow';
 import { Role } from '../enum/role';
+import { ApplicationWorkflowAssignTo } from '../enum/application';
 
 export const getByApplicationId = async (applicationId: string): Promise<IApplicationWorkflowInstance[]> => {
     const application = await applicationRepo.findById(applicationId);

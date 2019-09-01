@@ -1,3 +1,4 @@
+
 import * as boom from 'boom';
 import * as _ from 'lodash';
 import { validate } from '../validations/index';
@@ -13,6 +14,8 @@ import * as applicationExecutionWorkflowRepo from '../repositories/application-e
 import * as applicationSectionRepo from '../repositories/application-form-section';
 import * as applicationWorkflowFieldPermissionRepo from '../repositories/application-workflow-field-permission';
 import * as userRepo from '../repositories/user';
+import * as departmentRepo from '../repositories/department';
+import * as officeLocationRepo from '../repositories/office-location';
 import { IApplicationInstance, IApplicationAttributes } from '../models/application';
 import { IApplicationExecutionInstance, IApplicationExecutionAttributes } from '../models/application-execution';
 import { IApplicationFormFieldInstance } from '../models/application-form-field';
@@ -20,7 +23,8 @@ import { Role } from '../enum/role';
 import { ApplicationExecutionStatus,
     ApplicationWorkflowType,
     ApplicationWorkflowPermissionType,
-    ApplicationWorkflowFieldPermission
+    ApplicationWorkflowFieldPermission,
+    ApplicationWorkflowAssignTo
 } from '../enum/application';
 import { IApplicationExecutionWorkflowAttributes } from '../models/application-execution-workflow';
 import { IExecutionWorkflowCount } from '../interface/application';
@@ -47,32 +51,48 @@ export const getByApplicationId = async (applicationId: string): Promise<IApplic
 };
 
 export const getExecutionByLoggedInUserId =
-    async (loggedInUserId: string, type: string, status?: string): Promise<IApplicationExecutionAttributes[]> => {
-    await validate({ loggedInUserId, type, status }, joiSchema.getExecutionByLoggedInUserId);
+    async (loggedInUser: any, type: string, status?: string): Promise<IApplicationExecutionAttributes[]> => {
+    await validate({ loggedInUserId: loggedInUser.userId, type, status }, joiSchema.getExecutionByLoggedInUserId);
     let dbApplicationExecutions: IApplicationExecutionInstance[] = [];
     if (status === ApplicationExecutionStatus.DRAFT) {
-        dbApplicationExecutions = await applicationExecutionRepo.getDraftApplicationExecutions(loggedInUserId);
+        dbApplicationExecutions = await applicationExecutionRepo.getDraftApplicationExecutions(loggedInUser.userId);
     } else {
         dbApplicationExecutions = await applicationExecutionRepo.
-            getApplicationExecutionsForApproval(loggedInUserId, type);
+            getApplicationExecutionsForApproval(type);
     }
-    return transformExecutionData(dbApplicationExecutions, status);
+    return transformExecutionData(dbApplicationExecutions, loggedInUser, status);
 };
 
 export const getExecutionInProcessLoggedInUserId =
-    async (loggedInUserId: string, status: string): Promise<IApplicationExecutionAttributes[]> => {
-    await validate({ loggedInUserId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
+    async (loggedInUser: any, status: string): Promise<IApplicationExecutionAttributes[]> => {
+    await validate({ loggedInUserId: loggedInUser.userId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
     const dbApplicationExecutions = await
-        applicationExecutionRepo.getApplicationExecutionInProcess(loggedInUserId, status);
-    return transformExecutionData(dbApplicationExecutions, status);
+        applicationExecutionRepo.getApplicationExecutionInProcess(loggedInUser.userId, status);
+    return transformExecutionData(dbApplicationExecutions, loggedInUser, status);
 };
 
-const transformExecutionData = async (dbApplicationExecutions: IApplicationExecutionInstance[], status?: string) => {
+const transformExecutionData = async (
+    dbApplicationExecutions: IApplicationExecutionInstance[],
+    user: any,
+    status?: string,
+) => {
     const applicationExecutions: IApplicationExecutionAttributes[] = [];
     for (const execution of dbApplicationExecutions) {
         const plainExecution = execution.get({ plain: true });
         if (!plainExecution.application) {
             continue;
+        }
+        if (plainExecution.applicationExecutionWorkflows &&
+            plainExecution.applicationExecutionWorkflows.length) {
+            const executionWorkflow = plainExecution.applicationExecutionWorkflows[0];
+            if (!executionWorkflow || !executionWorkflow.applicationWorkflowId) {
+                continue;
+            }
+            const shouldContinue = await checkWorkflowPermission(plainExecution,
+                    executionWorkflow.applicationWorkflowId, user.userId);
+            if (shouldContinue) {
+                continue;
+            }
         }
         const sections = await applicationSectionRepo.getByApplicationId(execution.applicationId);
         plainExecution.application.applicationFormSections = [];
@@ -129,6 +149,62 @@ const transformExecutionData = async (dbApplicationExecutions: IApplicationExecu
         applicationExecutions.push(plainExecution);
     }
     return applicationExecutions;
+};
+
+const checkWorkflowPermission = async (
+    plainExecution: IApplicationExecutionAttributes,
+    applicationWorkflowId: string,
+    userId: string
+) => {
+    let shouldContinue: boolean = false;
+    const applicationWorkflow = await applicationWorkflowRepo.findById(applicationWorkflowId);
+    if (applicationWorkflow &&
+        applicationWorkflow.applicationWorkflowPermissions) {
+        if (!applicationWorkflow.assignTo) {
+            const hasPermission = applicationWorkflow.applicationWorkflowPermissions.
+                find(per => per.userId === userId);
+            if (!hasPermission) {
+                shouldContinue = true;
+            }
+        } else {
+            switch (applicationWorkflow.assignTo) {
+                case ApplicationWorkflowAssignTo.INITIATOR:
+                    if (plainExecution.createdBy !== userId) {
+                        shouldContinue = true;
+                    }
+                    break;
+                case ApplicationWorkflowAssignTo.MANAGER:
+                    if (plainExecution.createdByUser &&
+                        plainExecution.createdByUser.managerId !== userId) {
+                            shouldContinue = true;
+                    }
+                    break;
+                case ApplicationWorkflowAssignTo.DEPARTMENT_HEAD:
+                    if (plainExecution.createdByUser &&
+                        plainExecution.createdByUser.departmentId) {
+                        const department = await departmentRepo.
+                            findById(plainExecution.createdByUser.departmentId);
+                        if (department &&
+                            department.userId !== userId) {
+                                shouldContinue = true;
+                        }
+                    }
+                    break;
+                case ApplicationWorkflowAssignTo.LOCATION_HEAD:
+                    if (plainExecution.createdByUser &&
+                        plainExecution.createdByUser.officeLocationId) {
+                        const officeLocation = await officeLocationRepo.
+                            findById(plainExecution.createdByUser.officeLocationId);
+                        if (officeLocation &&
+                            officeLocation.userId !== userId) {
+                                shouldContinue = true;
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+    return shouldContinue;
 };
 
 export const getExecutionWorkflowsCount =

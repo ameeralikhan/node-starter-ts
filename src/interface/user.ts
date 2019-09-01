@@ -11,4 +11,7 @@ export interface IUserRequest {
     password?: string;
     timezone?: number;
     roleIds: number[];
+    managerId: string;
+    departmentId: number;
+    officeLocationId: number;
 }

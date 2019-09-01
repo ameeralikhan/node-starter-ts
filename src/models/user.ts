@@ -13,9 +13,13 @@ export interface IUserAttributes {
   contactNo: string;
   pictureUrl: string;
   gender: string;
+  managerId: string;
+  departmentId: number;
+  officeLocationId: number;
   timezone: string;
   isApproved: boolean;
   isActive: boolean;
+  createdAt: Date;
   deletedAt: Date;
   deletedBy: string;
   userRoles: IUserRoleAttributes[];
@@ -31,6 +35,9 @@ export interface IUserInstance extends Sequelize.Instance<IUserAttributes> {
   contactNo: string;
   pictureUrl: string;
   gender: string;
+  managerId: string;
+  departmentId: number;
+  officeLocationId: number;
   timezone: string;
   isApproved: boolean;
   isActive: boolean;
@@ -88,6 +95,30 @@ export const define = (sequelize: Sequelize.Sequelize): IUserModel => {
       timezone: {
         type: Sequelize.STRING,
         allowNull: true,
+      },
+      managerId: {
+        type: Sequelize.UUIDV4,
+        allowNull: true,
+        references: {
+          model: 'user',
+          key: 'id'
+        }
+      },
+      departmentId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'department',
+          key: 'id'
+        }
+      },
+      officeLocationId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'officeLocation',
+          key: 'id'
+        }
       },
       isApproved: Sequelize.BOOLEAN,
       isActive: Sequelize.BOOLEAN,

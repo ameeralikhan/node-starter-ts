@@ -24,3 +24,10 @@ export enum ApplicationWorkflowPermissionType {
     ALL_TASK = 'all_task',
     WORKFLOW = 'workflow'
 }
+
+export enum ApplicationWorkflowAssignTo {
+    INITIATOR = 'initiator',
+    MANAGER = 'manager',
+    DEPARTMENT_HEAD = 'department_head',
+    LOCATION_HEAD = 'location_head'
+}

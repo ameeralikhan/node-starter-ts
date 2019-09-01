@@ -70,15 +70,15 @@ export const getAllExecution = async (ctx: Context, next: () => void) => {
 export const getExecutionByLoggedInUserId = async (ctx: Context, next: () => void) => {
   const status: string = ctx.request.query.status === 'undefined' ? undefined : ctx.request.query.status;
   const type: string = ctx.request.query.type;
-  const userId: string = ctx.state.user.userId;
-  ctx.state.data = await applicationExecutionService.getExecutionByLoggedInUserId(userId, type, status);
+  const user: any = ctx.state.user;
+  ctx.state.data = await applicationExecutionService.getExecutionByLoggedInUserId(user, type, status);
   await next();
 };
 
 export const getExecutionInProcessLoggedInUserId = async (ctx: Context, next: () => void) => {
   const status: string = ctx.request.query.status;
-  const userId: string = ctx.state.user.userId;
-  ctx.state.data = await applicationExecutionService.getExecutionInProcessLoggedInUserId(userId, status);
+  const user: any = ctx.state.user;
+  ctx.state.data = await applicationExecutionService.getExecutionInProcessLoggedInUserId(user, status);
   await next();
 };
 

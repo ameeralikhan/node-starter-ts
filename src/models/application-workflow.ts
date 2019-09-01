@@ -13,6 +13,7 @@ export interface IApplicationWorkflowAttributes {
     type?: string;
     order: number;
     stepId: string;
+    assignTo?: string;
     isActive: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -31,6 +32,7 @@ export interface IApplicationWorkflowInstance extends Sequelize.Instance<IApplic
     type?: string;
     order: number;
     stepId: string;
+    assignTo?: string;
     isActive: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -70,6 +72,10 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationWorkflowMode
       },
       order: {
         type: Sequelize.INTEGER,
+        allowNull: true,
+      },
+      assignTo: {
+        type: Sequelize.STRING,
         allowNull: true,
       },
       stepId: {

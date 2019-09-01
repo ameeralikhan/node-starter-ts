@@ -9,6 +9,7 @@ import { IApplicationAttributes, IApplicationInstance } from './application';
 import {
   IApplicationExecutionWorkflowAttributes,
   IApplicationExecutionWorkflowInstance } from './application-execution-workflow';
+import { IUserAttributes, IUserInstance } from './user';
 
 export interface IApplicationExecutionAttributes {
     id?: string;
@@ -26,6 +27,7 @@ export interface IApplicationExecutionAttributes {
     application?: IApplicationAttributes;
     applicationExecutionForms?: IApplicationExecutionFormAttributes[];
     applicationExecutionWorkflows?: IApplicationExecutionWorkflowAttributes[];
+    createdByUser?: IUserAttributes;
 }
 
 export interface IApplicationExecutionInstance extends Sequelize.Instance<IApplicationExecutionAttributes> {
@@ -44,6 +46,7 @@ export interface IApplicationExecutionInstance extends Sequelize.Instance<IAppli
     application?: IApplicationInstance;
     applicationExecutionForms?: IApplicationExecutionFormInstance[];
     applicationExecutionWorkflows?: IApplicationExecutionWorkflowInstance[];
+    createdByUser?: IUserInstance;
 }
 
 export interface IApplicationExecutionModel
@@ -115,6 +118,7 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationExecutionMod
 
     model.associate = (models: IModelFactory) => {
         model.belongsTo(models.Application);
+        model.belongsTo(models.User, { foreignKey: 'createdBy', as: 'createdByUser' });
 
         model.hasMany(models.ApplicationExecutionForm);
         model.hasMany(models.ApplicationExecutionWorkflow);
