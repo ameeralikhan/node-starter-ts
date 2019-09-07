@@ -167,7 +167,13 @@ const checkWorkflowPermission = async (
                 shouldContinue = true;
             }
         } else {
-            switch (applicationWorkflow.assignTo) {
+            let assignTo = applicationWorkflow.assignTo;
+            let fieldId = '';
+            if (assignTo.includes('field_')) {
+                assignTo = ApplicationWorkflowAssignTo.FIELD;
+                fieldId = assignTo.split('_')[1];
+            }
+            switch (assignTo) {
                 case ApplicationWorkflowAssignTo.INITIATOR:
                     if (plainExecution.createdBy !== userId) {
                         shouldContinue = true;
@@ -198,6 +204,14 @@ const checkWorkflowPermission = async (
                         if (officeLocation &&
                             officeLocation.userId !== userId) {
                                 shouldContinue = true;
+                        }
+                    }
+                    break;
+                case ApplicationWorkflowAssignTo.FIELD:
+                    if (plainExecution.applicationExecutionForms) {
+                        const field = plainExecution.applicationExecutionForms.find(field => field.fieldId === fieldId);
+                        if (field && field.value !== userId) {
+                            shouldContinue = true;
                         }
                     }
                     break;

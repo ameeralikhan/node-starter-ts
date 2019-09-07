@@ -6,6 +6,7 @@ export interface IApplicationExecutionFormAttributes {
     id: string;
     applicationExecutionId: string;
     applicationFormFieldId: string;
+    fieldId: string;
     value: string;
     isActive: boolean;
     createdAt?: Date;
@@ -20,6 +21,7 @@ export interface IApplicationExecutionFormInstance extends Sequelize.Instance<IA
     id: string;
     applicationExecutionId: string;
     applicationFormFieldId: string;
+    fieldId: string;
     value: string;
     isActive: boolean;
     createdAt?: Date;
@@ -56,6 +58,10 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationExecutionFor
           model: 'applicationFormField',
           key: 'id'
         }
+      },
+      fieldId: {
+        type: Sequelize.STRING,
+        allowNull: true
       },
       value: {
         type: Sequelize.STRING(1000),

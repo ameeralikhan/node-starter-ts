@@ -12,11 +12,11 @@ const router = new Router({
 
 router.use(authentication);
 
-router.get('/', authorization(false, [Role.SUPER_ADMIN]), userCtrl.getAll);
+router.get('/', authorization(false, [Role.SUPER_ADMIN, Role.USER]), userCtrl.getAll);
 
 router.get('/me', userCtrl.getUser);
 
-router.get('/:userId', authorization(false, [Role.SUPER_ADMIN]), userCtrl.getUserById);
+router.get('/:userId', authorization(false, [Role.SUPER_ADMIN, Role.USER]), userCtrl.getUserById);
 
 router.post('/', authorization(false, [Role.SUPER_ADMIN]), userCtrl.saveUser);
 
