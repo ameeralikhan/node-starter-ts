@@ -170,8 +170,8 @@ const checkWorkflowPermission = async (
             let assignTo = applicationWorkflow.assignTo;
             let fieldId = '';
             if (assignTo.includes('field_')) {
+                fieldId = assignTo.replace('field_', '');
                 assignTo = ApplicationWorkflowAssignTo.FIELD;
-                fieldId = assignTo.split('_')[1];
             }
             switch (assignTo) {
                 case ApplicationWorkflowAssignTo.INITIATOR:

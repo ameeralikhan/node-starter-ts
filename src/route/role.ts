@@ -10,12 +10,11 @@ const router = new Router({
 });
 
 router.use(authentication);
-router.use(authorization(false, [Role.SUPER_ADMIN]));
 
 router.get('/', ctrl.getAll);
 
-router.post('/', ctrl.saveRole);
+router.post('/', authorization(false, [Role.SUPER_ADMIN]), ctrl.saveRole);
 
-router.delete('/:id', ctrl.deleteRole);
+router.delete('/:id', authorization(false, [Role.SUPER_ADMIN]), ctrl.deleteRole);
 
 export default router.routes();
