@@ -88,10 +88,13 @@ const transformExecutionData = async (
             if (!executionWorkflow || !executionWorkflow.applicationWorkflowId) {
                 continue;
             }
-            const shouldContinue = await checkWorkflowPermission(plainExecution,
+            if (executionWorkflow.status !== ApplicationExecutionStatus.APPROVED &&
+                executionWorkflow.status !== ApplicationExecutionStatus.REJECT) {
+                const shouldContinue = await checkWorkflowPermission(plainExecution,
                     executionWorkflow.applicationWorkflowId, user.userId);
-            if (shouldContinue) {
-                continue;
+                if (shouldContinue) {
+                    continue;
+                }
             }
         }
         const sections = await applicationSectionRepo.getByApplicationId(execution.applicationId);
