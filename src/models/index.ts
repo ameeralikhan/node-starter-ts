@@ -63,7 +63,7 @@ const models: IModelFactory = {
   ApplicationExecutionForm: ApplicationExecutionForm.define(Database),
   ApplicationExecutionWorkflow: ApplicationExecutionWorkflow.define(Database),
   Lookup: Lookup.define(Database),
-  LookupData: LookupData.define(Database)
+  LookupData: LookupData.define(Database),
 };
 
 // Execute the associations where defined

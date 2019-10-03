@@ -165,3 +165,7 @@ export const getExecutionInProcessLoggedInUserId: Joi.SchemaMap = {
         ApplicationExecutionStatus.CLARITY,
     ])
 };
+
+export const getExecutionParticipatedLoggedInUserId: Joi.SchemaMap = {
+    loggedInUserId: Joi.string().uuid().required(),
+};

@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
 
+import { Database } from './../bootstrap/database';
 import { Models } from '../models/index';
 import { IApplicationExecutionInstance, IApplicationExecutionAttributes } from '../models/application-execution';
 import { ApplicationExecutionStatus } from './../enum/application';
@@ -230,6 +231,51 @@ export const getApplicationExecutionInProcessCount = async (userId: string, stat
             where: {
                 status
             },
+            include: [{
+                model: Models.ApplicationWorkflow,
+            }]
+        }]
+    });
+};
+
+export const getApplicationExecutionParticipatedIds = async (userId: string) => {
+    return Database.query(`
+        WITH
+        A AS (
+            SELECT
+            "applicationExecutionId", jsonb_array_elements("comments") AS comments
+            FROM "applicationExecutionWorkflow"
+        )
+        SELECT distinct("applicationExecutionId") as id
+        FROM A
+        WHERE (comments->>'userId') = '${userId}';
+    `);
+};
+
+export const getApplicationExecutionsByIds = async (ids: string[]) => {
+    return Models.ApplicationExecution.findAll({
+        attributes: ['id', 'applicationId', 'title', 'startedAt', 'status', 'createdAt', 'updatedAt', 'createdBy'],
+        where: {
+            isActive: true,
+            id: {
+                [Sequelize.Op.in]: ids
+            },
+        },
+        include: [{
+            model: Models.Application,
+            where: {
+                isActive: true
+            },
+        }, {
+            model: Models.ApplicationExecutionForm,
+            include: [{
+                model: Models.ApplicationFormField
+            }],
+            where: {
+                isActive: true
+            }
+        }, {
+            model: Models.ApplicationExecutionWorkflow,
             include: [{
                 model: Models.ApplicationWorkflow,
             }]
