@@ -243,7 +243,8 @@ export const getExecutionWorkflowsCount =
         clarification: 0,
         draft: 0,
         approved: 0,
-        reject: 0
+        reject: 0,
+        participated: 0
     };
     const response = await Promise.all([
         applicationExecutionRepo.getApplicationExecutionInProcessCount(loggedInUserId,
@@ -256,15 +257,18 @@ export const getExecutionWorkflowsCount =
             ApplicationWorkflowType.APPROVAL),
         applicationExecutionRepo.getApplicationExecutionsForApprovalCount(loggedInUserId,
             ApplicationWorkflowType.INPUT),
-        applicationExecutionRepo.getDraftApplicationExecutionsCount(loggedInUserId)
+        applicationExecutionRepo.getDraftApplicationExecutionsCount(loggedInUserId),
+        applicationExecutionRepo.getApplicationExecutionParticipatedIds(loggedInUserId)
     ]);
+    const participatedIds: string[] = response[6][0].map((execution: any) => execution.id);
     resp = {
         approval: response[3],
         inputRequest: response[4],
         clarification: response[2],
         draft: response[5],
         approved: response[0],
-        reject: response[1]
+        reject: response[1],
+        participated: participatedIds.length
     };
     return resp;
 };
