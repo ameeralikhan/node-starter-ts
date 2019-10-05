@@ -17,6 +17,8 @@ export interface IApplicationExecutionAttributes {
     startedAt?: Date;
     status?: string;
     title?: string;
+    latitude?: number;
+    longitude?: number;
     isActive?: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -36,6 +38,8 @@ export interface IApplicationExecutionInstance extends Sequelize.Instance<IAppli
     startedAt: Date;
     status: string;
     title: string;
+    latitude: number;
+    longitude: number;
     isActive: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -77,6 +81,14 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationExecutionMod
       },
       title: {
         type: Sequelize.STRING,
+        allowNull: true,
+      },
+      latitude: {
+        type: Sequelize.FLOAT,
+        allowNull: true,
+      },
+      longitude: {
+        type: Sequelize.FLOAT,
         allowNull: true,
       },
       isActive: {
