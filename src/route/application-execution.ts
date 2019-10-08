@@ -25,6 +25,8 @@ router.get('/workflow/action/count', ctrl.getExecutionWorkflowsCount);
 
 router.get('/:executionId/detail', ctrl.getExecutionById);
 
+router.get('/:executionId/transformed', ctrl.getDetailExecutionById);
+
 router.get('/participated', ctrl.getExecutionParticipatedLoggedInUserId);
 
 router.post('/:applicationId/execution', ctrl.saveApplicationExecution);

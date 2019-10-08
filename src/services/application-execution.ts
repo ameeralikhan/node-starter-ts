@@ -50,6 +50,16 @@ export const getByApplicationId = async (applicationId: string): Promise<IApplic
     return applicationExecutionRepo.getByApplicationId(applicationId);
 };
 
+export const getDetailedExecutionById = async (executionId: string,
+                                               loggedInUserId: string): Promise<IApplicationExecutionAttributes> => {
+    const execution = await applicationExecutionRepo.findById(executionId);
+    if (!execution) {
+        throw boom.badRequest('Invalid execution id');
+    }
+    const transformedExecution = await transformExecutionData([execution], loggedInUserId);
+    return transformedExecution[0];
+};
+
 export const getExecutionByLoggedInUserId =
     async (loggedInUser: any, type: string, status?: string): Promise<IApplicationExecutionAttributes[]> => {
     await validate({ loggedInUserId: loggedInUser.userId, type, status }, joiSchema.getExecutionByLoggedInUserId);

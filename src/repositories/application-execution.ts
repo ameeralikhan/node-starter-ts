@@ -56,14 +56,32 @@ export const findById = async (id: string) => {
             id
         },
         include: [{
-            model: Models.ApplicationExecutionForm,
-            attributes: ['id', 'applicationExecutionId', 'applicationFormFieldId', 'value', 'isActive'],
+            model: Models.User,
+            as: 'createdByUser'
+        }, {
+            model: Models.Application,
             where: {
                 isActive: true
             },
+        }, {
+            model: Models.ApplicationExecutionForm,
             include: [{
-                model: Models.ApplicationFormField,
+                model: Models.ApplicationFormField
             }],
+            where: {
+                isActive: true
+            }
+        }, {
+            model: Models.ApplicationExecutionWorkflow,
+            where: {
+                status: ApplicationExecutionStatus.DRAFT
+            },
+            include: [{
+                model: Models.ApplicationWorkflow,
+                include: [{
+                    model: Models.ApplicationWorkflowPermission,
+                }]
+            }]
         }]
     });
 };
