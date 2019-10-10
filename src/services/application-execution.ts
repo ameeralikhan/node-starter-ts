@@ -51,13 +51,18 @@ export const getByApplicationId = async (applicationId: string): Promise<IApplic
 };
 
 export const getDetailedExecutionById = async (executionId: string,
-                                               loggedInUserId: string): Promise<IApplicationExecutionAttributes> => {
+                                               loggedInUser: any,
+                                               status: string): Promise<IApplicationExecutionAttributes> => {
     const execution = await applicationExecutionRepo.findById(executionId);
     if (!execution) {
         throw boom.badRequest('Invalid execution id');
     }
-    const transformedExecution = await transformExecutionData([execution], loggedInUserId);
-    return transformedExecution[0];
+    const transformedExecution = await transformExecutionData([execution], loggedInUser, status);
+    if (!transformedExecution || !transformedExecution.length) {
+        throw boom.badRequest('Not allowed');
+    } else {
+        return transformedExecution[0];
+    }
 };
 
 export const getExecutionByLoggedInUserId =

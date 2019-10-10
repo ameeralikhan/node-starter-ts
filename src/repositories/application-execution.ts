@@ -73,9 +73,6 @@ export const findById = async (id: string) => {
             }
         }, {
             model: Models.ApplicationExecutionWorkflow,
-            where: {
-                status: ApplicationExecutionStatus.DRAFT
-            },
             include: [{
                 model: Models.ApplicationWorkflow,
                 include: [{

@@ -64,8 +64,9 @@ export const getExecutionById = async (ctx: Context, next: () => void) => {
 
 export const getDetailExecutionById = async (ctx: Context, next: () => void) => {
   const executionId: string = ctx.params.executionId;
-  const userId: any = ctx.state.user.userId;
-  ctx.state.data = await applicationExecutionService.getDetailedExecutionById(executionId, userId);
+  const user: any = ctx.state.user;
+  const status: string = ctx.request.query.status === 'undefined' ? undefined : ctx.request.query.status;
+  ctx.state.data = await applicationExecutionService.getDetailedExecutionById(executionId, user, status);
   await next();
 };
 
