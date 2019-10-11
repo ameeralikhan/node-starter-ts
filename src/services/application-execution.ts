@@ -335,7 +335,7 @@ export const saveApplicationExecution = async (applicationId: string,
     }
     applicationExecution.title = title;
     await applicationExecutionRepo.saveApplicationExecution(applicationExecution);
-    return getByApplicationId(applicationId);
+    return execution;
 };
 
 export const saveApplicationExecutionForm = async (applicationId: string,
