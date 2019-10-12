@@ -14,4 +14,6 @@ router.use(authorization(false, [Role.SUPER_ADMIN]));
 
 router.get('/my-item', ctrl.getMyItemReport);
 
+router.get('/workload/:userId', ctrl.getUserWorkloadReport);
+
 export default router.routes();

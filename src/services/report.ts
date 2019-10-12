@@ -32,6 +32,12 @@ export const getMyItemReport = async (loggedInUser: any) => {
     return { participated: responseParticipatedItems, myItem: responseMyItems };
 };
 
+export const getUserWorkloadReport = async (userId: string) => {
+    const dbApplicationExecutions = await
+        applicationExecutionRepo.getAll(userId, true);
+    return { assignToMe: dbApplicationExecutions.length };
+};
+
 const transformExecutionData = (
     dbApplicationExecutions: IApplicationExecutionInstance[],
 ) => {
