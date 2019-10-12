@@ -30,8 +30,8 @@ import { IApplicationExecutionWorkflowAttributes } from '../models/application-e
 import { IExecutionWorkflowCount } from '../interface/application';
 import { PERMISSION_STATUS_MAPPING } from '../constants/application';
 
-export const getAll = async (): Promise<IApplicationExecutionInstance[]> => {
-    return applicationExecutionRepo.getAll();
+export const getAll = async (loggedInUser: any): Promise<IApplicationExecutionInstance[]> => {
+    return applicationExecutionRepo.getAll(loggedInUser.userId, false);
 };
 
 export const getById = async (executionId: string): Promise<IApplicationExecutionInstance> => {

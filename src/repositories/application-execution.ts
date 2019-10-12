@@ -5,12 +5,16 @@ import { Models } from '../models/index';
 import { IApplicationExecutionInstance, IApplicationExecutionAttributes } from '../models/application-execution';
 import { ApplicationExecutionStatus } from './../enum/application';
 
-export const getAll = async () => {
+export const getAll = async (userId: string, applyCreatedBy: boolean = false) => {
+    const where: any = {
+        isActive: true
+    };
+    if (applyCreatedBy) {
+        where.createdBy = userId;
+    }
     return Models.ApplicationExecution.findAll({
         attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt'],
-        where: {
-            isActive: true,
-        },
+        where,
         include: [{
             model: Models.ApplicationExecutionForm,
             attributes: ['id', 'applicationExecutionId', 'applicationFormFieldId', 'value', 'isActive'],
@@ -22,6 +26,11 @@ export const getAll = async () => {
             }],
         }, {
             model: Models.Application
+        }, {
+            model: Models.ApplicationExecutionWorkflow,
+            include: [{
+                model: Models.ApplicationWorkflow,
+            }]
         }]
     });
 };

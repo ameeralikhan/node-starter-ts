@@ -14,6 +14,7 @@ import dashboard from './dashboard';
 import application from './application';
 import applicationExecution from './application-execution';
 import lookup from './lookup';
+import report from './report';
 
 const router = new Router({
   prefix: '/api/v1',
@@ -40,7 +41,8 @@ const routesToExport = [
   dashboard,
   application,
   applicationExecution,
-  lookup
+  lookup,
+  report
 ];
 
 export default () => compose(routesToExport);
