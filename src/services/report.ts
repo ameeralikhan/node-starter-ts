@@ -8,7 +8,7 @@ import * as joiSchema from '../validations/schemas/application';
 import * as applicationExecutionRepo from '../repositories/application-execution';
 import { IApplicationExecutionInstance, IApplicationExecutionAttributes } from '../models/application-execution';
 import { ApplicationExecutionStatus } from '../enum/application';
-import { IExecutionWorkflowCount, IMyItemReport } from '../interface/application';
+import { IExecutionWorkflowCount, IMyItemReport, IUserWorkloadReport } from '../interface/application';
 
 export const getMyItemReport = async (loggedInUser: any) => {
     await validate({ loggedInUserId: loggedInUser.userId }, joiSchema.getExecutionParticipatedLoggedInUserId);
@@ -34,8 +34,17 @@ export const getMyItemReport = async (loggedInUser: any) => {
 
 export const getUserWorkloadReport = async (userId: string) => {
     const dbApplicationExecutions = await
-        applicationExecutionRepo.getAll(userId, true);
-    return { assignToMe: dbApplicationExecutions.length };
+        applicationExecutionRepo.getAllForParticipatedReport(userId, true);
+    const groupedExecutions = _.groupBy(dbApplicationExecutions, 'application.name');
+    const response: IUserWorkloadReport[] = [];
+    for (const key of Object.keys(groupedExecutions)) {
+        response.push({
+            applicationId: '',
+            applicationName: key,
+            assignToMe: groupedExecutions[key].length
+        });
+    }
+    return response;
 };
 
 const transformExecutionData = (

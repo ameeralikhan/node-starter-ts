@@ -25,12 +25,34 @@ export const getAll = async (userId: string, applyCreatedBy: boolean = false) =>
                 model: Models.ApplicationFormField,
             }],
         }, {
-            model: Models.Application
+            model: Models.Application,
+            where: {
+                isActive: true
+            }
         }, {
             model: Models.ApplicationExecutionWorkflow,
             include: [{
                 model: Models.ApplicationWorkflow,
             }]
+        }]
+    });
+};
+
+export const getAllForParticipatedReport = async (userId: string, applyCreatedBy: boolean = false) => {
+    const where: any = {
+        isActive: true
+    };
+    if (applyCreatedBy) {
+        where.createdBy = userId;
+    }
+    return Models.ApplicationExecution.findAll({
+        attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt'],
+        where,
+        include: [{
+            model: Models.Application,
+            where: {
+                isActive: true
+            }
         }]
     });
 };

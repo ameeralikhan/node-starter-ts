@@ -37,3 +37,9 @@ export interface IMyItemReport {
     completed: number;
     rejected: number;
 }
+
+export interface IUserWorkloadReport {
+    applicationId: string;
+    applicationName: string;
+    assignToMe: number;
+}
