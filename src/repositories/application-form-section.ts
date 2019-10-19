@@ -24,7 +24,7 @@ export const getByApplicationId = async (applicationId: string) => {
             }],
             required: false
         }],
-        order: ['order']
+        order: [['order'], [Models.ApplicationFormField, 'order', 'asc']]
     });
 };
 
