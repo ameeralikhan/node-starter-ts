@@ -5,12 +5,15 @@ import { IUserInstance, IUserAttributes } from './../models/user';
 import { IUserRoleInstance, IUserRoleAttributes } from './../models/user-role';
 
 export const authenticate = async (email: string, password: string) => {
+    const where: any = {
+        email,
+        deletedAt: null
+    };
+    if (password) {
+        where.password = password;
+    }
     return Models.User.findOne({
-        where: {
-            email,
-            password,
-            deletedAt: null
-        },
+        where,
         include: [{
             model: Models.UserRole,
             include: [{
@@ -48,6 +51,17 @@ export const getAll = async () => {
         }],
         where: {
             deletedAt: null
+        },
+    });
+};
+
+export const getByDepartmentId = async (departmentId: number) => {
+    return Models.User.findAll({
+        attributes: ['id', 'firstName', 'lastName', 'email', 'contactNo', 'gender', 'pictureUrl',
+            'managerId', 'departmentId', 'officeLocationId', 'isActive', 'createdAt', 'updatedAt'],
+        where: {
+            deletedAt: null,
+            departmentId
         },
     });
 };

@@ -10,7 +10,6 @@ const router = new Router({
 });
 
 router.use(authentication);
-router.use(authorization(false, [Role.SUPER_ADMIN]));
 
 router.get('/', ctrl.getAll);
 

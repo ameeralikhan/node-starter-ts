@@ -89,11 +89,11 @@ export const getExecutionInProcessLoggedInUserId =
 export const getExecutionParticipatedLoggedInUserId =
     async (loggedInUser: any): Promise<IApplicationExecutionAttributes[]> => {
     await validate({ loggedInUserId: loggedInUser.userId }, joiSchema.getExecutionParticipatedLoggedInUserId);
-    const executionIds = await
-        applicationExecutionRepo.getApplicationExecutionParticipatedIds(loggedInUser.userId);
-    const ids: string[] = executionIds[0].map((execution: any) => execution.id);
+    // const executionIds = await
+    //     applicationExecutionRepo.getApplicationExecutionParticipatedIds(loggedInUser.userId);
+    // const ids: string[] = executionIds[0].map((execution: any) => execution.id);
     const dbApplicationExecutions = await
-        applicationExecutionRepo.getApplicationExecutionsByIds(ids);
+        applicationExecutionRepo.getApprovedApplicationExecutions(loggedInUser.userId);
     return transformExecutionData(dbApplicationExecutions, loggedInUser);
 };
 

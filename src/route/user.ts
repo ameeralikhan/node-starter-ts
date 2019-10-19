@@ -18,6 +18,9 @@ router.get('/me', userCtrl.getUser);
 
 router.get('/:userId', authorization(false, [Role.SUPER_ADMIN, Role.USER]), userCtrl.getUserById);
 
+router.get('/department/:departmentId',
+authorization(false, [Role.SUPER_ADMIN, Role.USER]), userCtrl.getUserByDepartmentId);
+
 router.post('/', authorization(false, [Role.SUPER_ADMIN]), userCtrl.saveUser);
 
 router.put('/change-password', ctrl.changePassword);

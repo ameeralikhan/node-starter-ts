@@ -213,6 +213,39 @@ export const getDraftApplicationExecutions = async (userId: string) => {
     });
 };
 
+export const getApprovedApplicationExecutions = async (userId: string) => {
+    return Models.ApplicationExecution.findAll({
+        attributes: ['id', 'applicationId', 'title', 'startedAt', 'status', 'createdAt', 'updatedAt', 'createdBy'],
+        where: {
+            isActive: true,
+            updatedBy: userId,
+            status: ApplicationExecutionStatus.APPROVED
+        },
+        include: [{
+            model: Models.Application,
+            where: {
+                isActive: true
+            },
+        }, {
+            model: Models.ApplicationExecutionForm,
+            include: [{
+                model: Models.ApplicationFormField
+            }],
+            where: {
+                isActive: true
+            }
+        }, {
+            model: Models.ApplicationExecutionWorkflow,
+            where: {
+                status: ApplicationExecutionStatus.APPROVED
+            },
+            include: [{
+                model: Models.ApplicationWorkflow,
+            }]
+        }]
+    });
+};
+
 export const getDraftApplicationExecutionsCount = async (userId: string) => {
     return Models.ApplicationExecution.count({
         where: {

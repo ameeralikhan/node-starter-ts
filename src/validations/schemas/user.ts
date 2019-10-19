@@ -4,6 +4,10 @@ export const getUserById: Joi.SchemaMap = {
   userId: Joi.string().uuid().required()
 };
 
+export const getUserByDepartmentId: Joi.SchemaMap = {
+  departmentId: Joi.number().required()
+};
+
 export const userRequest: Joi.SchemaMap = {
   id: Joi.string().uuid(),
   firstName: Joi.string().required(),

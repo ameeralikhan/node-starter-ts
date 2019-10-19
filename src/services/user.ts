@@ -38,6 +38,12 @@ export const getAll = async () => {
     return returnUsers;
 };
 
+export const getByDepartmentId = async (departmentId: number) => {
+    await validate({ departmentId }, joiSchema.getUserByDepartmentId);
+    const departments: any = await userRepo.getByDepartmentId(departmentId);
+    return departments;
+};
+
 export const saveUser = async (payload: IUserRequest) => {
     await validate(payload, joiSchema.userRequest);
     const existingUser = await userRepo.findByEmail(payload.email);
