@@ -27,7 +27,7 @@ import { ApplicationExecutionStatus,
     ApplicationWorkflowAssignTo
 } from '../enum/application';
 import { IApplicationExecutionWorkflowAttributes } from '../models/application-execution-workflow';
-import { IExecutionWorkflowCount } from '../interface/application';
+import { IExecutionWorkflowCount, IGetExecutionSelect } from '../interface/application';
 import { PERMISSION_STATUS_MAPPING } from '../constants/application';
 
 export const getAll = async (loggedInUser: any): Promise<IApplicationExecutionInstance[]> => {
@@ -84,6 +84,27 @@ export const getExecutionInProcessLoggedInUserId =
     const dbApplicationExecutions = await
         applicationExecutionRepo.getApplicationExecutionInProcess(loggedInUser.userId, status);
     return transformExecutionData(dbApplicationExecutions, loggedInUser, status);
+};
+
+export const getExecutionInProcessLoggedInUserIdByQuery =
+    async (loggedInUser: any, status: string, type?: string): Promise<IGetExecutionSelect[]> => {
+    await validate({ loggedInUserId: loggedInUser.userId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
+    let dbApplicationExecutions = [];
+    if (!type) {
+        if (status === ApplicationExecutionStatus.DRAFT) {
+            dbApplicationExecutions = await
+                applicationExecutionRepo.getDraftApplicationExecutionQuery(loggedInUser.userId, status);
+        } else {
+            dbApplicationExecutions = await
+                applicationExecutionRepo.getApplicationExecutionInProcessQuery(loggedInUser.userId, status);
+        }
+    } else {
+        dbApplicationExecutions = await applicationExecutionRepo.getApplicationExecutionByWorkflowTypeAndStatusQuery(
+            status, type);
+    }
+    dbApplicationExecutions = dbApplicationExecutions.filter((ex) =>
+        checkWorkflowPermissionQuery(ex, loggedInUser.userId));
+    return dbApplicationExecutions;
 };
 
 export const getExecutionParticipatedLoggedInUserId =
@@ -244,6 +265,70 @@ const checkWorkflowPermission = async (
                         }
                     }
                     break;
+            }
+        }
+    }
+    return shouldContinue;
+};
+
+const checkWorkflowPermissionQuery = async (execution: IGetExecutionSelect, userId: string) => {
+    let shouldContinue: boolean = true;
+    const applicationWorkflow = await applicationWorkflowRepo.findById(execution.applicationWorkflowId);
+    if (applicationWorkflow &&
+        applicationWorkflow.applicationWorkflowPermissions) {
+        if (!applicationWorkflow.assignTo) {
+            const hasPermission = applicationWorkflow.applicationWorkflowPermissions.
+                find(per => per.userId === userId);
+            if (!hasPermission) {
+                shouldContinue = false;
+            }
+        } else {
+            let assignTo = applicationWorkflow.assignTo;
+            let fieldId = '';
+            if (assignTo.includes('field_')) {
+                fieldId = assignTo.replace('field_', '');
+                assignTo = ApplicationWorkflowAssignTo.FIELD;
+            }
+            switch (assignTo) {
+                case ApplicationWorkflowAssignTo.INITIATOR:
+                    if (execution.createdBy !== userId) {
+                        shouldContinue = false;
+                    }
+                    break;
+                case ApplicationWorkflowAssignTo.MANAGER:
+                    if (execution.managerId !== userId) {
+                            shouldContinue = false;
+                    }
+                    break;
+                case ApplicationWorkflowAssignTo.DEPARTMENT_HEAD:
+                    if (execution.departmentId) {
+                        const department = await departmentRepo.
+                            findById(execution.departmentId);
+                        if (department &&
+                            department.userId !== userId) {
+                                shouldContinue = false;
+                        }
+                    }
+                    break;
+                case ApplicationWorkflowAssignTo.LOCATION_HEAD:
+                    if (execution.officeLocationId) {
+                        const officeLocation = await officeLocationRepo.
+                            findById(execution.officeLocationId);
+                        if (officeLocation &&
+                            officeLocation.userId !== userId) {
+                                shouldContinue = false;
+                        }
+                    }
+                    break;
+                case ApplicationWorkflowAssignTo.FIELD:
+                    const field = await applicationExecutionFormRepo.
+                        getByApplicationExecutionIdAndFieldId(execution.id, fieldId);
+                    if (!field || (field && field.value !== userId)) {
+                        shouldContinue = false;
+                    }
+                    break;
+                default:
+                    shouldContinue = false;
             }
         }
     }

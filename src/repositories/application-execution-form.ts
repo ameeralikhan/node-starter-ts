@@ -22,6 +22,17 @@ export const getByApplicationExecutionId = async (applicationExecutionId: string
     });
 };
 
+export const getByApplicationExecutionIdAndFieldId = async (applicationExecutionId: string, fieldId: string) => {
+    return Models.ApplicationExecutionForm.findOne({
+        attributes: ['id', 'applicationExecutionId', 'applicationFormFieldId', 'value', 'createdAt', 'updatedAt'],
+        where: {
+            isActive: true,
+            applicationExecutionId,
+            fieldId
+        },
+    });
+};
+
 export const findById = async (id: string) => {
     return Models.ApplicationExecutionForm.findOne({ where: { id }});
 };

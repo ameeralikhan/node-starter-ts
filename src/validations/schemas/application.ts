@@ -160,6 +160,7 @@ export const getExecutionByLoggedInUserId: Joi.SchemaMap = {
 export const getExecutionInProcessLoggedInUserId: Joi.SchemaMap = {
     loggedInUserId: Joi.string().uuid().required(),
     status: Joi.string().required().valid([
+        ApplicationExecutionStatus.DRAFT,
         ApplicationExecutionStatus.APPROVED,
         ApplicationExecutionStatus.REJECT,
         ApplicationExecutionStatus.CLARITY,

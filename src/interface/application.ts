@@ -30,6 +30,17 @@ export interface IExecutionWorkflowCount {
     participated: number;
 }
 
+export interface IGetExecutionSelect {
+    id: string;
+    title: string;
+    createdAt: Date;
+    createdBy: string;
+    managerId: string;
+    departmentId: number;
+    officeLocationId: number;
+    applicationWorkflowId: string;
+}
+
 export interface IMyItemReport {
     applicationId: string;
     applicationName: string;

@@ -91,6 +91,14 @@ export const getExecutionInProcessLoggedInUserId = async (ctx: Context, next: ()
   await next();
 };
 
+export const getExecutionInProcessLoggedInUserIdByQuery = async (ctx: Context, next: () => void) => {
+  const status: string = ctx.request.query.status;
+  const type: string = ctx.request.query.type;
+  const user: any = ctx.state.user;
+  ctx.state.data = await applicationExecutionService.getExecutionInProcessLoggedInUserIdByQuery(user, status, type);
+  await next();
+};
+
 export const getExecutionParticipatedLoggedInUserId = async (ctx: Context, next: () => void) => {
   const user: any = ctx.state.user;
   ctx.state.data = await applicationExecutionService.getExecutionParticipatedLoggedInUserId(user);

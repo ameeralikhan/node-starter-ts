@@ -4,6 +4,7 @@ import { Database } from './../bootstrap/database';
 import { Models } from '../models/index';
 import { IApplicationExecutionInstance, IApplicationExecutionAttributes } from '../models/application-execution';
 import { ApplicationExecutionStatus } from './../enum/application';
+import { IGetExecutionSelect } from '../interface/application';
 
 export const getAll = async (userId: string, applyCreatedBy: boolean = false) => {
     const where: any = {
@@ -276,11 +277,13 @@ export const getApplicationExecutionInProcess = async (userId: string, status: s
         },
         include: [{
             model: Models.Application,
+            attributes: ['id', 'subject'],
             where: {
                 isActive: true
             },
         }, {
             model: Models.ApplicationExecutionForm,
+            attributes: ['id', 'applicationFormFieldId'],
             include: [{
                 model: Models.ApplicationFormField
             }],
@@ -289,6 +292,7 @@ export const getApplicationExecutionInProcess = async (userId: string, status: s
             }
         }, {
             model: Models.ApplicationExecutionWorkflow,
+            attributes: ['id', 'applicationWorkflowId'],
             where: {
                 status
             },
@@ -360,6 +364,69 @@ export const getApplicationExecutionsByIds = async (ids: string[]) => {
             }]
         }]
     });
+};
+
+// Raw query
+export const getDraftApplicationExecutionQuery =
+    async (userId: string, status: string): Promise<IGetExecutionSelect[]> => {
+    const result = await Database.query(`
+        select distinct execution.id, execution."createdAt", execution."createdBy",
+        u."managerId", u."departmentId", u."officeLocationId", ew."applicationWorkflowId",
+        (
+            select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
+            where ef."applicationExecutionId" = execution.id and
+            app.subject ilike concat('%', ef."fieldId", '%') limit 1
+        ) as title
+        from "applicationExecution" execution
+        inner join application app on execution."applicationId" = app.id and app."isActive" = true
+        inner join "user" u on u.id = execution."createdBy"
+        left join "applicationExecutionWorkflow" ew on ew."applicationExecutionId" = execution.id and
+        and ew."isActive" = true
+        where execution."createdBy" = '${userId}' and execiton.status = '${status}' execution."isActive" = true
+    `).then((res) => res[0]);
+    return result;
+};
+
+export const getApplicationExecutionInProcessQuery =
+    async (userId: string, status: string): Promise<IGetExecutionSelect[]> => {
+    const result = await Database.query(`
+        select distinct execution.id, execution."createdAt", execution."createdBy",
+        u."managerId", u."departmentId", u."officeLocationId", ew."applicationWorkflowId",
+        (
+            select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
+            where ef."applicationExecutionId" = execution.id and
+            app.subject ilike concat('%', ef."fieldId", '%') limit 1
+        ) as title
+        from "applicationExecution" execution
+        inner join application app on execution."applicationId" = app.id and app."isActive" = true
+        inner join "user" u on u.id = execution."createdBy"
+        left join "applicationExecutionWorkflow" ew on ew."applicationExecutionId" = execution.id and
+        ew.status = '${status}' and ew."isActive" = true
+        where execution."createdBy" = '${userId}' and execution."isActive" = true
+    `).then((res) => res[0]);
+    return result;
+};
+
+export const getApplicationExecutionByWorkflowTypeAndStatusQuery =
+    async (status: string, type: string): Promise<IGetExecutionSelect[]> => {
+    const result = await Database.query(`
+        select distinct execution.id, execution."createdAt", execution."createdBy",
+        u."managerId", u."departmentId", u."officeLocationId", ew."applicationWorkflowId",
+        (
+            select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
+            where ef."applicationExecutionId" = execution.id and
+            app.subject ilike concat('%', ef."fieldId", '%') limit 1
+        ) as title
+        from "applicationExecution" execution
+        inner join application app on execution."applicationId" = app.id and app."isActive" = true
+        inner join "user" u on u.id = execution."createdBy"
+        inner join "applicationExecutionWorkflow" ew on ew."applicationExecutionId" = execution.id
+        and ew.status = '${status}' and ew."isActive" = true
+        inner join "applicationWorkflow" workflow on ew."applicationWorkflowId" = workflow.id
+        and workflow.type = '${type}' and workflow."isActive" = true
+        where execution."isActive" = true
+    `).then((res) => res[0]);
+    return result;
 };
 
 export const findByIds = async (ids: string[]) => {
