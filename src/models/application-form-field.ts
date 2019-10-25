@@ -99,10 +99,10 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationFormFieldMod
       lookupId: {
         type: Sequelize.INTEGER,
         allowNull: true,
-        references: {
-            model: 'lookup',
-            key: 'id'
-        }
+        // references: {
+        //     model: 'lookup',
+        //     key: 'id'
+        // }
       },
       order: {
         type: Sequelize.INTEGER,
@@ -119,7 +119,7 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationFormFieldMod
 
     model.associate = (models: IModelFactory) => {
       model.belongsTo(models.ApplicationFormSection);
-      model.belongsTo(models.Lookup);
+      // model.belongsTo(models.Lookup);
 
       model.hasMany(models.ApplicationWorkflowFieldPermission);
     };

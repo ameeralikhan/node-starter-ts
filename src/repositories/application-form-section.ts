@@ -18,10 +18,10 @@ export const getByApplicationId = async (applicationId: string) => {
             where: {
                 isActive: true
             },
-            include: [{
-                model: Models.Lookup,
-                include: [Models.LookupData]
-            }],
+            // include: [{
+            //     model: Models.Lookup,
+            //     include: [Models.LookupData]
+            // }],
             required: false
         }],
         order: [['order'], [Models.ApplicationFormField, 'order', 'asc']]
