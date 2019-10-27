@@ -366,6 +366,24 @@ export const getApplicationExecutionsByIds = async (ids: string[]) => {
     });
 };
 
+export const getApplicationExecutionsForTimeReport = async (applicationId: string, startDate: Date, endDate: Date) => {
+    const result = await Database.query(`
+        select distinct execution.id, execution."createdAt", execution."createdBy",
+        execution."applicationId",
+        (
+            select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
+            where ef."applicationExecutionId" = execution.id and
+            app.subject ilike concat('%', ef."fieldId", '%') limit 1
+        ) as title
+        from "applicationExecution" execution
+        inner join application app on execution."applicationId" = app.id and app."isActive" = true
+        inner join "user" u on u.id = execution."createdBy"
+        where execution."applicationId" = '${applicationId}' and execution."isActive" = true
+        and execution."createdAt" >= '${startDate}' and execution."createdAt" < '${endDate}'
+    `).then((res) => res[0]);
+    return result;
+};
+
 // Raw query
 export const getDraftApplicationExecutionQuery =
     async (userId: string, status: string): Promise<IGetExecutionSelect[]> => {
@@ -382,7 +400,8 @@ export const getDraftApplicationExecutionQuery =
         inner join "user" u on u.id = execution."createdBy"
         left join "applicationExecutionWorkflow" ew on ew."applicationExecutionId" = execution.id and
         and ew."isActive" = true
-        where execution."createdBy" = '${userId}' and execiton.status = '${status}' execution."isActive" = true
+        where execution."createdBy" = '${userId}' and execiton.status = '${status}'
+        and execution."isActive" = true
     `).then((res) => res[0]);
     return result;
 };

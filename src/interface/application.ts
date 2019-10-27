@@ -54,3 +54,30 @@ export interface IUserWorkloadReport {
     applicationName: string;
     assignToMe: number;
 }
+
+export interface IGetExecutionTimelineSelect {
+    id: string;
+    title: string;
+    createdAt: Date;
+    createdBy: string;
+    applicationId: string;
+}
+
+export interface ITimeApplicationReport {
+    applicationId: string;
+    startDate: Date;
+    endDate: Date;
+}
+
+export interface ITimeApplicationResponse {
+    applicationId?: string;
+    title?: string;
+    timeline?: IExecutionTimeline[];
+}
+
+export interface IExecutionTimeline {
+    workflowType?: string;
+    startedAt?: Date;
+    endAt?: Date;
+    timestamp?: string;
+}

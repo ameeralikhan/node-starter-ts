@@ -16,4 +16,6 @@ router.get('/my-item', ctrl.getMyItemReport);
 
 router.get('/workload/:userId', ctrl.getUserWorkloadReport);
 
+router.get('/application/:applicationId/time', ctrl.getApplicationExecutionTimeReport);
+
 export default router.routes();

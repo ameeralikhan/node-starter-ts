@@ -22,6 +22,24 @@ export const getByApplicationExecutionId = async (applicationExecutionId: string
     });
 };
 
+export const getByApplicationExecutionIds = async (applicationExecutionIds: string[]) => {
+    return Models.ApplicationExecutionWorkflow.findAll({
+        attributes: ['id', 'applicationExecutionId', 'applicationWorkflowId', 'comments', 'createdAt', 'updatedAt'],
+        where: {
+            isActive: true,
+            applicationExecutionId: {
+                [Sequelize.Op.in]: applicationExecutionIds
+            }
+        },
+        include: [{
+            model: Models.ApplicationWorkflow,
+            where: {
+                isActive: true
+            }
+        }]
+    });
+};
+
 export const findById = async (id: string) => {
     return Models.ApplicationExecutionWorkflow.findOne({ where: { id }});
 };

@@ -1,14 +1,22 @@
 
 import * as boom from 'boom';
 import * as _ from 'lodash';
+import * as moment from 'moment';
 import { validate } from '../validations/index';
 
 import * as helper from '../utils/helper';
 import * as joiSchema from '../validations/schemas/application';
 import * as applicationExecutionRepo from '../repositories/application-execution';
+import * as applicationExecutionWorkflowRepo from '../repositories/application-execution-workflow';
 import { IApplicationExecutionInstance, IApplicationExecutionAttributes } from '../models/application-execution';
 import { ApplicationExecutionStatus } from '../enum/application';
-import { IExecutionWorkflowCount, IMyItemReport, IUserWorkloadReport } from '../interface/application';
+import { IExecutionWorkflowCount,
+    IMyItemReport,
+    IUserWorkloadReport,
+    ITimeApplicationReport,
+    ITimeApplicationResponse,
+    IGetExecutionTimelineSelect
+} from '../interface/application';
 
 export const getMyItemReport = async (loggedInUser: any) => {
     await validate({ loggedInUserId: loggedInUser.userId }, joiSchema.getExecutionParticipatedLoggedInUserId);
@@ -82,6 +90,41 @@ const transformExecutionData = (
                 response[plainExecution.application.id].inProgress += 1;
             }
         }
+    }
+    return response;
+};
+
+export const getApplicationExecutionTimeReport =
+    async (payload: ITimeApplicationReport): Promise<ITimeApplicationResponse[]> => {
+    await validate(payload, joiSchema.getApplicationExecutionTimeReport);
+    const dbApplicationExecutions: IGetExecutionTimelineSelect[] = await
+        applicationExecutionRepo.getApplicationExecutionsForTimeReport(payload.applicationId,
+            payload.startDate, payload.endDate);
+    const response: ITimeApplicationResponse[] = [];
+    const ids = dbApplicationExecutions.map((execution) => execution.id);
+    const executionWorkflows = await applicationExecutionWorkflowRepo.getByApplicationExecutionIds(ids);
+    for (const execution of dbApplicationExecutions) {
+        const responseExecution: ITimeApplicationResponse = {
+            applicationId: execution.applicationId,
+            title: execution.title,
+            timeline: []
+        };
+        const appExecutionWorklows = executionWorkflows.filter((workflow) =>
+            workflow.applicationExecutionId === execution.id);
+        for (const workflowExecution of appExecutionWorklows) {
+            if (!workflowExecution.applicationWorkflow || !responseExecution.timeline) {
+                continue;
+            }
+            const timestamp = moment(workflowExecution.updatedAt).diff(moment(workflowExecution.createdAt));
+            const duration = moment.duration(timestamp);
+            responseExecution.timeline.push({
+                workflowType: workflowExecution.applicationWorkflow.type,
+                startedAt: workflowExecution.createdAt,
+                endAt: workflowExecution.updatedAt,
+                timestamp: `${duration.get('h')}:${duration.get('m')}:${duration.get('s')}`
+            });
+        }
+        response.push(responseExecution);
     }
     return response;
 };
