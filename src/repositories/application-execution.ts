@@ -398,9 +398,9 @@ export const getDraftApplicationExecutionQuery =
         from "applicationExecution" execution
         inner join application app on execution."applicationId" = app.id and app."isActive" = true
         inner join "user" u on u.id = execution."createdBy"
-        left join "applicationExecutionWorkflow" ew on ew."applicationExecutionId" = execution.id and
+        left join "applicationExecutionWorkflow" ew on ew."applicationExecutionId" = execution.id
         and ew."isActive" = true
-        where execution."createdBy" = '${userId}' and execiton.status = '${status}'
+        where execution."createdBy" = '${userId}' and execution.status = '${status}'
         and execution."isActive" = true
     `).then((res) => res[0]);
     return result;
