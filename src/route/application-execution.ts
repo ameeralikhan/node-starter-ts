@@ -31,6 +31,8 @@ router.get('/:executionId/transformed', ctrl.getDetailExecutionById);
 
 router.get('/participated', ctrl.getExecutionParticipatedLoggedInUserId);
 
+router.get('/participated/query', ctrl.getExecutionParticipatedQuery);
+
 router.post('/:applicationId/execution', ctrl.saveApplicationExecution);
 
 router.put('/:applicationId/execution/form', ctrl.saveApplicationExecutionForm);

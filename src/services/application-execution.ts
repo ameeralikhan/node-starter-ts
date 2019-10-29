@@ -118,6 +118,14 @@ export const getExecutionParticipatedLoggedInUserId =
     return transformExecutionData(dbApplicationExecutions, loggedInUser);
 };
 
+export const getExecutionParticipatedLoggedInUserIdQuery =
+    async (loggedInUser: any): Promise<IApplicationExecutionAttributes[]> => {
+    await validate({ loggedInUserId: loggedInUser.userId }, joiSchema.getExecutionParticipatedLoggedInUserId);
+    const dbApplicationExecutions = await
+        applicationExecutionRepo.getParticipatedApplicationExecutionQuery(loggedInUser.userId);
+    return dbApplicationExecutions;
+};
+
 const transformExecutionData = async (
     dbApplicationExecutions: IApplicationExecutionInstance[],
     user: any,

@@ -105,6 +105,12 @@ export const getExecutionParticipatedLoggedInUserId = async (ctx: Context, next:
   await next();
 };
 
+export const getExecutionParticipatedQuery = async (ctx: Context, next: () => void) => {
+  const user: any = ctx.state.user;
+  ctx.state.data = await applicationExecutionService.getExecutionParticipatedLoggedInUserIdQuery(user);
+  await next();
+};
+
 export const getExecutionWorkflowsCount = async (ctx: Context, next: () => void) => {
   const userId: string = ctx.state.user.userId;
   ctx.state.data = await applicationExecutionService.getExecutionWorkflowsCount(userId);
