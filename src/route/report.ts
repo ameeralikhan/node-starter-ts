@@ -18,4 +18,6 @@ router.get('/workload/:userId', ctrl.getUserWorkloadReport);
 
 router.get('/application/:applicationId/time', ctrl.getApplicationExecutionTimeReport);
 
+router.get('/application/:applicationId/metrics', ctrl.getTotalExecutionsCountReport);
+
 export default router.routes();

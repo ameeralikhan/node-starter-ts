@@ -81,3 +81,10 @@ export interface IExecutionTimeline {
     endAt?: Date;
     timestamp?: string;
 }
+
+export interface ITotalExecutionCount {
+    total: number;
+    completed: number;
+    inProgress: number;
+    rejected: number;
+}

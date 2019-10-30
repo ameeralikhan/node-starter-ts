@@ -24,3 +24,14 @@ export const getApplicationExecutionTimeReport = async (ctx: Context, next: () =
   ctx.state.data = await reportService.getApplicationExecutionTimeReport(payload);
   await next();
 };
+
+export const getTotalExecutionsCountReport = async (ctx: Context, next: () => void) => {
+  const user: string = ctx.state.user;
+  const payload: ITimeApplicationReport = {
+    applicationId: ctx.params.applicationId,
+    startDate: ctx.query.startDate,
+    endDate: ctx.query.endDate
+  };
+  ctx.state.data = await reportService.getTotalExecutionsCountReport(payload);
+  await next();
+};

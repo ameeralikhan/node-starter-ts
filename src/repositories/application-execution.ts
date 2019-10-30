@@ -466,6 +466,25 @@ export const getParticipatedApplicationExecutionQuery =
     return result;
 };
 
+export const getTotalApplicationExecutionQuery =
+    async (applicationId: string, startDate: string, endDate: string): Promise<IGetExecutionSelect[]> => {
+    const result = await Database.query(`
+        select distinct execution.id
+        (
+            select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
+            where ef."applicationExecutionId" = execution.id and
+            app.subject ilike concat('%', ef."fieldId", '%') limit 1
+        ) as title
+        from "applicationExecution" execution
+        inner join application app on execution."applicationId" = app.id and app."isActive" = true
+        inner join "user" u on u.id = execution."createdBy"
+        inner join "applicationExecutionWorkflow" aew on aew."applicationExecutionId" = execution.id
+        where execution."applicationId" = '${applicationId}' and execution."isActive" = true
+        and execution."createdAt" >= '${startDate}' and execution."createdAt" < '${endDate}'
+    `).then((res) => res[0]);
+    return result;
+};
+
 export const findByIds = async (ids: string[]) => {
     return Models.ApplicationExecution.findAll({ where: { id: { [Sequelize.Op.in]: ids } }});
 };

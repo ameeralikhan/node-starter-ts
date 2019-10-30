@@ -36,7 +36,8 @@ export const getByApplicationExecutionIds = async (applicationExecutionIds: stri
             where: {
                 isActive: true
             }
-        }]
+        }],
+        order: [['createdAt', 'desc']]
     });
 };
 

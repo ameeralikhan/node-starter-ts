@@ -15,7 +15,8 @@ import { IExecutionWorkflowCount,
     IUserWorkloadReport,
     ITimeApplicationReport,
     ITimeApplicationResponse,
-    IGetExecutionTimelineSelect
+    IGetExecutionTimelineSelect,
+    ITotalExecutionCount
 } from '../interface/application';
 
 export const getMyItemReport = async (loggedInUser: any) => {
@@ -125,6 +126,30 @@ export const getApplicationExecutionTimeReport =
             });
         }
         response.push(responseExecution);
+    }
+    return response;
+};
+
+export const getTotalExecutionsCountReport = async (payload: ITimeApplicationReport): Promise<ITotalExecutionCount> => {
+    await validate(payload, joiSchema.getApplicationExecutionTimeReport);
+    const startDateString = payload.startDate.toDateString();
+    const endDateString = payload.endDate.toDateString();
+    const dbApplicationExecutions = await
+        applicationExecutionRepo.getTotalApplicationExecutionQuery(payload.applicationId,
+            startDateString, endDateString);
+    const response: ITotalExecutionCount = {
+        total: dbApplicationExecutions.length,
+        completed: 0,
+        inProgress: 0,
+        rejected: 0
+    };
+    const ids = dbApplicationExecutions.map((execution) => execution.id);
+    const workflows = await applicationExecutionWorkflowRepo.getByApplicationExecutionIds(ids);
+    for (const execution of dbApplicationExecutions) {
+        const currentWorkflows = workflows.filter(ex => ex.applicationExecutionId === execution.id);
+        response.completed += currentWorkflows[0].status === ApplicationExecutionStatus.APPROVED ? 1 : 0;
+        response.inProgress += currentWorkflows[0].status === ApplicationExecutionStatus.DRAFT ? 1 : 0;
+        response.rejected += currentWorkflows[0].status === ApplicationExecutionStatus.REJECT ? 1 : 0;
     }
     return response;
 };
