@@ -65,8 +65,8 @@ export interface IGetExecutionTimelineSelect {
 
 export interface ITimeApplicationReport {
     applicationId: string;
-    startDate: Date;
-    endDate: Date;
+    startDate: string;
+    endDate: string;
 }
 
 export interface ITimeApplicationResponse {
@@ -87,4 +87,9 @@ export interface ITotalExecutionCount {
     completed: number;
     inProgress: number;
     rejected: number;
+}
+
+export interface ITotalExecutionMonthGraph {
+    categories: string[];
+    data: ITotalExecutionCount[];
 }

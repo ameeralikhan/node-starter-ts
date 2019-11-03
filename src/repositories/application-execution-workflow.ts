@@ -8,7 +8,8 @@ import {
 
 export const getByApplicationExecutionId = async (applicationExecutionId: string) => {
     return Models.ApplicationExecutionWorkflow.findAll({
-        attributes: ['id', 'applicationExecutionId', 'applicationWorkflowId', 'comments', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'applicationExecutionId', 'applicationWorkflowId', 'status',
+        'comments', 'createdAt', 'updatedAt'],
         where: {
             isActive: true,
             applicationExecutionId
@@ -24,7 +25,8 @@ export const getByApplicationExecutionId = async (applicationExecutionId: string
 
 export const getByApplicationExecutionIds = async (applicationExecutionIds: string[]) => {
     return Models.ApplicationExecutionWorkflow.findAll({
-        attributes: ['id', 'applicationExecutionId', 'applicationWorkflowId', 'comments', 'createdAt', 'updatedAt'],
+        attributes: ['id', 'applicationExecutionId', 'applicationWorkflowId', 'status',
+            'comments', 'createdAt', 'updatedAt'],
         where: {
             isActive: true,
             applicationExecutionId: {

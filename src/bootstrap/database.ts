@@ -13,7 +13,7 @@ export const Database = new Sequelize({
     database: config.postgres.database,
     dialect: 'postgres',
     dialectOptions: {
-        ssl: false,
+        ssl: true,
     },
     timezone: '+00:00',
     pool: {

@@ -16,7 +16,8 @@ import { IExecutionWorkflowCount,
     ITimeApplicationReport,
     ITimeApplicationResponse,
     IGetExecutionTimelineSelect,
-    ITotalExecutionCount
+    ITotalExecutionCount,
+    ITotalExecutionMonthGraph
 } from '../interface/application';
 
 export const getMyItemReport = async (loggedInUser: any) => {
@@ -132,11 +133,9 @@ export const getApplicationExecutionTimeReport =
 
 export const getTotalExecutionsCountReport = async (payload: ITimeApplicationReport): Promise<ITotalExecutionCount> => {
     await validate(payload, joiSchema.getApplicationExecutionTimeReport);
-    const startDateString = payload.startDate.toDateString();
-    const endDateString = payload.endDate.toDateString();
     const dbApplicationExecutions = await
         applicationExecutionRepo.getTotalApplicationExecutionQuery(payload.applicationId,
-            startDateString, endDateString);
+            payload.startDate, payload.endDate);
     const response: ITotalExecutionCount = {
         total: dbApplicationExecutions.length,
         completed: 0,
@@ -150,6 +149,24 @@ export const getTotalExecutionsCountReport = async (payload: ITimeApplicationRep
         response.completed += currentWorkflows[0].status === ApplicationExecutionStatus.APPROVED ? 1 : 0;
         response.inProgress += currentWorkflows[0].status === ApplicationExecutionStatus.DRAFT ? 1 : 0;
         response.rejected += currentWorkflows[0].status === ApplicationExecutionStatus.REJECT ? 1 : 0;
+    }
+    return response;
+};
+
+export const getTotalExecutionsCountGraph =
+    async (payload: ITimeApplicationReport): Promise<ITotalExecutionMonthGraph> => {
+    await validate(payload, joiSchema.getApplicationExecutionTimeReport);
+    const dbApplicationExecutions = await
+        applicationExecutionRepo.getTotalApplicationExecutionQuery(payload.applicationId,
+            payload.startDate, payload.endDate);
+    const response: ITotalExecutionMonthGraph = {
+        categories: [],
+        data: []
+    };
+    const startMonth = moment(payload.startDate).month();
+    const diffMonth = moment(payload.startDate).diff(payload.endDate, 'month');
+    for (let i = 0; i < diffMonth; i++) {
+        response.categories.push(moment.months(startMonth + (i - 1)));
     }
     return response;
 };

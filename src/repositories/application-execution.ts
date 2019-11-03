@@ -366,7 +366,8 @@ export const getApplicationExecutionsByIds = async (ids: string[]) => {
     });
 };
 
-export const getApplicationExecutionsForTimeReport = async (applicationId: string, startDate: Date, endDate: Date) => {
+export const getApplicationExecutionsForTimeReport = async (
+    applicationId: string, startDate: string, endDate: string) => {
     const result = await Database.query(`
         select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
         execution."applicationId",
@@ -470,7 +471,7 @@ export const getParticipatedApplicationExecutionQuery =
 export const getTotalApplicationExecutionQuery =
     async (applicationId: string, startDate: string, endDate: string): Promise<IGetExecutionSelect[]> => {
     const result = await Database.query(`
-        select distinct execution.id
+        select distinct execution.id, execution."createdAt",
         (
             select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
             where ef."applicationExecutionId" = execution.id and
