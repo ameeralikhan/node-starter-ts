@@ -486,7 +486,7 @@ export const publishApplicationExecution = async (applicationId: string,
         id: savedApplicationExecution.id,
         applicationId: savedApplicationExecution.applicationId,
         startedAt: savedApplicationExecution.startedAt,
-        status: ApplicationExecutionStatus.APPROVED,
+        status: ApplicationExecutionStatus.IN_PROGRESS,
         updatedBy: loggedInUserId
      });
     const workflows = await applicationWorkflowRepo.getByApplicationId(applicationId);
@@ -573,7 +573,21 @@ export const saveApplicationExecutionWorkflow =
                 createdBy: loggedInUserId
             };
             await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(newExecutionWorkflow);
+        } else {
+            // if no workflow found, mark execution as approved
+            await applicationExecutionRepo.saveApplicationExecution({
+                id: savedApplicationExecution.id,
+                status: ApplicationExecutionStatus.APPROVED,
+                updatedBy: loggedInUserId
+            });
         }
+    } else if (payload.status === ApplicationExecutionStatus.REJECT) {
+        // mark execution as rejected
+        await applicationExecutionRepo.saveApplicationExecution({
+            id: savedApplicationExecution.id,
+            status: ApplicationExecutionStatus.REJECT,
+            updatedBy: loggedInUserId
+        });
     }
     return { success: true };
 };
@@ -612,6 +626,12 @@ export const publishApplicationExecutionWorkflow =
             status: ApplicationExecutionStatus.DRAFT
         };
         await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(payload);
+    } else {
+        // if no workflow found, mark execution as approved
+        await applicationExecutionRepo.saveApplicationExecution({
+            id: savedApplicationExecution.id,
+            status: ApplicationExecutionStatus.APPROVED
+        });
     }
     return { success: true };
 };

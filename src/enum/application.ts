@@ -2,7 +2,8 @@ export enum ApplicationExecutionStatus {
     DRAFT = 'draft',
     CLARITY = 'clarity',
     REJECT = 'reject',
-    APPROVED = 'approved'
+    APPROVED = 'approved',
+    IN_PROGRESS = 'inProgress'
 }
 
 export enum ApplicationWorkflowType {
