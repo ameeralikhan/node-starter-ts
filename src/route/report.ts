@@ -20,4 +20,6 @@ router.get('/application/:applicationId/time', ctrl.getApplicationExecutionTimeR
 
 router.get('/application/:applicationId/metrics', ctrl.getTotalExecutionsCountReport);
 
+router.get('/application/:applicationId/metrics/graph', ctrl.getTotalExecutionsCountGraph);
+
 export default router.routes();

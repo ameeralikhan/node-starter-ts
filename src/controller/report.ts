@@ -35,3 +35,14 @@ export const getTotalExecutionsCountReport = async (ctx: Context, next: () => vo
   ctx.state.data = await reportService.getTotalExecutionsCountReport(payload);
   await next();
 };
+
+export const getTotalExecutionsCountGraph = async (ctx: Context, next: () => void) => {
+    const user: string = ctx.state.user;
+    const payload: ITimeApplicationReport = {
+      applicationId: ctx.params.applicationId,
+      startDate: ctx.query.startDate,
+      endDate: ctx.query.endDate
+    };
+    ctx.state.data = await reportService.getTotalExecutionsCountGraph(payload);
+    await next();
+  };
