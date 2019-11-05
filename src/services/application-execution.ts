@@ -415,6 +415,7 @@ export const saveApplicationExecution = async (applicationId: string,
     // validation for required in form fields
     applicationExecution.applicationId = applicationId;
     const execution = await applicationExecutionRepo.saveApplicationExecution(applicationExecution);
+    applicationExecution.id = execution.id;
     if (!applicationExecution.applicationExecutionForms) {
         return getByApplicationId(applicationId);
     }
@@ -629,7 +630,7 @@ export const publishApplicationExecutionWorkflow =
     } else {
         // if no workflow found, mark execution as approved
         await applicationExecutionRepo.saveApplicationExecution({
-            id: savedApplicationExecution.id,
+            id: applicationExecutionId,
             status: ApplicationExecutionStatus.APPROVED
         });
     }
