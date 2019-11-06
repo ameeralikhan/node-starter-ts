@@ -576,16 +576,18 @@ export const saveApplicationExecutionWorkflow =
             await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(newExecutionWorkflow);
         } else {
             // if no workflow found, mark execution as approved
+            const toSaveExecution = savedApplicationExecution.get({ plain: true });
             await applicationExecutionRepo.saveApplicationExecution({
-                id: savedApplicationExecution.id,
+                ...toSaveExecution,
                 status: ApplicationExecutionStatus.APPROVED,
                 updatedBy: loggedInUserId
             });
         }
     } else if (payload.status === ApplicationExecutionStatus.REJECT) {
         // mark execution as rejected
+        const toSaveExecution = savedApplicationExecution.get({ plain: true });
         await applicationExecutionRepo.saveApplicationExecution({
-            id: savedApplicationExecution.id,
+            ...toSaveExecution,
             status: ApplicationExecutionStatus.REJECT,
             updatedBy: loggedInUserId
         });
