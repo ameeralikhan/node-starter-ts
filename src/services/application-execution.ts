@@ -583,12 +583,13 @@ export const saveApplicationExecutionWorkflow =
                 updatedBy: loggedInUserId
             });
         }
-    } else if (payload.status === ApplicationExecutionStatus.REJECT) {
-        // mark execution as rejected
+    } else {
+        // mark execution as rejected or clarity
         const toSaveExecution = savedApplicationExecution.get({ plain: true });
         await applicationExecutionRepo.saveApplicationExecution({
             ...toSaveExecution,
-            status: ApplicationExecutionStatus.REJECT,
+            status: payload.status === ApplicationExecutionStatus.DRAFT ?
+                ApplicationExecutionStatus.IN_PROGRESS : payload.status,
             updatedBy: loggedInUserId
         });
     }
