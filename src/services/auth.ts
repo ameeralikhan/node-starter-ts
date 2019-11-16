@@ -30,6 +30,10 @@ export const login = async (payload: ILoginRequest): Promise<IAuthResponse> => {
   if (!user) {
     throw boom.badRequest('Incorrect Username or Password');
   }
+  // update user devideId
+  if (payload.deviceId) {
+    await userRepo.updateUser(user.id, { deviceId: payload.deviceId });
+  }
   return generateTokenAndAuthResponse(user);
 };
 

@@ -19,6 +19,7 @@ export interface IUserAttributes {
   timezone: string;
   isApproved: boolean;
   isActive: boolean;
+  deviceId: string;
   createdAt: Date;
   deletedAt: Date;
   deletedBy: string;
@@ -41,6 +42,7 @@ export interface IUserInstance extends Sequelize.Instance<IUserAttributes> {
   timezone: string;
   isApproved: boolean;
   isActive: boolean;
+  deviceId: string;
   createdAt: Date;
   deletedAt: Date;
   deletedBy: string;
@@ -121,6 +123,10 @@ export const define = (sequelize: Sequelize.Sequelize): IUserModel => {
         }
       },
       isApproved: Sequelize.BOOLEAN,
+      deviceId: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       isActive: Sequelize.BOOLEAN,
       deletedAt: Sequelize.DATE,
       deletedBy: Sequelize.UUID

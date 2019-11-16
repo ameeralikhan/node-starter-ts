@@ -102,9 +102,14 @@ export const getExecutionInProcessLoggedInUserIdByQuery =
         dbApplicationExecutions = await applicationExecutionRepo.getApplicationExecutionByWorkflowTypeAndStatusQuery(
             status, type);
     }
-    dbApplicationExecutions = dbApplicationExecutions.filter((ex) =>
-        checkWorkflowPermissionQuery(ex, loggedInUser.userId));
-    return dbApplicationExecutions;
+    const response = [];
+    for (const ex of dbApplicationExecutions) {
+        const shouldContinue = await checkWorkflowPermissionQuery(ex, loggedInUser.userId);
+        if (shouldContinue) {
+            response.push(ex);
+        }
+    }
+    return response;
 };
 
 export const getExecutionParticipatedLoggedInUserId =
@@ -156,9 +161,11 @@ const transformExecutionData = async (
         plainExecution.application.applicationFormSections = [];
         const fieldPermissions = await applicationWorkflowFieldPermissionRepo.
             getByApplicationId(execution.applicationId);
-        const latestWorkflowId = plainExecution.applicationExecutionWorkflows &&
-            plainExecution.applicationExecutionWorkflows.length ?
-             plainExecution.applicationExecutionWorkflows[0].applicationWorkflowId : null;
+        const draftExecution = (plainExecution.applicationExecutionWorkflows &&
+            plainExecution.applicationExecutionWorkflows.length) ?
+                plainExecution.applicationExecutionWorkflows.find((ex) =>
+                ex.status === ApplicationExecutionStatus.DRAFT) : null;
+        const latestWorkflowId = draftExecution ? draftExecution.applicationWorkflowId : null;
         let title = plainExecution.application.subject;
         for (const sectionInstance of sections) {
             const section = sectionInstance.get({ plain: true });
