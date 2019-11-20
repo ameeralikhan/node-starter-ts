@@ -454,17 +454,17 @@ export const getParticipatedApplicationExecutionQuery =
     async (userId: string): Promise<IGetExecutionSelect[]> => {
         const result = await Database.query(`
         select distinct execution.id, execution."createdAt", execution."createdBy", execution."applicationId",
-        app."name",
+        app."name", aew."applicationWorkflowId",
         (
-        select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
-        where ef."applicationExecutionId" = execution.id and
-        app.subject ilike concat('%', ef."fieldId", '%') limit 1
+            select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
+            where ef."applicationExecutionId" = execution.id and
+            app.subject ilike concat('%', ef."fieldId", '%') limit 1
         ) as title
         from "applicationExecution" execution
         inner join application app on execution."applicationId" = app.id and app."isActive" = true
         inner join "user" u on u.id = execution."createdBy"
         inner join "applicationExecutionWorkflow" aew on aew."applicationExecutionId" = execution.id
-        where aew.status = 'approved' and aew."updatedBy" = '${userId}';
+        where aew.status = 'approved' and (aew."createdBy" = '${userId}' OR aew."updatedBy" = '${userId}');
     `).then((res) => res[0]);
         return result;
     };

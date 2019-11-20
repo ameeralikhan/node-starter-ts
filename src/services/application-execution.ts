@@ -120,7 +120,7 @@ export const getExecutionParticipatedLoggedInUserId =
     // const ids: string[] = executionIds[0].map((execution: any) => execution.id);
     const dbApplicationExecutions = await
         applicationExecutionRepo.getApprovedApplicationExecutions(loggedInUser.userId);
-    return transformExecutionData(dbApplicationExecutions, loggedInUser);
+    return transformExecutionData(dbApplicationExecutions, loggedInUser, undefined);
 };
 
 export const getExecutionParticipatedLoggedInUserIdQuery =
@@ -144,9 +144,24 @@ const transformExecutionData = async (
         }
         if (plainExecution.applicationExecutionWorkflows &&
             plainExecution.applicationExecutionWorkflows.length) {
-            const executionWorkflow = plainExecution.applicationExecutionWorkflows[0];
+            // if (onlyDraftEx) {
+            //     plainExecution.applicationExecutionWorkflows = plainExecution.applicationExecutionWorkflows.filter(
+            //     (ex =>
+            //         ex.status === ApplicationExecutionStatus.DRAFT
+            //     ));
+            // }
+            let executionWorkflow: any = plainExecution.applicationExecutionWorkflows[
+                plainExecution.applicationExecutionWorkflows.length - 1
+            ];
             if (!executionWorkflow || !executionWorkflow.applicationWorkflowId) {
                 continue;
+            }
+            if (status === 'participated') {
+                plainExecution.applicationExecutionWorkflows = plainExecution.applicationExecutionWorkflows.filter(
+                (ex =>
+                    ex.createdBy === user.userId || ex.updatedBy === user.userId
+                ));
+                executionWorkflow = plainExecution.applicationExecutionWorkflows[0];
             }
             if (executionWorkflow.status !== ApplicationExecutionStatus.APPROVED &&
                 executionWorkflow.status !== ApplicationExecutionStatus.REJECT) {
