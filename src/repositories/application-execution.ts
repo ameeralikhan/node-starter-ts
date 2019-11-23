@@ -390,7 +390,8 @@ export const getDraftApplicationExecutionQuery =
     async (userId: string, status: string): Promise<IGetExecutionSelect[]> => {
         const result = await Database.query(`
         select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
-        u."managerId", u."departmentId", u."officeLocationId", execution."applicationId", ew."applicationWorkflowId",
+        u."managerId", u."departmentId", u."officeLocationId", execution."applicationId",
+        ew."applicationWorkflowId", workflow."showMap",
         (
             select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
             where ef."applicationExecutionId" = execution.id and
@@ -400,6 +401,7 @@ export const getDraftApplicationExecutionQuery =
         inner join application app on execution."applicationId" = app.id and app."isActive" = true
         inner join "user" u on u.id = execution."createdBy"
         left join "applicationExecutionWorkflow" ew on ew."applicationExecutionId" = execution.id
+        inner join "applicationWorkflow" workflow on ew."applicationWorkflowId" = workflow.id
         and ew."isActive" = true
         where execution."createdBy" = '${userId}' and execution.status = '${status}'
         and execution."isActive" = true
@@ -411,7 +413,8 @@ export const getApplicationExecutionInProcessQuery =
     async (userId: string, status: string): Promise<IGetExecutionSelect[]> => {
         const result = await Database.query(`
         select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
-        u."managerId", u."departmentId", u."officeLocationId", execution."applicationId", ew."applicationWorkflowId",
+        u."managerId", u."departmentId", u."officeLocationId", execution."applicationId",
+        ew."applicationWorkflowId", workflow."showMap",
         (
             select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
             where ef."applicationExecutionId" = execution.id and
@@ -421,6 +424,7 @@ export const getApplicationExecutionInProcessQuery =
         inner join application app on execution."applicationId" = app.id and app."isActive" = true
         inner join "user" u on u.id = execution."createdBy"
         left join "applicationExecutionWorkflow" ew on ew."applicationExecutionId" = execution.id
+        inner join "applicationWorkflow" workflow on ew."applicationWorkflowId" = workflow.id
         and ew."isActive" = true
         where execution."createdBy" = '${userId}' and execution."isActive" = true
         and execution."status" = '${status}'
@@ -432,7 +436,8 @@ export const getApplicationExecutionByWorkflowTypeAndStatusQuery =
     async (status: string, type: string): Promise<IGetExecutionSelect[]> => {
         const result = await Database.query(`
         select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
-        u."managerId", u."departmentId", u."officeLocationId", execution."applicationId", ew."applicationWorkflowId",
+        u."managerId", u."departmentId", u."officeLocationId", execution."applicationId",
+        ew."applicationWorkflowId", workflow."showMap",
         (
             select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
             where ef."applicationExecutionId" = execution.id and

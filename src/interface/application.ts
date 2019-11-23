@@ -40,6 +40,7 @@ export interface IGetExecutionSelect {
     departmentId: number;
     officeLocationId: number;
     applicationWorkflowId: string;
+    showMap: boolean;
 }
 
 export interface IMyItemReport {
