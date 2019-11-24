@@ -23,7 +23,7 @@ export const uploadProfilePicture = async (userId: string, file: any) => {
 };
 
 export const saveExecutionFile = async (prefix: string, file: any) => {
-  await validate({ file }, joiSchema.uploadUserProfileImage);
+  await validate({ file }, joiSchema.uploadExecutionFile);
   const fileName = file.name;
   const nameToSave = `./upload/${prefix}_${fileName}`;
   const buff = fs.readFileSync(file.path);
