@@ -38,6 +38,9 @@ interface IConfig {
   sendgrid: {
     key: string;
   };
+  fcm: {
+    serverKey: string;
+  };
 }
 
 const config = convict<IConfig>({
@@ -176,6 +179,13 @@ const config = convict<IConfig>({
     key: {
       format: String,
       env: 'SENDGRID_API_KEY',
+      default: ''
+    }
+  },
+  fcm: {
+    serverKey: {
+      format: String,
+      env: 'FCM_SERVER_KEY',
       default: ''
     }
   }

@@ -21,6 +21,7 @@ import * as ApplicationExecutionForm from './application-execution-form';
 import * as ApplicationExecutionWorkflow from './application-execution-workflow';
 import * as Lookup from './lookup';
 import * as LookupData from './lookup-data';
+import * as Notification from './notification';
 
 export interface IModelFactory extends Sequelize.Models {
   Role: Role.IRoleModel;
@@ -42,6 +43,7 @@ export interface IModelFactory extends Sequelize.Models {
   ApplicationExecutionWorkflow: ApplicationExecutionWorkflow.IApplicationExecutionWorkflowModel;
   Lookup: Lookup.ILookupModel;
   LookupData: LookupData.ILookupDataModel;
+  Notification: Notification.INotificationModel;
 }
 
 const models: IModelFactory = {
@@ -64,6 +66,7 @@ const models: IModelFactory = {
   ApplicationExecutionWorkflow: ApplicationExecutionWorkflow.define(Database),
   Lookup: Lookup.define(Database),
   LookupData: LookupData.define(Database),
+  Notification: Notification.define(Database)
 };
 
 // Execute the associations where defined
