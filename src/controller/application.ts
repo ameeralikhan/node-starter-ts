@@ -95,7 +95,9 @@ export const getExecutionInProcessLoggedInUserIdByQuery = async (ctx: Context, n
   const status: string = ctx.request.query.status;
   const type: string = ctx.request.query.type;
   const user: any = ctx.state.user;
-  ctx.state.data = await applicationExecutionService.getExecutionInProcessLoggedInUserIdByQuery(user, status, type);
+  const applicationId: string = ctx.request.query.applicationId;
+  ctx.state.data = await applicationExecutionService.
+    getExecutionInProcessLoggedInUserIdByQuery(user, status, applicationId, type);
   await next();
 };
 

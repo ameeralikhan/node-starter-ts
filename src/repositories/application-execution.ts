@@ -387,9 +387,8 @@ export const getApplicationExecutionsForTimeReport = async (
 
 // Raw query
 export const getDraftApplicationExecutionQuery =
-    async (userId: string, status: string): Promise<IGetExecutionSelect[]> => {
-        const result = await Database.query(`
-        select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
+    async (userId: string, status: string, applicationId?: string): Promise<IGetExecutionSelect[]> => {
+        let query = `select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
         u."managerId", u."departmentId", u."officeLocationId", execution."applicationId",
         ew."applicationWorkflowId", workflow."showMap",
         (
@@ -404,15 +403,17 @@ export const getDraftApplicationExecutionQuery =
         inner join "applicationWorkflow" workflow on ew."applicationWorkflowId" = workflow.id
         and ew."isActive" = true
         where execution."createdBy" = '${userId}' and execution.status = '${status}'
-        and execution."isActive" = true
-    `).then((res) => res[0]);
+        and execution."isActive" = true`;
+        if (applicationId) {
+            query += ` and execution."applicationId" = '${applicationId}'`;
+        }
+        const result = await Database.query(query).then((res) => res[0]);
         return result;
     };
 
 export const getApplicationExecutionInProcessQuery =
-    async (userId: string, status: string): Promise<IGetExecutionSelect[]> => {
-        const result = await Database.query(`
-        select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
+    async (userId: string, status: string, applicationId?: string): Promise<IGetExecutionSelect[]> => {
+        let query = `select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
         u."managerId", u."departmentId", u."officeLocationId", execution."applicationId",
         ew."applicationWorkflowId", workflow."showMap",
         (
@@ -427,15 +428,17 @@ export const getApplicationExecutionInProcessQuery =
         inner join "applicationWorkflow" workflow on ew."applicationWorkflowId" = workflow.id
         and ew."isActive" = true
         where execution."createdBy" = '${userId}' and execution."isActive" = true
-        and execution."status" = '${status}'
-    `).then((res) => res[0]);
+        and execution."status" = '${status}'`;
+        if (applicationId) {
+            query += ` and execution."applicationId" = '${applicationId}'`;
+        }
+        const result = await Database.query(query).then((res) => res[0]);
         return result;
     };
 
 export const getApplicationExecutionByWorkflowTypeAndStatusQuery =
-    async (status: string, type: string): Promise<IGetExecutionSelect[]> => {
-        const result = await Database.query(`
-        select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
+    async (status: string, type: string, applicationId?: string): Promise<IGetExecutionSelect[]> => {
+        let query = `select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
         u."managerId", u."departmentId", u."officeLocationId", execution."applicationId",
         ew."applicationWorkflowId", workflow."showMap",
         (
@@ -450,8 +453,11 @@ export const getApplicationExecutionByWorkflowTypeAndStatusQuery =
         and ew.status = '${status}' and ew."isActive" = true
         inner join "applicationWorkflow" workflow on ew."applicationWorkflowId" = workflow.id
         and workflow.type = '${type}' and workflow."isActive" = true
-        where execution."isActive" = true
-    `).then((res) => res[0]);
+        where execution."isActive" = true`;
+        if (applicationId) {
+            query += ` and execution."applicationId" = '${applicationId}'`;
+        }
+        const result = await Database.query(query).then((res) => res[0]);
         return result;
     };
 

@@ -87,20 +87,21 @@ export const getExecutionInProcessLoggedInUserId =
 };
 
 export const getExecutionInProcessLoggedInUserIdByQuery =
-    async (loggedInUser: any, status: string, type?: string): Promise<IGetExecutionSelect[]> => {
+    async (loggedInUser: any, status: string,
+           applicationId?: string, type?: string): Promise<IGetExecutionSelect[]> => {
     await validate({ loggedInUserId: loggedInUser.userId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
     let dbApplicationExecutions = [];
     if (!type) {
         if (status === ApplicationExecutionStatus.DRAFT) {
             dbApplicationExecutions = await
-                applicationExecutionRepo.getDraftApplicationExecutionQuery(loggedInUser.userId, status);
+                applicationExecutionRepo.getDraftApplicationExecutionQuery(loggedInUser.userId, status, applicationId);
         } else {
-            dbApplicationExecutions = await
-                applicationExecutionRepo.getApplicationExecutionInProcessQuery(loggedInUser.userId, status);
+            dbApplicationExecutions = await applicationExecutionRepo.
+                getApplicationExecutionInProcessQuery(loggedInUser.userId, status, applicationId);
         }
     } else {
         dbApplicationExecutions = await applicationExecutionRepo.getApplicationExecutionByWorkflowTypeAndStatusQuery(
-            status, type);
+            status, type, applicationId);
     }
     const response = [];
     for (const ex of dbApplicationExecutions) {
