@@ -113,6 +113,13 @@ export const getExecutionParticipatedQuery = async (ctx: Context, next: () => vo
   await next();
 };
 
+export const getInProgressExecutions = async (ctx: Context, next: () => void) => {
+  const user: any = ctx.state.user;
+  const applicationId: string = ctx.params.applicationId;
+  ctx.state.data = await applicationExecutionService.getInProgressExecutions(user, applicationId);
+  await next();
+};
+
 export const getExecutionWorkflowsCount = async (ctx: Context, next: () => void) => {
   const userId: string = ctx.state.user.userId;
   ctx.state.data = await applicationExecutionService.getExecutionWorkflowsCount(userId);

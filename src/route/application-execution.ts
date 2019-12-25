@@ -33,6 +33,8 @@ router.get('/participated', ctrl.getExecutionParticipatedLoggedInUserId);
 
 router.get('/participated/query', ctrl.getExecutionParticipatedQuery);
 
+router.get('/:applicationId/in-progress', ctrl.getInProgressExecutions);
+
 router.post('/:applicationId/execution', ctrl.saveApplicationExecution);
 
 router.put('/:applicationId/execution/form', ctrl.saveApplicationExecutionForm);

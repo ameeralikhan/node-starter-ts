@@ -409,7 +409,7 @@ export const getDraftApplicationExecutionQuery =
         }
         const result = await Database.query(query).then((res) => res[0]);
         return result;
-    };
+};
 
 export const getApplicationExecutionInProcessQuery =
     async (userId: string, status: string, applicationId?: string): Promise<IGetExecutionSelect[]> => {
@@ -434,7 +434,7 @@ export const getApplicationExecutionInProcessQuery =
         }
         const result = await Database.query(query).then((res) => res[0]);
         return result;
-    };
+};
 
 export const getApplicationExecutionByWorkflowTypeAndStatusQuery =
     async (status: string, type: string, applicationId?: string): Promise<IGetExecutionSelect[]> => {
@@ -459,7 +459,7 @@ export const getApplicationExecutionByWorkflowTypeAndStatusQuery =
         }
         const result = await Database.query(query).then((res) => res[0]);
         return result;
-    };
+};
 
 export const getParticipatedApplicationExecutionQuery =
     async (userId: string): Promise<IGetExecutionSelect[]> => {
@@ -481,7 +481,7 @@ export const getParticipatedApplicationExecutionQuery =
         select * from ex where excount > 0;
     `).then((res) => res[0]);
         return result;
-    };
+};
 
 export const getTotalApplicationExecutionQuery =
     async (applicationId: string, startDate: string, endDate: string): Promise<IGetExecutionSelect[]> => {
@@ -500,7 +500,32 @@ export const getTotalApplicationExecutionQuery =
         and execution."createdAt" >= '${startDate}' and execution."createdAt" < '${endDate}'
     `).then((res) => res[0]);
         return result;
-    };
+};
+
+export const getAllExecutionsByStatus =
+    async (userId: string, status: string[], applicationId?: string): Promise<IGetExecutionSelect[]> => {
+        let query = `select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
+        u."managerId", u."departmentId", u."officeLocationId", execution."applicationId",
+        ew."applicationWorkflowId", workflow."showMap",
+        (
+            select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
+            where ef."applicationExecutionId" = execution.id and
+            app.subject ilike concat('%', ef."fieldId", '%') limit 1
+        ) as title
+        from "applicationExecution" execution
+        inner join application app on execution."applicationId" = app.id and app."isActive" = true
+        inner join "user" u on u.id = execution."createdBy"
+        left join "applicationExecutionWorkflow" ew on ew."applicationExecutionId" = execution.id
+        inner join "applicationWorkflow" workflow on ew."applicationWorkflowId" = workflow.id
+        and ew."isActive" = true
+        where execution."createdBy" = '${userId}' and execution.status in (${status.map(s => `'${s}'`).join(',')})
+        and execution."isActive" = true`;
+        if (applicationId) {
+            query += ` and execution."applicationId" = '${applicationId}'`;
+        }
+        const result = await Database.query(query).then((res) => res[0]);
+        return result;
+};
 
 export const findByIds = async (ids: string[]) => {
     return Models.ApplicationExecution.findAll({ where: { id: { [Sequelize.Op.in]: ids } } });
