@@ -49,7 +49,7 @@ export const getUserWorkloadReport = async (userId: string) => {
     const response: IUserWorkloadReport[] = [];
     for (const key of Object.keys(groupedExecutions)) {
         response.push({
-            applicationId: groupedExecutions[key][0].id,
+            applicationId: groupedExecutions[key][0].applicationId,
             applicationName: key,
             assignToMe: groupedExecutions[key].length
         });
