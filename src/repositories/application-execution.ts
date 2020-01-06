@@ -520,6 +520,7 @@ export const getAllExecutionsByStatus =
         inner join application app on execution."applicationId" = app.id and app."isActive" = true
         inner join "user" u on u.id = execution."createdBy"
         left join "applicationExecutionWorkflow" ew on ew."applicationExecutionId" = execution.id
+        and ew.status = 'draft'
         inner join "applicationWorkflow" workflow on ew."applicationWorkflowId" = workflow.id
         and ew."isActive" = true
         where execution."createdBy" = '${userId}' and execution.status in (${status.map(s => `'${s}'`).join(',')})
