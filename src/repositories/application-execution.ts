@@ -481,7 +481,7 @@ export const getParticipatedApplicationExecutionQuery =
             inner join application app on execution."applicationId" = app.id and app."isActive" = true
             inner join "user" u on u.id = execution."createdBy"
         )
-        select * from ex where excount > 0;
+        select * from ex where excount > 0 order by "createdAt" desc;
     `).then((res) => res[0]);
         return result;
 };
