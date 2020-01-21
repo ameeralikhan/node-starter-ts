@@ -169,6 +169,7 @@ export const getExecutionInProcessLoggedInUserId: Joi.SchemaMap = {
 
 export const getExecutionParticipatedLoggedInUserId: Joi.SchemaMap = {
     loggedInUserId: Joi.string().uuid().required(),
+    searchText: Joi.string().optional().allow(null, ''),
 };
 
 export const getApplicationExecutionTimeReport: Joi.SchemaMap = {

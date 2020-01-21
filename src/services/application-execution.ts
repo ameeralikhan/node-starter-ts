@@ -133,10 +133,11 @@ export const getInProgressExecutions =
 };
 
 export const getExecutionParticipatedLoggedInUserIdQuery =
-    async (loggedInUser: any): Promise<IApplicationExecutionAttributes[]> => {
-    await validate({ loggedInUserId: loggedInUser.userId }, joiSchema.getExecutionParticipatedLoggedInUserId);
+    async (loggedInUser: any, searchText?: string): Promise<IApplicationExecutionAttributes[]> => {
+    await validate({ loggedInUserId: loggedInUser.userId, searchText },
+        joiSchema.getExecutionParticipatedLoggedInUserId);
     const dbApplicationExecutions = await
-        applicationExecutionRepo.getParticipatedApplicationExecutionQuery(loggedInUser.userId);
+        applicationExecutionRepo.getParticipatedApplicationExecutionQuery(loggedInUser.userId, searchText);
     return dbApplicationExecutions;
 };
 

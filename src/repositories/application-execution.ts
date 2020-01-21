@@ -465,7 +465,11 @@ export const getApplicationExecutionByWorkflowTypeAndStatusQuery =
 };
 
 export const getParticipatedApplicationExecutionQuery =
-    async (userId: string): Promise<IGetExecutionSelect[]> => {
+    async (userId: string, searchText?: string): Promise<IGetExecutionSelect[]> => {
+        let query = 'select * from ex where excount > 0';
+        if (searchText) {
+            query += ` and title ilike '%${searchText}%'`;
+        }
         const result = await Database.query(`
         WITH ex AS (
             select distinct execution.id, execution."createdAt", execution."createdBy", execution."applicationId",
@@ -481,7 +485,7 @@ export const getParticipatedApplicationExecutionQuery =
             inner join application app on execution."applicationId" = app.id and app."isActive" = true
             inner join "user" u on u.id = execution."createdBy"
         )
-        select * from ex where excount > 0 order by "createdAt" desc;
+        ${query} order by "createdAt" desc;
     `).then((res) => res[0]);
         return result;
 };

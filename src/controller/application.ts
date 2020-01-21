@@ -109,7 +109,8 @@ export const getExecutionParticipatedLoggedInUserId = async (ctx: Context, next:
 
 export const getExecutionParticipatedQuery = async (ctx: Context, next: () => void) => {
   const user: any = ctx.state.user;
-  ctx.state.data = await applicationExecutionService.getExecutionParticipatedLoggedInUserIdQuery(user);
+  const searchText: string = ctx.request.query.searchText;
+  ctx.state.data = await applicationExecutionService.getExecutionParticipatedLoggedInUserIdQuery(user, searchText);
   await next();
 };
 
