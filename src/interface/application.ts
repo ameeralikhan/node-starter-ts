@@ -73,6 +73,7 @@ export interface ITimeApplicationReport {
 
 export interface ITimeApplicationResponse {
     applicationId?: string;
+    id?: string;
     title?: string;
     timeline?: IExecutionTimeline[];
 }

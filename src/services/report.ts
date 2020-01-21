@@ -108,6 +108,7 @@ export const getApplicationExecutionTimeReport =
     for (const execution of dbApplicationExecutions) {
         const responseExecution: ITimeApplicationResponse = {
             applicationId: execution.applicationId,
+            id: execution.id,
             title: execution.title,
             timeline: []
         };
