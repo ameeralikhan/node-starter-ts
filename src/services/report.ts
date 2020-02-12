@@ -20,41 +20,43 @@ import { IExecutionWorkflowCount,
     ITotalExecutionMonthGraph
 } from '../interface/application';
 
-export const getMyItemReport = async (loggedInUser: any) => {
+export const getMyItemReport = async (loggedInUser: any, participated: boolean = true) => {
     await validate({ loggedInUserId: loggedInUser.userId }, joiSchema.getExecutionParticipatedLoggedInUserId);
-    const executionIds = await
-        applicationExecutionRepo.getApplicationExecutionParticipatedIds(loggedInUser.userId);
-    const ids: string[] = executionIds[0].map((execution: any) => execution.id);
-    const myParticipatedExecutions = await
-        applicationExecutionRepo.getApplicationExecutionsByIds(ids);
+    const responseMyItems: IMyItemReport[] = [];
     const dbApplicationExecutions = await
         applicationExecutionRepo.getAll(loggedInUser.userId, true);
-    const responseParticipatedItems: IMyItemReport[] = [];
-    const responseMyItems: IMyItemReport[] = [];
-    const participatedItems = transformExecutionData(myParticipatedExecutions);
     const myItems = transformExecutionData(dbApplicationExecutions);
-    for (const item of Object.keys(participatedItems)) {
-        responseParticipatedItems.push({ ...participatedItems[item] });
-    }
     for (const item of Object.keys(myItems)) {
         responseMyItems.push({ ...myItems[item] });
+    }
+    const responseParticipatedItems: IMyItemReport[] = [];
+    if (participated) {
+        const executionIds = await applicationExecutionRepo.getApplicationExecutionParticipatedIds(loggedInUser.userId);
+        const ids: string[] = executionIds[0].map((execution: any) => execution.id);
+        const myParticipatedExecutions = await
+            applicationExecutionRepo.getApplicationExecutionsByIds(ids);
+        const participatedItems = transformExecutionData(myParticipatedExecutions);
+        for (const item of Object.keys(participatedItems)) {
+            responseParticipatedItems.push({ ...participatedItems[item] });
+        }
     }
     return { participated: responseParticipatedItems, myItem: responseMyItems };
 };
 
 export const getUserWorkloadReport = async (userId: string) => {
-    const dbApplicationExecutions = await
-        applicationExecutionRepo.getAllForParticipatedReport(userId, true);
-    const groupedExecutions = _.groupBy(dbApplicationExecutions, 'application.name');
-    const response: IUserWorkloadReport[] = [];
-    for (const key of Object.keys(groupedExecutions)) {
-        response.push({
-            applicationId: groupedExecutions[key][0].applicationId,
-            applicationName: key,
-            assignToMe: groupedExecutions[key].length
-        });
-    }
-    return response;
+    return getMyItemReport({ userId }, false);
+    // const dbApplicationExecutions = await
+    //     applicationExecutionRepo.getAllForParticipatedReport(userId, true);
+    // const groupedExecutions = _.groupBy(dbApplicationExecutions, 'application.name');
+    // const response: IUserWorkloadReport[] = [];
+    // for (const key of Object.keys(groupedExecutions)) {
+    //     response.push({
+    //         applicationId: groupedExecutions[key][0].applicationId,
+    //         applicationName: key,
+    //         assignToMe: groupedExecutions[key].length
+    //     });
+    // }
+    // return response;
 };
 
 const transformExecutionData = (
