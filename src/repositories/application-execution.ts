@@ -369,8 +369,8 @@ export const getApplicationExecutionsByIds = async (ids: string[]) => {
 export const getApplicationExecutionsForTimeReport = async (
     applicationId: string, startDate: string, endDate: string) => {
     const result = await Database.query(`
-        select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
-        execution."applicationId",
+        select distinct execution.id, execution.latitude, execution.longitude, execution."createdAt",
+        execution."createdBy", app."name", execution."applicationId",
         (
             select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
             where ef."applicationExecutionId" = execution.id and

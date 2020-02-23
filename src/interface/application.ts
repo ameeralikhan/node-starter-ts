@@ -63,6 +63,8 @@ export interface IGetExecutionTimelineSelect {
     createdAt: Date;
     createdBy: string;
     applicationId: string;
+    longitude: number;
+    latitude: number;
 }
 
 export interface ITimeApplicationReport {
@@ -95,4 +97,12 @@ export interface ITotalExecutionCount {
 export interface ITotalExecutionMonthGraph {
     categories: string[];
     data: ITotalExecutionCount[];
+}
+
+export interface IExecutionLocation {
+    applicationId: string;
+    id: string;
+    title: string;
+    latitude: number;
+    longitude: number;
 }

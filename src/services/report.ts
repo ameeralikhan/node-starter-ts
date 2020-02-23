@@ -17,7 +17,8 @@ import { IExecutionWorkflowCount,
     ITimeApplicationResponse,
     IGetExecutionTimelineSelect,
     ITotalExecutionCount,
-    ITotalExecutionMonthGraph
+    ITotalExecutionMonthGraph,
+    IExecutionLocation
 } from '../interface/application';
 
 export const getMyItemReport = async (loggedInUser: any, participated: boolean = true) => {
@@ -193,6 +194,26 @@ export const getTotalExecutionsCountGraph =
             data.rejected += currentWorkflows[0].status === ApplicationExecutionStatus.REJECT ? 1 : 0;
         }
         response.data.push(data);
+    }
+    return response;
+};
+
+export const getApplicationExecutionLocationReport =
+    async (payload: ITimeApplicationReport): Promise<IExecutionLocation[]> => {
+    await validate(payload, joiSchema.getApplicationExecutionTimeReport);
+    const dbApplicationExecutions: IGetExecutionTimelineSelect[] = await
+        applicationExecutionRepo.getApplicationExecutionsForTimeReport(payload.applicationId,
+            payload.startDate, payload.endDate);
+    const response: IExecutionLocation[] = [];
+    for (const execution of dbApplicationExecutions) {
+        const responseExecution: IExecutionLocation = {
+            applicationId: execution.applicationId,
+            id: execution.id,
+            title: execution.title,
+            longitude: execution.longitude,
+            latitude: execution.latitude
+        };
+        response.push(responseExecution);
     }
     return response;
 };

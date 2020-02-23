@@ -22,4 +22,6 @@ router.get('/application/:applicationId/metrics', ctrl.getTotalExecutionsCountRe
 
 router.get('/application/:applicationId/metrics/graph', ctrl.getTotalExecutionsCountGraph);
 
+router.get('/application/:applicationId/location', ctrl.getApplicationExecutionLocationReport);
+
 export default router.routes();
