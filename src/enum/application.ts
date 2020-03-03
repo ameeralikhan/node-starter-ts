@@ -31,5 +31,6 @@ export enum ApplicationWorkflowAssignTo {
     MANAGER = 'manager',
     DEPARTMENT_HEAD = 'department_head',
     LOCATION_HEAD = 'location_head',
-    FIELD = 'field'
+    FIELD = 'field',
+    GROUP = 'group'
 }

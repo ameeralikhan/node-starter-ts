@@ -15,6 +15,7 @@ export interface IApplicationWorkflowAttributes {
     stepId: string;
     showMap: boolean;
     assignTo?: string;
+    groupId?: number | null;
     isActive: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -35,6 +36,7 @@ export interface IApplicationWorkflowInstance extends Sequelize.Instance<IApplic
     stepId: string;
     showMap: boolean;
     assignTo?: string;
+    groupId?: number | null;
     isActive: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -79,6 +81,14 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationWorkflowMode
       assignTo: {
         type: Sequelize.STRING,
         allowNull: true,
+      },
+      groupId: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+        references: {
+          model: 'group',
+          key: 'id'
+        }
       },
       stepId: {
         type: Sequelize.UUID,

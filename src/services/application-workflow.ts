@@ -10,6 +10,7 @@ import * as applicationFormFieldRepo from '../repositories/application-form-fiel
 import * as applicationWorkflowPermissionRepo from '../repositories/application-workflow-permission';
 import * as applicationFormSectionRepo from '../repositories/application-form-section';
 import * as userRepo from '../repositories/user';
+import * as groupRepo from '../repositories/group';
 import { IApplicationInstance, IApplicationAttributes } from '../models/application';
 import { IApplicationWorkflowInstance, IApplicationWorkflowAttributes } from '../models/application-workflow';
 import { Role } from '../enum/role';
@@ -49,8 +50,17 @@ export const saveApplicationWorkflow = async (applicationId: string,
         if (workflow.id) {
             await applicationWorkflowPermissionRepo.hardDeleteWorkflowPermissionByWorkflowId(workflow.id);
             workflow.updatedBy = loggedInUserId;
+            if (workflow.assignTo !== ApplicationWorkflowAssignTo.GROUP) {
+                workflow.groupId = null;
+            }
         } else {
             workflow.createdBy = loggedInUserId;
+        }
+        if (workflow.groupId) {
+            const group = await groupRepo.findById(workflow.groupId);
+            if (!group) {
+                throw boom.badRequest('Invalid group id');
+            }
         }
         const savedWorkflow = await applicationWorkflowRepo.saveApplicationWorkflow(workflow);
         if (!workflow.userIds) {

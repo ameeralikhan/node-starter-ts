@@ -16,6 +16,7 @@ import * as applicationWorkflowFieldPermissionRepo from '../repositories/applica
 import * as userRepo from '../repositories/user';
 import * as departmentRepo from '../repositories/department';
 import * as officeLocationRepo from '../repositories/office-location';
+import * as groupRepo from '../repositories/group';
 import { IApplicationInstance, IApplicationAttributes } from '../models/application';
 import { IApplicationExecutionInstance, IApplicationExecutionAttributes } from '../models/application-execution';
 import { IApplicationFormFieldInstance } from '../models/application-form-field';
@@ -295,6 +296,17 @@ const checkWorkflowPermission = async (
                         if (officeLocation &&
                             officeLocation.userId !== userId) {
                                 shouldContinue = true;
+                        }
+                    }
+                    break;
+                case ApplicationWorkflowAssignTo.GROUP:
+                    if (!applicationWorkflow.groupId) {
+                        shouldContinue = true;
+                    } else {
+                        const userGroups = await groupRepo.findUserGroupByGroupId(applicationWorkflow.groupId);
+                        const hasUser = userGroups.find(userGroup => userGroup.userId === userId);
+                        if (!hasUser) {
+                            shouldContinue = true;
                         }
                     }
                     break;

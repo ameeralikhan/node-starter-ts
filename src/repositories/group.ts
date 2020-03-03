@@ -25,6 +25,10 @@ export const findById = async (id: number) => {
     return Models.Group.findOne({ where: { id }});
 };
 
+export const findUserGroupByGroupId = async (groupId: number) => {
+    return Models.UserGroup.findAll({ where: { groupId }});
+};
+
 export const saveGroup = async (group: IGroupAttributes) => {
     return Models.Group.insertOrUpdate(group, { returning: true });
 };
