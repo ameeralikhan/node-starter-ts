@@ -41,6 +41,7 @@ interface IConfig {
   fcm: {
     serverKey: string;
   };
+  realTimeIntervalInMin: number;
 }
 
 const config = convict<IConfig>({
@@ -188,6 +189,11 @@ const config = convict<IConfig>({
       env: 'FCM_SERVER_KEY',
       default: ''
     }
+  },
+  realTimeIntervalInMin: {
+    format: Number,
+    env: 'REAL_TIME_INTERVAL_IN_MIN',
+    default: 2
   }
 });
 

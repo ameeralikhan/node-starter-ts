@@ -16,6 +16,7 @@ import applicationExecution from './application-execution';
 import lookup from './lookup';
 import report from './report';
 import userLocationTrail from './user-location-trail';
+import config from './config';
 
 const router = new Router({
   prefix: '/api/v1',
@@ -44,7 +45,8 @@ const routesToExport = [
   applicationExecution,
   lookup,
   report,
-  userLocationTrail
+  userLocationTrail,
+  config
 ];
 
 export default () => compose(routesToExport);
