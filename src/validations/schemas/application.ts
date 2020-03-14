@@ -135,7 +135,7 @@ export const saveApplicationExecutionWorkflow: Joi.SchemaMap = {
         is: ApplicationExecutionStatus.CLARITY,
         then: Joi.object({
             userId: Joi.string().uuid().required(),
-            comment: Joi.string().required()
+            comment: Joi.string().required(),
         }).required()
     })
 };
@@ -176,4 +176,11 @@ export const getApplicationExecutionTimeReport: Joi.SchemaMap = {
     applicationId: Joi.string().uuid().required(),
     startDate: Joi.date().required(),
     endDate: Joi.date().required(),
+};
+
+export const reassignWorkflow: Joi.SchemaMap = {
+    applicationId: Joi.string().uuid().required(),
+    executionId: Joi.string().uuid().required(),
+    workflowId: Joi.string().uuid().required(),
+    userId: Joi.string().uuid().required(),
 };

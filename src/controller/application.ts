@@ -4,6 +4,7 @@ import * as applicationFormService from '../services/application-form';
 import * as applicationWorkflowService from '../services/application-workflow';
 import * as applicationWorkflowFieldPermissionService from '../services/application-workflow-field-permission';
 import * as applicationExecutionService from '../services/application-execution';
+import { IReassignExecutionRequest } from '../interface/application';
 
 export const getCurrentLoggedInUserApplications = async (ctx: Context, next: () => void) => {
   const userId: string = ctx.state.user.userId;
@@ -207,7 +208,7 @@ export const saveApplicationExecutionWorkflow = async (ctx: Context, next: () =>
     comments: ctx.request.body.comments,
     status: ctx.request.body.status,
     rejectionDetails: ctx.request.body.rejectionDetails,
-    clarificationDetails: ctx.request.body.clarificationDetails
+    clarificationDetails: ctx.request.body.clarificationDetails,
   };
   ctx.state.data = await applicationExecutionService.saveApplicationExecutionWorkflow(applicationId, userId, payload);
   await next();
@@ -234,5 +235,16 @@ export const deleteApplicationExecution = async (ctx: Context, next: () => void)
   const executionId: string = ctx.params.executionId;
   const userId: string = ctx.state.user.userId;
   ctx.state.data = await applicationExecutionService.deleteApplicationExecution(executionId, userId);
+  await next();
+};
+
+export const reassignWorkflow = async (ctx: Context, next: () => void) => {
+  const payload: IReassignExecutionRequest = {
+    applicationId: ctx.request.body.appId,
+    executionId: ctx.params.applicationExecutionId,
+    workflowId: ctx.request.body.workflowId,
+    userId: ctx.request.body.userId,
+  };
+  ctx.state.data = await applicationExecutionService.reassignWorkflow(payload);
   await next();
 };

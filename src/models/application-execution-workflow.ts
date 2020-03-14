@@ -10,6 +10,7 @@ export interface IApplicationExecutionWorkflowAttributes {
     comments?: any;
     rejectionDetails?: any;
     clarificationDetails?: any;
+    clarificationUserId?: string;
     status?: string;
     isActive?: boolean;
     createdAt?: Date;
@@ -29,6 +30,7 @@ export interface IApplicationExecutionWorkflowInstance
     comments?: any;
     rejectionDetails?: any;
     clarificationDetails?: any;
+    clarificationUserId?: string;
     status?: string;
     isActive?: boolean;
     createdAt?: Date;
@@ -78,6 +80,14 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationExecutionWor
       clarificationDetails: {
         type: Sequelize.JSONB,
         allowNull: true
+      },
+      clarificationUserId: {
+        type: Sequelize.UUID,
+        allowNull: true,
+        references: {
+          model: 'users',
+          key: 'id'
+        }
       },
       status: {
         type: Sequelize.STRING(50),

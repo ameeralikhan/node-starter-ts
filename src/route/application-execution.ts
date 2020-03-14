@@ -44,6 +44,8 @@ router.put('/:applicationId/execution/:applicationExecutionId/publish', ctrl.pub
 // tslint:disable-next-line:max-line-length
 router.put('/:applicationId/execution/:applicationExecutionId/workflow/:applicationExecutionWorkflowId', ctrl.saveApplicationExecutionWorkflow);
 
+router.put('/:applicationExecutionId/reassign', ctrl.reassignWorkflow);
+
 router.delete('/execution/:executionId', ctrl.deleteApplicationExecution);
 
 export default router.routes();

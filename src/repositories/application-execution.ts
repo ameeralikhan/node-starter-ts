@@ -413,7 +413,8 @@ export const getDraftApplicationExecutionQuery =
 };
 
 export const getApplicationExecutionInProcessQuery =
-    async (userId: string, status: string, applicationId?: string): Promise<IGetExecutionSelect[]> => {
+    async (userId: string, status: string, applicationId?: string, 
+           isClarity?: boolean): Promise<IGetExecutionSelect[]> => {
         let query = `select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
         u."managerId", u."departmentId", u."officeLocationId", execution."applicationId", execution."updatedAt",
         ew."applicationWorkflowId", workflow."showMap",
@@ -429,8 +430,12 @@ export const getApplicationExecutionInProcessQuery =
         left join "applicationExecutionWorkflow" ew on ew."applicationExecutionId" = execution.id
         inner join "applicationWorkflow" workflow on ew."applicationWorkflowId" = workflow.id
         and ew."isActive" = true
-        where execution."createdBy" = '${userId}' and execution."isActive" = true
-        and execution."status" = '${status}'`;
+        where execution."isActive" = true and execution."status" = '${status}'`;
+        if (isClarity) {
+            query += ` and ew."clarificationUserId" = '${userId}'`;
+        } else {
+            query += ` and execution."createdBy" = '${userId}'`;
+        }
         if (applicationId) {
             query += ` and execution."applicationId" = '${applicationId}'`;
         }

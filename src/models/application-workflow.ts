@@ -14,7 +14,7 @@ export interface IApplicationWorkflowAttributes {
     order: number;
     stepId: string;
     showMap: boolean;
-    assignTo?: string;
+    assignTo?: string | null;
     groupId?: number | null;
     isActive: boolean;
     createdAt?: Date;

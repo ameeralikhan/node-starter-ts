@@ -13,6 +13,7 @@ import * as applicationExecutionFormRepo from '../repositories/application-execu
 import * as applicationExecutionWorkflowRepo from '../repositories/application-execution-workflow';
 import * as applicationSectionRepo from '../repositories/application-form-section';
 import * as applicationWorkflowFieldPermissionRepo from '../repositories/application-workflow-field-permission';
+import * as applicationWorkflowPermissionRepo from '../repositories/application-workflow-permission';
 import * as userRepo from '../repositories/user';
 import * as departmentRepo from '../repositories/department';
 import * as officeLocationRepo from '../repositories/office-location';
@@ -28,7 +29,7 @@ import { ApplicationExecutionStatus,
     ApplicationWorkflowAssignTo
 } from '../enum/application';
 import { IApplicationExecutionWorkflowAttributes } from '../models/application-execution-workflow';
-import { IExecutionWorkflowCount, IGetExecutionSelect } from '../interface/application';
+import { IExecutionWorkflowCount, IGetExecutionSelect, IReassignExecutionRequest } from '../interface/application';
 import { PERMISSION_STATUS_MAPPING } from '../constants/application';
 
 export const getAll = async (loggedInUser: any): Promise<IApplicationExecutionInstance[]> => {
@@ -97,8 +98,12 @@ export const getExecutionInProcessLoggedInUserIdByQuery =
             dbApplicationExecutions = await
                 applicationExecutionRepo.getDraftApplicationExecutionQuery(loggedInUser.userId, status, applicationId);
         } else {
+            let isClarity = false;
+            if (status === ApplicationExecutionStatus.CLARITY) {
+                isClarity = true;
+            }
             dbApplicationExecutions = await applicationExecutionRepo.
-                getApplicationExecutionInProcessQuery(loggedInUser.userId, status, applicationId);
+                getApplicationExecutionInProcessQuery(loggedInUser.userId, status, applicationId, isClarity);
         }
     } else {
         dbApplicationExecutions = await applicationExecutionRepo.getApplicationExecutionByWorkflowTypeAndStatusQuery(
@@ -571,6 +576,13 @@ export const saveApplicationExecutionWorkflow =
     if (!user) {
         throw boom.badRequest('Invalid user');
     }
+    if (payload.clarificationDetails && payload.clarificationDetails.userId) {
+        const clarificationUser = await userRepo.findById(payload.clarificationDetails.userId);
+        if (!clarificationUser) {
+            throw boom.badRequest('Invalid clarification user');
+        }
+        payload.clarificationUserId = payload.clarificationDetails.userId;
+    }
     if (toSave.status === ApplicationExecutionStatus.APPROVED ||
         toSave.status === ApplicationExecutionStatus.REJECT) {
         throw boom.badRequest('Execution is already approved or reject, cannot be modified now');
@@ -691,5 +703,32 @@ export const deleteApplicationExecution = async (id: string, loggedInUserId: str
         throw boom.badRequest('Invalid application execution id');
     }
     await applicationExecutionRepo.deleteApplicationExecution(id, loggedInUserId);
+    return { success: true };
+};
+
+export const reassignWorkflow = async (payload: IReassignExecutionRequest) => {
+    await validate(payload, joiSchema.reassignWorkflow);
+    const applicationExecution = await applicationExecutionRepo.findById(payload.executionId);
+    if (!applicationExecution) {
+        throw boom.badRequest('Invalid application execution id');
+    }
+    const user = await userRepo.findById(payload.userId);
+    if (!user) {
+        throw boom.badRequest('Invalid user id');
+    }
+    const workflow = await applicationWorkflowRepo.findById(payload.workflowId);
+    if (!workflow) {
+        throw boom.badRequest('Invalid application workflow id');
+    }
+    if (workflow.assignTo) {
+        const toSaveWorkflow = workflow.get({ plain: true });
+        toSaveWorkflow.assignTo = null;
+        await applicationWorkflowRepo.saveApplicationWorkflow(toSaveWorkflow);
+    }
+    const newPermission = {
+        applicationWorkflowId: workflow.id,
+        userId: payload.userId
+    };
+    await applicationWorkflowPermissionRepo.saveApplicationWorkflowPermission(newPermission);
     return { success: true };
 };

@@ -23,7 +23,7 @@ export const getByApplicationId = async (applicationId: string) => {
 
 export const findById = async (id: string) => {
     return Models.ApplicationWorkflow.findOne({
-        where: { id },
+        where: { id, isActive: true },
         include: [{
             model: Models.ApplicationWorkflowPermission,
             where: {

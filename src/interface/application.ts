@@ -106,3 +106,10 @@ export interface IExecutionLocation {
     latitude: number;
     longitude: number;
 }
+
+export interface IReassignExecutionRequest {
+    applicationId: string;
+    executionId: string;
+    workflowId: string;
+    userId: string;
+}
