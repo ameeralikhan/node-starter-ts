@@ -82,7 +82,8 @@ export const getByApplicationId = async (applicationId: string) => {
 
 export const findById = async (id: string) => {
     return Models.ApplicationExecution.findOne({
-        attributes: ['id', 'applicationId', 'startedAt', 'status', 'createdAt', 'updatedAt', 'latitude', 'longitude'],
+        attributes: ['id', 'applicationId', 'startedAt', 'status',
+        'createdAt', 'createdBy', 'updatedAt', 'latitude', 'longitude'],
         where: {
             isActive: true,
             id
@@ -413,7 +414,7 @@ export const getDraftApplicationExecutionQuery =
 };
 
 export const getApplicationExecutionInProcessQuery =
-    async (userId: string, status: string, applicationId?: string, 
+    async (userId: string, status: string, applicationId?: string,
            isClarity?: boolean): Promise<IGetExecutionSelect[]> => {
         let query = `select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
         u."managerId", u."departmentId", u."officeLocationId", execution."applicationId", execution."updatedAt",

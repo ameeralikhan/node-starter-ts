@@ -184,3 +184,8 @@ export const reassignWorkflow: Joi.SchemaMap = {
     workflowId: Joi.string().uuid().required(),
     userId: Joi.string().uuid().required(),
 };
+
+export const withdraw: Joi.SchemaMap = {
+    loggedInUserId: Joi.string().uuid().required(),
+    executionId: Joi.string().uuid().required(),
+};

@@ -130,6 +130,13 @@ export const getExecutionParticipatedLoggedInUserId =
     return transformExecutionData(dbApplicationExecutions, loggedInUser, undefined);
 };
 
+export const getExecutionWithdrawLoggedInUserId =
+    async (loggedInUser: any): Promise<IApplicationExecutionAttributes[]> => {
+    await validate({ loggedInUserId: loggedInUser.userId }, joiSchema.getExecutionParticipatedLoggedInUserId);
+    return applicationExecutionRepo.getApplicationExecutionInProcessQuery(
+            loggedInUser.userId, ApplicationExecutionStatus.WITHDRAW);
+};
+
 export const getInProgressExecutions =
     async (loggedInUser: any, applicationId: string): Promise<IGetExecutionSelect[]> => {
     const dbApplicationExecutions = await
@@ -730,5 +737,27 @@ export const reassignWorkflow = async (payload: IReassignExecutionRequest) => {
         userId: payload.userId
     };
     await applicationWorkflowPermissionRepo.saveApplicationWorkflowPermission(newPermission);
+    return { success: true };
+};
+
+export const withdraw = async (loggedInUserId: string, executionId: string, executionWorkflowId: string) => {
+    await validate({ loggedInUserId, executionId }, joiSchema.withdraw);
+    const applicationExecution = await applicationExecutionRepo.findById(executionId);
+    if (!applicationExecution) {
+        throw boom.badRequest('Invalid application execution id');
+    }
+    if (applicationExecution.createdBy !== loggedInUserId) {
+        throw boom.unauthorized('You are not authorize to withdraw this execution');
+    }
+    const executionWorkflow = await applicationExecutionWorkflowRepo.findById(executionWorkflowId);
+    if (!executionWorkflow) {
+        throw boom.badRequest('Invalid application execution id');
+    }
+    const execution = {
+        ...executionWorkflow.get({plain: true}),
+        id: executionWorkflowId,
+        status: ApplicationExecutionStatus.WITHDRAW,
+    };
+    await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(execution);
     return { success: true };
 };

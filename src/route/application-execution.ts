@@ -35,6 +35,8 @@ router.get('/participated/query', ctrl.getExecutionParticipatedQuery);
 
 router.get('/:applicationId/in-progress', ctrl.getInProgressExecutions);
 
+router.get('/withdraw', ctrl.getWithdrawExecutions);
+
 router.post('/:applicationId/execution', ctrl.saveApplicationExecution);
 
 router.put('/:applicationId/execution/form', ctrl.saveApplicationExecutionForm);
@@ -44,7 +46,9 @@ router.put('/:applicationId/execution/:applicationExecutionId/publish', ctrl.pub
 // tslint:disable-next-line:max-line-length
 router.put('/:applicationId/execution/:applicationExecutionId/workflow/:applicationExecutionWorkflowId', ctrl.saveApplicationExecutionWorkflow);
 
-router.put('/:applicationExecutionId/reassign', ctrl.reassignWorkflow);
+router.put('/:executionId/reassign', ctrl.reassignWorkflow);
+
+router.put('/:executionId/withdraw/:executionWorkflowId', ctrl.withdraw);
 
 router.delete('/execution/:executionId', ctrl.deleteApplicationExecution);
 

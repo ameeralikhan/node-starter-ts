@@ -134,6 +134,12 @@ export const getApplicationFieldTitles = async (ctx: Context, next: () => void) 
   await next();
 };
 
+export const getWithdrawExecutions = async (ctx: Context, next: () => void) => {
+  const userId: string = ctx.state.user.userId;
+  ctx.state.data = await applicationExecutionService.getExecutionWithdrawLoggedInUserId(userId);
+  await next();
+};
+
 export const saveApplication = async (ctx: Context, next: () => void) => {
   const userId: string = ctx.state.user.userId;
   const payload = ctx.request.body;
@@ -240,11 +246,19 @@ export const deleteApplicationExecution = async (ctx: Context, next: () => void)
 
 export const reassignWorkflow = async (ctx: Context, next: () => void) => {
   const payload: IReassignExecutionRequest = {
-    applicationId: ctx.request.body.appId,
-    executionId: ctx.params.applicationExecutionId,
-    workflowId: ctx.request.body.workflowId,
+    executionId: ctx.params.executionId,
     userId: ctx.request.body.userId,
+    applicationId: ctx.request.body.appId,
+    workflowId: ctx.request.body.workflowId,
   };
   ctx.state.data = await applicationExecutionService.reassignWorkflow(payload);
+  await next();
+};
+
+export const withdraw = async (ctx: Context, next: () => void) => {
+  const executionId: string = ctx.params.executionId;
+  const executionWorkflowId: string = ctx.params.executionWorkflowId;
+  const userId: string = ctx.state.user.userId;
+  ctx.state.data = await applicationExecutionService.withdraw(userId, executionId, executionWorkflowId);
   await next();
 };
