@@ -29,6 +29,7 @@ export const getByUserId = async (userId: string) => {
                 }
             },
         },
+        order: [['createdAt', 'DESC']]
     });
 };
 
