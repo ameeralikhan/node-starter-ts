@@ -135,8 +135,8 @@ export const getApplicationFieldTitles = async (ctx: Context, next: () => void) 
 };
 
 export const getWithdrawExecutions = async (ctx: Context, next: () => void) => {
-  const userId: string = ctx.state.user.userId;
-  ctx.state.data = await applicationExecutionService.getExecutionWithdrawLoggedInUserId(userId);
+  const loggedInUser: string = ctx.state.user;
+  ctx.state.data = await applicationExecutionService.getExecutionWithdrawLoggedInUserId(loggedInUser);
   await next();
 };
 
