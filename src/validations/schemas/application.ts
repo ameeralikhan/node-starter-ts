@@ -189,3 +189,8 @@ export const withdraw: Joi.SchemaMap = {
     loggedInUserId: Joi.string().uuid().required(),
     executionId: Joi.string().uuid().required(),
 };
+
+export const getExecutionParticipatedUsers: Joi.SchemaMap = {
+    loggedInUserId: Joi.string().uuid().required(),
+    executionId: Joi.string().uuid().required()
+};

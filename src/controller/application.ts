@@ -140,6 +140,13 @@ export const getWithdrawExecutions = async (ctx: Context, next: () => void) => {
   await next();
 };
 
+export const getExecutionParticipatedUsers = async (ctx: Context, next: () => void) => {
+  const loggedInUser: string = ctx.state.user;
+  const executionId: string = ctx.params.executionId;
+  ctx.state.data = await applicationExecutionService.getExecutionParticipatedUsers(loggedInUser, executionId);
+  await next();
+};
+
 export const saveApplication = async (ctx: Context, next: () => void) => {
   const userId: string = ctx.state.user.userId;
   const payload = ctx.request.body;

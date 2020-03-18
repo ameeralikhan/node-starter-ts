@@ -438,6 +438,17 @@ export const getExecutionWorkflowsCount =
     return resp;
 };
 
+export const getExecutionParticipatedUsers =
+    async (loggedInUser: any, executionId: string): Promise<IApplicationExecutionAttributes[]> => {
+    await validate({ loggedInUserId: loggedInUser.userId, executionId },
+        joiSchema.getExecutionParticipatedUsers);
+    const users = await applicationExecutionRepo.getParticipatedUsersByExecutionId(executionId);
+    let userIds = users.map((user) => user.createdBy);
+    userIds = users.filter((user) => user.updatedBy).map((user) => user.updatedBy);
+    const dbUsers = await userRepo.findByIds(userIds);
+    return dbUsers;
+};
+
 export const saveApplicationExecution = async (applicationId: string,
                                                loggedInUserId: string,
                                                applicationExecution: IApplicationExecutionAttributes) => {

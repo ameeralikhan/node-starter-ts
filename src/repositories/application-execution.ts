@@ -4,7 +4,7 @@ import { Database } from './../bootstrap/database';
 import { Models } from '../models/index';
 import { IApplicationExecutionInstance, IApplicationExecutionAttributes } from '../models/application-execution';
 import { ApplicationExecutionStatus } from './../enum/application';
-import { IGetExecutionSelect } from '../interface/application';
+import { IGetExecutionSelect, IGetParticipatedUserSelect } from '../interface/application';
 
 export const getAll = async (userId: string, applyCreatedBy: boolean = false) => {
     const where: any = {
@@ -539,6 +539,19 @@ export const getAllExecutionsByStatus =
             query += ` and execution."applicationId" = '${applicationId}'`;
         }
         const result = await Database.query(query).then((res) => res[0]);
+        return result;
+};
+
+export const getParticipatedUsersByExecutionId =
+    async (executionId: string): Promise<IGetParticipatedUserSelect[]> => {
+        const result = await Database.query(`
+        select distinct "createdByUser".id as "createdBy", "updatedByUser".id as "updatedBy"
+        from "applicationExecution" execution
+        inner join "applicationExecutionWorkflow" aew on aew."applicationExecutionId" = execution.id
+        inner join "user" "createdByUser" on aew."createdBy" = "createdByUser".id
+        left join "user" "updatedByUser" on aew."updatedBy" = "updatedByUser".id
+        where execution."id" = '${executionId}' and execution."isActive" = true
+    `).then((res) => res[0]);
         return result;
 };
 

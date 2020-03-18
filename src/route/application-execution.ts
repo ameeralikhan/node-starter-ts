@@ -37,6 +37,8 @@ router.get('/:applicationId/in-progress', ctrl.getInProgressExecutions);
 
 router.get('/withdraw', ctrl.getWithdrawExecutions);
 
+router.get('/:executionId/users', ctrl.getExecutionParticipatedUsers);
+
 router.post('/:applicationId/execution', ctrl.saveApplicationExecution);
 
 router.put('/:applicationId/execution/form', ctrl.saveApplicationExecutionForm);

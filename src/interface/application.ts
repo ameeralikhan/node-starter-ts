@@ -113,3 +113,8 @@ export interface IReassignExecutionRequest {
     workflowId: string;
     userId: string;
 }
+
+export interface IGetParticipatedUserSelect {
+    createdBy: string;
+    updatedBy: string;
+}
