@@ -431,7 +431,7 @@ export const getApplicationExecutionInProcessQuery =
         left join "applicationExecutionWorkflow" ew on ew."applicationExecutionId" = execution.id
         inner join "applicationWorkflow" workflow on ew."applicationWorkflowId" = workflow.id
         and ew."isActive" = true
-        where execution."isActive" = true and execution."status" = '${status}'`;
+        where execution."isActive" = true and ew."status" = '${status}'`;
         if (isClarity) {
             query += ` and ew."clarificationUserId" = '${userId}'`;
         } else {

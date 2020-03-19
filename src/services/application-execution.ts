@@ -188,6 +188,7 @@ const transformExecutionData = async (
             }
             if (executionWorkflow.status !== ApplicationExecutionStatus.APPROVED &&
                 executionWorkflow.status !== ApplicationExecutionStatus.REJECT &&
+                status !== ApplicationExecutionStatus.WITHDRAW &&
                 status !== 'participated') {
                 const shouldContinue = await checkWorkflowPermission(plainExecution,
                     executionWorkflow.applicationWorkflowId, user.userId);
@@ -764,11 +765,17 @@ export const withdraw = async (loggedInUserId: string, executionId: string, exec
     if (!executionWorkflow) {
         throw boom.badRequest('Invalid application execution id');
     }
-    const execution = {
+    const toSaveExecutionWorkflow = {
         ...executionWorkflow.get({plain: true}),
         id: executionWorkflowId,
         status: ApplicationExecutionStatus.WITHDRAW,
     };
-    await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(execution);
+    await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(toSaveExecutionWorkflow);
+    const execution = {
+        ...applicationExecution.get({plain: true}),
+        id: executionId,
+        status: ApplicationExecutionStatus.WITHDRAW,
+    };
+    await applicationExecutionRepo.saveApplicationExecution(execution);
     return { success: true };
 };
