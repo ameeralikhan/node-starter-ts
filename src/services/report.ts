@@ -127,7 +127,8 @@ export const getApplicationExecutionTimeReport =
                 workflowType: workflowExecution.applicationWorkflow.type,
                 startedAt: workflowExecution.createdAt,
                 endAt: workflowExecution.updatedAt,
-                timestamp: `${duration.get('h')}:${duration.get('m')}:${duration.get('s')}`
+                timestamp: `${duration.get('h')}:${duration.get('m')}:${duration.get('s')}`,
+                applicationWorkflowId: workflowExecution.applicationWorkflowId
             });
         }
         response.push(responseExecution);
