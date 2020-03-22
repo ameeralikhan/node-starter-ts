@@ -81,6 +81,7 @@ export interface ITimeApplicationResponse {
 }
 
 export interface IExecutionTimeline {
+    applicationWorkflowId?: string;
     workflowType?: string;
     startedAt?: Date;
     endAt?: Date;
@@ -117,4 +118,20 @@ export interface IReassignExecutionRequest {
 export interface IGetParticipatedUserSelect {
     createdBy: string;
     updatedBy: string;
+}
+
+export interface IGetWithdrawRequest {
+    applicationId: string;
+    startDate: string;
+    endDate: string;
+}
+
+export interface IApplicationExecutionInProcessQuery {
+    userId: string;
+    status: string;
+    isAdmin?: boolean;
+    applicationId?: string;
+    isClarity?: boolean;
+    startDate?: string;
+    endDate?: string;
 }

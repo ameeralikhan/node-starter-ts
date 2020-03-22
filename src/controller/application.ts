@@ -4,7 +4,7 @@ import * as applicationFormService from '../services/application-form';
 import * as applicationWorkflowService from '../services/application-workflow';
 import * as applicationWorkflowFieldPermissionService from '../services/application-workflow-field-permission';
 import * as applicationExecutionService from '../services/application-execution';
-import { IReassignExecutionRequest } from '../interface/application';
+import { IReassignExecutionRequest, IGetWithdrawRequest } from '../interface/application';
 
 export const getCurrentLoggedInUserApplications = async (ctx: Context, next: () => void) => {
   const userId: string = ctx.state.user.userId;
@@ -136,7 +136,12 @@ export const getApplicationFieldTitles = async (ctx: Context, next: () => void) 
 
 export const getWithdrawExecutions = async (ctx: Context, next: () => void) => {
   const loggedInUser: string = ctx.state.user;
-  ctx.state.data = await applicationExecutionService.getExecutionWithdrawLoggedInUserId(loggedInUser);
+  const payload: IGetWithdrawRequest = {
+    applicationId: ctx.query.applicationId,
+    startDate: ctx.query.startDate,
+    endDate: ctx.query.endDate
+  };
+  ctx.state.data = await applicationExecutionService.getExecutionWithdrawLoggedInUserId(loggedInUser, payload);
   await next();
 };
 

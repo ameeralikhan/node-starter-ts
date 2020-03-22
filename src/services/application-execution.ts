@@ -1,6 +1,7 @@
 
 import * as boom from 'boom';
 import * as _ from 'lodash';
+import * as moment from 'moment';
 import { validate } from '../validations/index';
 
 import * as helper from '../utils/helper';
@@ -29,7 +30,10 @@ import { ApplicationExecutionStatus,
     ApplicationWorkflowAssignTo
 } from '../enum/application';
 import { IApplicationExecutionWorkflowAttributes } from '../models/application-execution-workflow';
-import { IExecutionWorkflowCount, IGetExecutionSelect, IReassignExecutionRequest } from '../interface/application';
+import {
+    IExecutionWorkflowCount,
+    IGetExecutionSelect, IReassignExecutionRequest, IGetWithdrawRequest
+} from '../interface/application';
 import { PERMISSION_STATUS_MAPPING } from '../constants/application';
 
 export const getAll = async (loggedInUser: any): Promise<IApplicationExecutionInstance[]> => {
@@ -103,7 +107,11 @@ export const getExecutionInProcessLoggedInUserIdByQuery =
                 isClarity = true;
             }
             dbApplicationExecutions = await applicationExecutionRepo.
-                getApplicationExecutionInProcessQuery(loggedInUser.userId, status, applicationId, isClarity);
+                getApplicationExecutionInProcessQuery({
+                    userId: loggedInUser.userId,
+                    status,
+                    applicationId, isClarity
+                });
         }
     } else {
         dbApplicationExecutions = await applicationExecutionRepo.getApplicationExecutionByWorkflowTypeAndStatusQuery(
@@ -131,10 +139,23 @@ export const getExecutionParticipatedLoggedInUserId =
 };
 
 export const getExecutionWithdrawLoggedInUserId =
-    async (loggedInUser: any): Promise<IApplicationExecutionAttributes[]> => {
+    async (loggedInUser: any, payload: IGetWithdrawRequest): Promise<IApplicationExecutionAttributes[]> => {
     await validate({ loggedInUserId: loggedInUser.userId }, joiSchema.getExecutionParticipatedLoggedInUserId);
-    return applicationExecutionRepo.getApplicationExecutionInProcessQuery(
-            loggedInUser.userId, ApplicationExecutionStatus.WITHDRAW);
+    const isAdmin = loggedInUser.roles.includes(Role.SUPER_ADMIN);
+    if (payload.startDate) {
+        payload.startDate = moment(payload.startDate + ' 00:00:00').add(-5, 'h').toISOString();
+    }
+    if (payload.endDate) {
+        payload.endDate = moment(payload.endDate + ' 23:59:59').add(-5, 'h').toISOString();
+    }
+    return applicationExecutionRepo.getApplicationExecutionInProcessQuery({
+            userId: loggedInUser.userId,
+            status: ApplicationExecutionStatus.WITHDRAW,
+            applicationId: payload.applicationId,
+            startDate: payload.startDate,
+            endDate: payload.endDate,
+            isAdmin
+    });
 };
 
 export const getInProgressExecutions =

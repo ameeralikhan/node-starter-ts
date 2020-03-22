@@ -4,7 +4,11 @@ import { Database } from './../bootstrap/database';
 import { Models } from '../models/index';
 import { IApplicationExecutionInstance, IApplicationExecutionAttributes } from '../models/application-execution';
 import { ApplicationExecutionStatus } from './../enum/application';
-import { IGetExecutionSelect, IGetParticipatedUserSelect } from '../interface/application';
+import {
+    IGetExecutionSelect,
+    IGetParticipatedUserSelect,
+    IApplicationExecutionInProcessQuery
+} from '../interface/application';
 
 export const getAll = async (userId: string, applyCreatedBy: boolean = false) => {
     const where: any = {
@@ -414,8 +418,7 @@ export const getDraftApplicationExecutionQuery =
 };
 
 export const getApplicationExecutionInProcessQuery =
-    async (userId: string, status: string, applicationId?: string,
-           isClarity?: boolean): Promise<IGetExecutionSelect[]> => {
+    async (payload: IApplicationExecutionInProcessQuery): Promise<IGetExecutionSelect[]> => {
         let query = `select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
         u."managerId", u."departmentId", u."officeLocationId", execution."applicationId", execution."updatedAt",
         ew."applicationWorkflowId", workflow."showMap",
@@ -431,14 +434,22 @@ export const getApplicationExecutionInProcessQuery =
         left join "applicationExecutionWorkflow" ew on ew."applicationExecutionId" = execution.id
         inner join "applicationWorkflow" workflow on ew."applicationWorkflowId" = workflow.id
         and ew."isActive" = true
-        where execution."isActive" = true and ew."status" = '${status}'`;
-        if (isClarity) {
-            query += ` and ew."clarificationUserId" = '${userId}'`;
-        } else {
-            query += ` and execution."createdBy" = '${userId}'`;
+        where execution."isActive" = true and ew."status" = '${payload.status}'`;
+        if (!payload.isAdmin) {
+            if (payload.isClarity) {
+                query += ` and ew."clarificationUserId" = '${payload.userId}'`;
+            } else {
+                query += ` and execution."createdBy" = '${payload.userId}'`;
+            }
         }
-        if (applicationId) {
-            query += ` and execution."applicationId" = '${applicationId}'`;
+        if (payload.applicationId) {
+            query += ` and execution."applicationId" = '${payload.applicationId}'`;
+        }
+        if (payload.startDate) {
+            query += ` and execution."createdAt" >= '${payload.startDate}'`;
+        }
+        if (payload.endDate) {
+            query += ` and execution."createdAt" < '${payload.endDate}'`;
         }
         const result = await Database.query(query).then((res) => res[0]);
         return result;
