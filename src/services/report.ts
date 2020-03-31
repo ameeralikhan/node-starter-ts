@@ -119,6 +119,7 @@ export const getApplicationExecutionTimeReport =
             workflow.applicationExecutionId === execution.id);
         for (const workflowExecution of appExecutionWorklows) {
             if (!workflowExecution.applicationWorkflow || !responseExecution.timeline) {
+                response.push(responseExecution);
                 continue;
             }
             const timestamp = moment(workflowExecution.updatedAt).diff(moment(workflowExecution.createdAt));
