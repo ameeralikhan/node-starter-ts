@@ -74,6 +74,7 @@ const transformExecutionData = (
             response[plainExecution.application.id] = {
                 applicationId: plainExecution.application.id,
                 applicationName: plainExecution.application.name,
+                draft: 0,
                 inProgress: 0,
                 completed: 0,
                 rejected: 0
@@ -85,6 +86,7 @@ const transformExecutionData = (
                 plainExecution.applicationExecutionWorkflows, 'createdAt').reverse();
             const executionWorkflow = plainExecution.applicationExecutionWorkflows[0];
             if (!executionWorkflow || !executionWorkflow.applicationWorkflowId) {
+                response[plainExecution.application.id].draft += 1;
                 continue;
             }
             if (executionWorkflow.status === ApplicationExecutionStatus.APPROVED) {
