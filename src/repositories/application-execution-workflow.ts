@@ -44,7 +44,7 @@ export const getByApplicationExecutionIds = async (applicationExecutionIds: stri
 };
 
 export const findById = async (id: string) => {
-    return Models.ApplicationExecutionWorkflow.findOne({ where: { id }});
+    return Models.ApplicationExecutionWorkflow.findOne({ where: { id }, include: [Models.ApplicationWorkflow]});
 };
 
 export const findByIds = async (ids: string[]) => {

@@ -16,6 +16,7 @@ export interface IApplicationWorkflowAttributes {
     showMap: boolean;
     assignTo?: string | null;
     groupId?: number | null;
+    canWithdraw?: boolean;
     isActive: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -37,6 +38,7 @@ export interface IApplicationWorkflowInstance extends Sequelize.Instance<IApplic
     showMap: boolean;
     assignTo?: string;
     groupId?: number | null;
+    canWithdraw?: boolean;
     isActive: boolean;
     createdAt?: Date;
     updatedAt?: Date;
@@ -89,6 +91,11 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationWorkflowMode
           model: 'group',
           key: 'id'
         }
+      },
+      canWithdraw: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: true
       },
       stepId: {
         type: Sequelize.UUID,

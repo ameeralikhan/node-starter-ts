@@ -84,6 +84,17 @@ export const getByApplicationId = async (applicationId: string) => {
     });
 };
 
+export const findByIdForValidation = async (id: string) => {
+    return Models.ApplicationExecution.findOne({
+        attributes: ['id', 'applicationId', 'startedAt', 'status',
+        'createdAt', 'createdBy', 'updatedAt', 'latitude', 'longitude'],
+        where: {
+            isActive: true,
+            id
+        },
+    });
+};
+
 export const findById = async (id: string) => {
     return Models.ApplicationExecution.findOne({
         attributes: ['id', 'applicationId', 'startedAt', 'status',
@@ -395,7 +406,7 @@ export const getDraftApplicationExecutionQuery =
     async (userId: string, status: string, applicationId?: string): Promise<IGetExecutionSelect[]> => {
         let query = `select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
         u."managerId", u."departmentId", u."officeLocationId", execution."applicationId", execution."updatedAt",
-        ew."applicationWorkflowId", workflow."showMap",
+        ew."applicationWorkflowId", workflow."showMap", workflow."canWithdraw",
         u."firstName" as "createdByName", workflow."name" as "applicationWorkflowName",
         (
             select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
@@ -421,7 +432,7 @@ export const getApplicationExecutionInProcessQuery =
     async (payload: IApplicationExecutionInProcessQuery): Promise<IGetExecutionSelect[]> => {
         let query = `select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
         u."managerId", u."departmentId", u."officeLocationId", execution."applicationId", execution."updatedAt",
-        ew."applicationWorkflowId", workflow."showMap",
+        ew."applicationWorkflowId", workflow."showMap", workflow."canWithdraw",
         u."firstName" as "createdByName", workflow."name" as "applicationWorkflowName",
         (
             select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
@@ -459,7 +470,7 @@ export const getApplicationExecutionByWorkflowTypeAndStatusQuery =
     async (status: string, type: string, applicationId?: string): Promise<IGetExecutionSelect[]> => {
         let query = `select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
         u."managerId", u."departmentId", u."officeLocationId", execution."applicationId", execution."updatedAt",
-        ew."applicationWorkflowId", workflow."showMap",
+        ew."applicationWorkflowId", workflow."showMap", workflow."canWithdraw",
         u."firstName" as "createdByName", workflow."name" as "applicationWorkflowName",
         (
             select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
@@ -530,7 +541,7 @@ export const getAllExecutionsByStatus =
     async (userId: string, status: string[], applicationId?: string): Promise<IGetExecutionSelect[]> => {
         let query = `select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
         u."managerId", u."departmentId", u."officeLocationId", execution."applicationId", execution."updatedAt",
-        ew."applicationWorkflowId", workflow."showMap",
+        ew."applicationWorkflowId", workflow."showMap", workflow."canWithdraw",
         u."firstName" as "createdByName", workflow."name" as "applicationWorkflowName",
         (
             select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef

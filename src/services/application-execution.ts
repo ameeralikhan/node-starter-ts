@@ -775,7 +775,7 @@ export const reassignWorkflow = async (payload: IReassignExecutionRequest) => {
 
 export const withdraw = async (loggedInUserId: string, executionId: string, executionWorkflowId: string) => {
     await validate({ loggedInUserId, executionId }, joiSchema.withdraw);
-    const applicationExecution = await applicationExecutionRepo.findById(executionId);
+    const applicationExecution = await applicationExecutionRepo.findByIdForValidation(executionId);
     if (!applicationExecution) {
         throw boom.badRequest('Invalid application execution id');
     }
@@ -785,6 +785,9 @@ export const withdraw = async (loggedInUserId: string, executionId: string, exec
     const executionWorkflow = await applicationExecutionWorkflowRepo.findById(executionWorkflowId);
     if (!executionWorkflow) {
         throw boom.badRequest('Invalid application execution id');
+    }
+    if (executionWorkflow.applicationWorkflow && !executionWorkflow.applicationWorkflow.canWithdraw) {
+        throw boom.badRequest('Withdraw is not allowed for this workflow');
     }
     const toSaveExecutionWorkflow = {
         ...executionWorkflow.get({plain: true}),
