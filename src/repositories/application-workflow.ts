@@ -15,7 +15,8 @@ export const getByApplicationId = async (applicationId: string) => {
             model: Models.ApplicationWorkflowPermission,
             where: {
                 isActive: true
-            }
+            },
+            required: false
         }],
         order: ['order']
     });

@@ -39,9 +39,11 @@ export const saveApplicationWorkflow = async (applicationId: string,
     }
     let userIds = _.reject(applicationWorkflows.map(form => form.userIds), _.isUndefined);
     userIds = _.flatMap(userIds);
-    const users = await userRepo.findByIds(userIds);
-    if (users.length !== _.uniq(userIds).length) {
-        throw boom.badRequest('Invalid user ids');
+    if (userIds && userIds.length) {
+        const users = await userRepo.findByIds(userIds);
+        if (users.length !== _.uniq(userIds).length) {
+            throw boom.badRequest('Invalid user ids');
+        }
     }
     let workflowIndex = 1;
     for (const workflow of applicationWorkflows) {
@@ -64,7 +66,7 @@ export const saveApplicationWorkflow = async (applicationId: string,
         }
         const savedWorkflow = await applicationWorkflowRepo.saveApplicationWorkflow(workflow);
         if (!workflow.userIds) {
-            continue;
+            workflow.userIds = [];
         }
         for (const userId of workflow.userIds) {
             const newPermission = {
