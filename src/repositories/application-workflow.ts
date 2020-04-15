@@ -6,7 +6,7 @@ import { IApplicationWorkflowInstance, IApplicationWorkflowAttributes } from '..
 export const getByApplicationId = async (applicationId: string) => {
     return Models.ApplicationWorkflow.findAll({
         attributes: ['id', 'applicationId', 'name', 'type', 'stepId', 'order', 'assignTo',
-            'isActive', 'createdAt', 'updatedAt', 'showMap', 'groupId'],
+            'isActive', 'createdAt', 'updatedAt', 'showMap', 'groupId', 'canWithdraw'],
         where: {
             isActive: true,
             applicationId
