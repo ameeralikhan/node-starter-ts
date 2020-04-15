@@ -508,10 +508,18 @@ export const getParticipatedApplicationExecutionQuery =
                 select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
                 where ef."applicationExecutionId" = execution.id and
                 app.subject ilike concat('%', ef."fieldId", '%') limit 1
-            ) as title
+            ) as title,
+            "outWorkflow"."canWithdraw"
             from "applicationExecution" execution
             inner join application app on execution."applicationId" = app.id and app."isActive" = true
             inner join "user" u on u.id = execution."createdBy"
+            LEFT JOIN LATERAL
+                (SELECT "executionWorkflow"."applicationWorkflowId", workflow."canWithdraw"
+                FROM "applicationExecutionWorkflow" "executionWorkflow"
+                inner join "applicationWorkflow" workflow on workflow.id = "executionWorkflow"."applicationWorkflowId"
+                WHERE "executionWorkflow"."applicationExecutionId" = execution.id
+                ORDER BY "executionWorkflow"."createdAt" DESC LIMIT 1)
+                "outWorkflow" ON true
         )
         ${query} order by "createdAt" desc;
     `).then((res) => res[0]);
