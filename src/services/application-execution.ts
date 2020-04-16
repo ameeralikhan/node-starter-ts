@@ -284,13 +284,16 @@ const checkWorkflowPermission = async (
 ) => {
     let shouldContinue: boolean = false;
     const applicationWorkflow = await applicationWorkflowRepo.findById(applicationWorkflowId);
-    if (applicationWorkflow &&
-        applicationWorkflow.applicationWorkflowPermissions) {
+    if (applicationWorkflow) {
         if (!applicationWorkflow.assignTo) {
-            const hasPermission = applicationWorkflow.applicationWorkflowPermissions.
-                find(per => per.userId === userId);
-            if (!hasPermission) {
-                shouldContinue = true;
+            if (applicationWorkflow.applicationWorkflowPermissions) {
+                const hasPermission = applicationWorkflow.applicationWorkflowPermissions.
+                    find(per => per.userId === userId);
+                if (!hasPermission) {
+                    shouldContinue = false;
+                }
+            } else {
+                shouldContinue = false;
             }
         } else {
             let assignTo = applicationWorkflow.assignTo;
@@ -361,12 +364,15 @@ const checkWorkflowPermission = async (
 const checkWorkflowPermissionQuery = async (execution: IGetExecutionSelect, userId: string) => {
     let shouldContinue: boolean = true;
     const applicationWorkflow = await applicationWorkflowRepo.findById(execution.applicationWorkflowId);
-    if (applicationWorkflow &&
-        applicationWorkflow.applicationWorkflowPermissions) {
+    if (applicationWorkflow) {
         if (!applicationWorkflow.assignTo) {
-            const hasPermission = applicationWorkflow.applicationWorkflowPermissions.
-                find(per => per.userId === userId);
-            if (!hasPermission) {
+            if (applicationWorkflow.applicationWorkflowPermissions) {
+                const hasPermission = applicationWorkflow.applicationWorkflowPermissions.
+                    find(per => per.userId === userId);
+                if (!hasPermission) {
+                    shouldContinue = false;
+                }
+            } else {
                 shouldContinue = false;
             }
         } else {

@@ -29,7 +29,8 @@ export const findById = async (id: string) => {
             model: Models.ApplicationWorkflowPermission,
             where: {
                 isActive: true
-            }
+            },
+            required: false
         }]
     });
 };
