@@ -117,7 +117,11 @@ export const getExecutionInProcessLoggedInUserIdByQuery =
         dbApplicationExecutions = await applicationExecutionRepo.getApplicationExecutionByWorkflowTypeAndStatusQuery(
             status, type, applicationId);
     }
-    const response = [];
+    let response = [];
+    if (status === ApplicationExecutionStatus.CLARITY) {
+        response = dbApplicationExecutions;
+        return response;
+    }
     for (const ex of dbApplicationExecutions) {
         const shouldContinue = await checkWorkflowPermissionQuery(ex, loggedInUser.userId);
         if (shouldContinue) {
