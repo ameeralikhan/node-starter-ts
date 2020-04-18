@@ -476,7 +476,8 @@ export const getExecutionParticipatedUsers =
         joiSchema.getExecutionParticipatedUsers);
     const users = await applicationExecutionRepo.getParticipatedUsersByExecutionId(executionId);
     let userIds = users.map((user) => user.createdBy);
-    userIds = users.filter((user) => user.updatedBy).map((user) => user.updatedBy);
+    const updatedByUserIds = users.filter((user) => user.updatedBy).map((user) => user.updatedBy);
+    userIds = updatedByUserIds.concat(userIds);
     const dbUsers = await userRepo.findByIds(userIds);
     return dbUsers;
 };
