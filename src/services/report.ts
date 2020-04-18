@@ -148,7 +148,7 @@ export const getTotalExecutionsCountReport = async (payload: ITimeApplicationRep
         applicationExecutionRepo.getTotalApplicationExecutionQuery(payload.applicationId,
             payload.startDate, payload.endDate);
     const response: ITotalExecutionCount = {
-        total: dbApplicationExecutions.length,
+        total: 0,
         completed: 0,
         inProgress: 0,
         rejected: 0,
@@ -158,11 +158,14 @@ export const getTotalExecutionsCountReport = async (payload: ITimeApplicationRep
     const workflows = await applicationExecutionWorkflowRepo.getByApplicationExecutionIds(ids);
     for (const execution of dbApplicationExecutions) {
         const currentWorkflows = workflows.filter(ex => ex.applicationExecutionId === execution.id);
-        response.completed += currentWorkflows[0].status === ApplicationExecutionStatus.APPROVED ? 1 : 0;
-        response.inProgress += currentWorkflows[0].status === ApplicationExecutionStatus.DRAFT ? 1 : 0;
-        response.rejected += currentWorkflows[0].status === ApplicationExecutionStatus.REJECT ? 1 : 0;
         response.withdraw += execution.status === ApplicationExecutionStatus.WITHDRAW ? 1 : 0;
+        if (execution.status !== ApplicationExecutionStatus.WITHDRAW) {
+            response.completed += currentWorkflows[0].status === ApplicationExecutionStatus.APPROVED ? 1 : 0;
+            response.inProgress += currentWorkflows[0].status === ApplicationExecutionStatus.DRAFT ? 1 : 0;
+            response.rejected += currentWorkflows[0].status === ApplicationExecutionStatus.REJECT ? 1 : 0;
+        }
     }
+    response.total = response.completed + response.inProgress + response.rejected + response.withdraw;
     return response;
 };
 
