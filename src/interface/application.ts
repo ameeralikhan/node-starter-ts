@@ -34,6 +34,7 @@ export interface IGetExecutionSelect {
     id: string;
     applicationId: string;
     title: string;
+    status: string;
     createdAt: Date;
     createdBy: string;
     managerId: string;

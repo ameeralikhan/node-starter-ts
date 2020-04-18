@@ -163,7 +163,8 @@ export const getExecutionWithdrawLoggedInUserId =
 };
 
 export const getInProgressExecutions =
-    async (loggedInUser: any, applicationId: string, forAdmin: boolean): Promise<IGetExecutionSelect[]> => {
+    async (loggedInUser: any, applicationId: string): Promise<IGetExecutionSelect[]> => {
+    const forAdmin: boolean = loggedInUser.roles.includes(Role.SUPER_ADMIN);
     const dbApplicationExecutions = await
         applicationExecutionRepo.getAllExecutionsByStatus(loggedInUser.userId,
             [ApplicationExecutionStatus.DRAFT, ApplicationExecutionStatus.IN_PROGRESS], applicationId, forAdmin);

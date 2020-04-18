@@ -161,7 +161,7 @@ export const getTotalExecutionsCountReport = async (payload: ITimeApplicationRep
         response.completed += currentWorkflows[0].status === ApplicationExecutionStatus.APPROVED ? 1 : 0;
         response.inProgress += currentWorkflows[0].status === ApplicationExecutionStatus.DRAFT ? 1 : 0;
         response.rejected += currentWorkflows[0].status === ApplicationExecutionStatus.REJECT ? 1 : 0;
-        response.withdraw += currentWorkflows[0].status === ApplicationExecutionStatus.WITHDRAW ? 1 : 0;
+        response.withdraw += execution.status === ApplicationExecutionStatus.WITHDRAW ? 1 : 0;
     }
     return response;
 };
