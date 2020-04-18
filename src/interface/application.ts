@@ -93,6 +93,7 @@ export interface ITotalExecutionCount {
     completed: number;
     inProgress: number;
     rejected: number;
+    withdraw: number;
 }
 
 export interface ITotalExecutionMonthGraph {

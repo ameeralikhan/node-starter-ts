@@ -77,7 +77,8 @@ const transformExecutionData = (
                 draft: 0,
                 inProgress: 0,
                 completed: 0,
-                rejected: 0
+                rejected: 0,
+                withdraw: 0
             };
         }
         if (plainExecution.applicationExecutionWorkflows &&
@@ -95,6 +96,8 @@ const transformExecutionData = (
                 response[plainExecution.application.id].rejected += 1;
             } else if (executionWorkflow.status === ApplicationExecutionStatus.DRAFT) {
                 response[plainExecution.application.id].inProgress += 1;
+            } else if (executionWorkflow.status === ApplicationExecutionStatus.WITHDRAW) {
+                response[plainExecution.application.id].withdraw += 1;
             }
         }
     }
@@ -148,7 +151,8 @@ export const getTotalExecutionsCountReport = async (payload: ITimeApplicationRep
         total: dbApplicationExecutions.length,
         completed: 0,
         inProgress: 0,
-        rejected: 0
+        rejected: 0,
+        withdraw: 0
     };
     const ids = dbApplicationExecutions.map((execution) => execution.id);
     const workflows = await applicationExecutionWorkflowRepo.getByApplicationExecutionIds(ids);
@@ -157,6 +161,7 @@ export const getTotalExecutionsCountReport = async (payload: ITimeApplicationRep
         response.completed += currentWorkflows[0].status === ApplicationExecutionStatus.APPROVED ? 1 : 0;
         response.inProgress += currentWorkflows[0].status === ApplicationExecutionStatus.DRAFT ? 1 : 0;
         response.rejected += currentWorkflows[0].status === ApplicationExecutionStatus.REJECT ? 1 : 0;
+        response.withdraw += currentWorkflows[0].status === ApplicationExecutionStatus.WITHDRAW ? 1 : 0;
     }
     return response;
 };
@@ -183,7 +188,8 @@ export const getTotalExecutionsCountGraph =
             total: 0,
             completed: 0,
             inProgress: 0,
-            rejected: 0
+            rejected: 0,
+            withdraw: 0
         };
         if (!ids.length) {
             response.data.push(data);
@@ -196,6 +202,7 @@ export const getTotalExecutionsCountGraph =
             data.completed += currentWorkflows[0].status === ApplicationExecutionStatus.APPROVED ? 1 : 0;
             data.inProgress += currentWorkflows[0].status === ApplicationExecutionStatus.DRAFT ? 1 : 0;
             data.rejected += currentWorkflows[0].status === ApplicationExecutionStatus.REJECT ? 1 : 0;
+            data.withdraw += currentWorkflows[0].status === ApplicationExecutionStatus.WITHDRAW ? 1 : 0;
         }
         response.data.push(data);
     }
