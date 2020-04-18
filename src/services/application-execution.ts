@@ -163,10 +163,10 @@ export const getExecutionWithdrawLoggedInUserId =
 };
 
 export const getInProgressExecutions =
-    async (loggedInUser: any, applicationId: string): Promise<IGetExecutionSelect[]> => {
+    async (loggedInUser: any, applicationId: string, forAdmin: boolean): Promise<IGetExecutionSelect[]> => {
     const dbApplicationExecutions = await
         applicationExecutionRepo.getAllExecutionsByStatus(loggedInUser.userId,
-            [ApplicationExecutionStatus.DRAFT, ApplicationExecutionStatus.IN_PROGRESS], applicationId);
+            [ApplicationExecutionStatus.DRAFT, ApplicationExecutionStatus.IN_PROGRESS], applicationId, forAdmin);
     return dbApplicationExecutions;
 };
 

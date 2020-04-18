@@ -118,7 +118,8 @@ export const getExecutionParticipatedQuery = async (ctx: Context, next: () => vo
 export const getInProgressExecutions = async (ctx: Context, next: () => void) => {
   const user: any = ctx.state.user;
   const applicationId: string = ctx.params.applicationId;
-  ctx.state.data = await applicationExecutionService.getInProgressExecutions(user, applicationId);
+  const forAdmin: boolean = ctx.request.query.forAdmin === 'true' ? true : false;
+  ctx.state.data = await applicationExecutionService.getInProgressExecutions(user, applicationId, forAdmin);
   await next();
 };
 

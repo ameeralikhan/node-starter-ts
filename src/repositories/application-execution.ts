@@ -545,8 +545,10 @@ export const getTotalApplicationExecutionQuery =
         return result;
 };
 
-export const getAllExecutionsByStatus =
-    async (userId: string, status: string[], applicationId?: string): Promise<IGetExecutionSelect[]> => {
+export const getAllExecutionsByStatus = async (
+    userId: string,
+    status: string[], applicationId?: string, forAdmin: boolean = false
+): Promise<IGetExecutionSelect[]> => {
         let query = `select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
         u."managerId", u."departmentId", u."officeLocationId", execution."applicationId", execution."updatedAt",
         ew."applicationWorkflowId", workflow."showMap", workflow."canWithdraw",
@@ -563,10 +565,13 @@ export const getAllExecutionsByStatus =
         and ew.status = 'draft'
         inner join "applicationWorkflow" workflow on ew."applicationWorkflowId" = workflow.id
         and ew."isActive" = true
-        where execution."createdBy" = '${userId}' and execution.status in (${status.map(s => `'${s}'`).join(',')})
+        where execution.status in (${status.map(s => `'${s}'`).join(',')})
         and execution."isActive" = true`;
         if (applicationId) {
             query += ` and execution."applicationId" = '${applicationId}'`;
+        }
+        if (!forAdmin) {
+            query += ` and execution."createdBy" = '${userId}'`;
         }
         const result = await Database.query(query).then((res) => res[0]);
         return result;
