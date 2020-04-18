@@ -801,12 +801,7 @@ export const withdraw = async (loggedInUserId: string, executionId: string, exec
     if (executionWorkflow.applicationWorkflow && !executionWorkflow.applicationWorkflow.canWithdraw) {
         throw boom.badRequest('Withdraw is not allowed for this workflow');
     }
-    const toSaveExecutionWorkflow = {
-        ...executionWorkflow.get({plain: true}),
-        id: executionWorkflowId,
-        status: ApplicationExecutionStatus.WITHDRAW,
-    };
-    await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(toSaveExecutionWorkflow);
+    await applicationExecutionWorkflowRepo.updateStatusById(ApplicationExecutionStatus.WITHDRAW, executionWorkflowId);
     const execution = {
         ...applicationExecution.get({plain: true}),
         id: executionId,

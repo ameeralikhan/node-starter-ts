@@ -66,6 +66,14 @@ export const updateApplicationExecutionWorkflow =
         .then((res) => res[0]);
 };
 
+export const updateStatusById =
+    async (status: string, id: string) => {
+    return Models.ApplicationExecutionWorkflow.update({ status }, { where: {
+        id,
+    }})
+        .then((res) => res[0]);
+};
+
 export const deleteApplicationExecutionWorkflowForm = async (id: string) => {
     return Models.ApplicationExecutionWorkflow.update({ isActive: false }, { where: { id }});
 };
