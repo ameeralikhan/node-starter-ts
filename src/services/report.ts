@@ -130,7 +130,8 @@ export const getApplicationExecutionTimeReport =
             const timestamp = moment(workflowExecution.updatedAt).diff(moment(workflowExecution.createdAt));
             const duration = moment.duration(timestamp);
             responseExecution.timeline.push({
-                workflowType: workflowExecution.applicationWorkflow.type,
+                workflowType: `${workflowExecution.applicationWorkflow.type} by
+                    ${workflowExecution.applicationWorkflow.name}`,
                 startedAt: workflowExecution.createdAt,
                 endAt: workflowExecution.updatedAt,
                 timestamp: `${duration.get('h')}:${duration.get('m')}:${duration.get('s')}`,
