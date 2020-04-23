@@ -122,6 +122,19 @@ export const getApplicationExecutionTimeReport =
         };
         const appExecutionWorklows = executionWorkflows.filter((workflow) =>
             workflow.applicationExecutionId === execution.id);
+        let endAt: any;
+        if (appExecutionWorklows.length) {
+            endAt = appExecutionWorklows[0].createdAt;
+        }
+        const timestamp = moment(moment(endAt)).diff(moment(execution.createdAt));
+        const duration = moment.duration(timestamp);
+        responseExecution.timeline = [];
+        responseExecution.timeline.push({
+            workflowType: `Initiate`,
+            startedAt: execution.createdAt,
+            endAt,
+            timestamp: `${duration.get('h')}:${duration.get('m')}:${duration.get('s')}`,
+        });
         for (const workflowExecution of appExecutionWorklows) {
             if (!workflowExecution.applicationWorkflow || !responseExecution.timeline) {
                 response.push(responseExecution);
