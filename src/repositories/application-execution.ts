@@ -406,8 +406,7 @@ export const getDraftApplicationExecutionQuery =
     async (userId: string, status: string, applicationId?: string): Promise<IGetExecutionSelect[]> => {
         let query = `select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
         u."managerId", u."departmentId", u."officeLocationId", execution."applicationId", execution."updatedAt",
-        ew."applicationWorkflowId", workflow."showMap", workflow."canWithdraw",
-        u."firstName" as "createdByName", workflow."name" as "applicationWorkflowName",
+        u."firstName" as "createdByName",
         (
             select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
             where ef."applicationExecutionId" = execution.id and
@@ -416,9 +415,6 @@ export const getDraftApplicationExecutionQuery =
         from "applicationExecution" execution
         inner join application app on execution."applicationId" = app.id and app."isActive" = true
         inner join "user" u on u.id = execution."createdBy"
-        left join "applicationExecutionWorkflow" ew on ew."applicationExecutionId" = execution.id
-        inner join "applicationWorkflow" workflow on ew."applicationWorkflowId" = workflow.id
-        and ew."isActive" = true
         where execution."createdBy" = '${userId}' and execution.status = '${status}'
         and execution."isActive" = true`;
         if (applicationId) {
@@ -551,8 +547,7 @@ export const getAllExecutionsByStatus = async (
 ): Promise<IGetExecutionSelect[]> => {
         let query = `select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
         u."managerId", u."departmentId", u."officeLocationId", execution."applicationId", execution."updatedAt",
-        ew."applicationWorkflowId", workflow."showMap", workflow."canWithdraw",
-        u."firstName" as "createdByName", workflow."name" as "applicationWorkflowName",
+        u."firstName" as "createdByName",
         (
             select REPLACE(app.subject, concat('{', ef."fieldId", '}'), ef.value) from "applicationExecutionForm" ef
             where ef."applicationExecutionId" = execution.id and
@@ -561,10 +556,6 @@ export const getAllExecutionsByStatus = async (
         from "applicationExecution" execution
         inner join application app on execution."applicationId" = app.id and app."isActive" = true
         inner join "user" u on u.id = execution."createdBy"
-        left join "applicationExecutionWorkflow" ew on ew."applicationExecutionId" = execution.id
-        and ew.status = 'draft'
-        inner join "applicationWorkflow" workflow on ew."applicationWorkflowId" = workflow.id
-        and ew."isActive" = true
         where execution.status in (${status.map(s => `'${s}'`).join(',')})
         and execution."isActive" = true`;
         if (applicationId) {

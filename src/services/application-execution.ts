@@ -98,7 +98,8 @@ export const getExecutionInProcessLoggedInUserIdByQuery =
     await validate({ loggedInUserId: loggedInUser.userId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
     let dbApplicationExecutions = [];
     if (!type) {
-        if (status === ApplicationExecutionStatus.DRAFT) {
+        if (status === ApplicationExecutionStatus.DRAFT ||
+            status === ApplicationExecutionStatus.IN_PROGRESS) {
             dbApplicationExecutions = await
                 applicationExecutionRepo.getDraftApplicationExecutionQuery(loggedInUser.userId, status, applicationId);
         } else {
@@ -118,7 +119,9 @@ export const getExecutionInProcessLoggedInUserIdByQuery =
             status, type, applicationId);
     }
     let response = [];
-    if (status === ApplicationExecutionStatus.CLARITY) {
+    if (status === ApplicationExecutionStatus.CLARITY ||
+        ((status === ApplicationExecutionStatus.DRAFT ||
+        status === ApplicationExecutionStatus.IN_PROGRESS) && !type)) {
         response = dbApplicationExecutions;
         return response;
     }
