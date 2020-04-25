@@ -1,4 +1,3 @@
-
 import * as boom from 'boom';
 import * as _ from 'lodash';
 import * as moment from 'moment';
@@ -107,6 +106,9 @@ const transformExecutionData = (
 export const getApplicationExecutionTimeReport =
     async (payload: ITimeApplicationReport): Promise<ITimeApplicationResponse[]> => {
     await validate(payload, joiSchema.getApplicationExecutionTimeReport);
+    if (payload.endDate) {
+        payload.endDate = moment(moment(payload.endDate).format('MM-DD-YYYY') + ' 23:59:59').toISOString();
+    }
     const dbApplicationExecutions: IGetExecutionTimelineSelect[] = await
         applicationExecutionRepo.getApplicationExecutionsForTimeReport(payload.applicationId,
             payload.startDate, payload.endDate);
@@ -158,6 +160,9 @@ export const getApplicationExecutionTimeReport =
 
 export const getTotalExecutionsCountReport = async (payload: ITimeApplicationReport): Promise<ITotalExecutionCount> => {
     await validate(payload, joiSchema.getApplicationExecutionTimeReport);
+    if (payload.endDate) {
+        payload.endDate = moment(moment(payload.endDate).format('MM-DD-YYYY') + ' 23:59:59').toISOString();
+    }
     const dbApplicationExecutions = await
         applicationExecutionRepo.getTotalApplicationExecutionQuery(payload.applicationId,
             payload.startDate, payload.endDate);
@@ -186,6 +191,9 @@ export const getTotalExecutionsCountReport = async (payload: ITimeApplicationRep
 export const getTotalExecutionsCountGraph =
     async (payload: ITimeApplicationReport): Promise<ITotalExecutionMonthGraph> => {
     await validate(payload, joiSchema.getApplicationExecutionTimeReport);
+    if (payload.endDate) {
+        payload.endDate = moment(moment(payload.endDate).format('MM-DD-YYYY') + ' 23:59:59').toISOString();
+    }
     const dbApplicationExecutions = await
         applicationExecutionRepo.getTotalApplicationExecutionQuery(payload.applicationId,
             payload.startDate, payload.endDate);
@@ -229,6 +237,9 @@ export const getTotalExecutionsCountGraph =
 export const getApplicationExecutionLocationReport =
     async (payload: ITimeApplicationReport): Promise<IExecutionLocation[]> => {
     await validate(payload, joiSchema.getApplicationExecutionTimeReport);
+    if (payload.endDate) {
+        payload.endDate = moment(moment(payload.endDate).format('MM-DD-YYYY') + ' 23:59:59').toISOString();
+    }
     const dbApplicationExecutions: IGetExecutionTimelineSelect[] = await
         applicationExecutionRepo.getApplicationExecutionsForTimeReport(payload.applicationId,
             payload.startDate, payload.endDate);

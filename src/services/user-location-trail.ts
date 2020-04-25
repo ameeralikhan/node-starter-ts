@@ -1,4 +1,5 @@
 import * as boom from 'boom';
+import * as moment from 'moment';
 import { validate } from '../validations/index';
 
 import * as joiSchema from '../validations/schemas/user-location-trail';
@@ -10,6 +11,9 @@ export const getAll = async (
     userId: number, startDate?: Date, endDate?: Date
 ): Promise<IUserLocationTrailInstance[]> => {
     await validate({ userId, startDate, endDate }, joiSchema.getAll);
+    if (endDate) {
+        endDate = moment(moment(endDate).format('MM-DD-YYYY') + ' 23:59:59').toDate();
+    }
     return userLocationTrailRepo.getAll(userId, startDate, endDate);
 };
 
