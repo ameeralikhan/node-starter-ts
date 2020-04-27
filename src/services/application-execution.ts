@@ -421,6 +421,17 @@ const checkWorkflowPermissionQuery = async (execution: IGetExecutionSelect, user
                         }
                     }
                     break;
+                case ApplicationWorkflowAssignTo.GROUP:
+                    if (!applicationWorkflow.groupId) {
+                        shouldContinue = true;
+                    } else {
+                        const userGroups = await groupRepo.findUserGroupByGroupId(applicationWorkflow.groupId);
+                        const hasUser = userGroups.find(userGroup => userGroup.userId === userId);
+                        if (!hasUser) {
+                            shouldContinue = true;
+                        }
+                    }
+                    break;
                 case ApplicationWorkflowAssignTo.FIELD:
                     const field = await applicationExecutionFormRepo.
                         getByApplicationExecutionIdAndFieldId(execution.id, fieldId);
