@@ -202,6 +202,8 @@ const transformExecutionData = async (
             //         ex.status === ApplicationExecutionStatus.DRAFT
             //     ));
             // }
+            plainExecution.applicationExecutionWorkflows = _.sortBy(
+                    plainExecution.applicationExecutionWorkflows, 'createdAt');
             let executionWorkflow: any = plainExecution.applicationExecutionWorkflows[
                 plainExecution.applicationExecutionWorkflows.length - 1
             ];
