@@ -106,6 +106,9 @@ const transformExecutionData = (
 export const getApplicationExecutionTimeReport =
     async (payload: ITimeApplicationReport): Promise<ITimeApplicationResponse[]> => {
     await validate(payload, joiSchema.getApplicationExecutionTimeReport);
+    if (payload.startDate) {
+        payload.startDate = moment(moment(payload.startDate).format('MM-DD-YYYY') + ' 00:00:00').toISOString();
+    }
     if (payload.endDate) {
         payload.endDate = moment(moment(payload.endDate).format('MM-DD-YYYY') + ' 23:59:59').toISOString();
     }
@@ -160,6 +163,9 @@ export const getApplicationExecutionTimeReport =
 
 export const getTotalExecutionsCountReport = async (payload: ITimeApplicationReport): Promise<ITotalExecutionCount> => {
     await validate(payload, joiSchema.getApplicationExecutionTimeReport);
+    if (payload.startDate) {
+        payload.startDate = moment(moment(payload.startDate).format('MM-DD-YYYY') + ' 00:00:00').toISOString();
+    }
     if (payload.endDate) {
         payload.endDate = moment(moment(payload.endDate).format('MM-DD-YYYY') + ' 23:59:59').toISOString();
     }
@@ -191,6 +197,9 @@ export const getTotalExecutionsCountReport = async (payload: ITimeApplicationRep
 export const getTotalExecutionsCountGraph =
     async (payload: ITimeApplicationReport): Promise<ITotalExecutionMonthGraph> => {
     await validate(payload, joiSchema.getApplicationExecutionTimeReport);
+    if (payload.startDate) {
+        payload.startDate = moment(moment(payload.startDate).format('MM-DD-YYYY') + ' 00:00:00').toISOString();
+    }
     if (payload.endDate) {
         payload.endDate = moment(moment(payload.endDate).format('MM-DD-YYYY') + ' 23:59:59').toISOString();
     }
@@ -237,6 +246,9 @@ export const getTotalExecutionsCountGraph =
 export const getApplicationExecutionLocationReport =
     async (payload: ITimeApplicationReport): Promise<IExecutionLocation[]> => {
     await validate(payload, joiSchema.getApplicationExecutionTimeReport);
+    if (payload.startDate) {
+        payload.startDate = moment(moment(payload.startDate).format('MM-DD-YYYY') + ' 00:00:00').toISOString();
+    }
     if (payload.endDate) {
         payload.endDate = moment(moment(payload.endDate).format('MM-DD-YYYY') + ' 23:59:59').toISOString();
     }
