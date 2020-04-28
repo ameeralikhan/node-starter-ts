@@ -423,12 +423,12 @@ const checkWorkflowPermissionQuery = async (execution: IGetExecutionSelect, user
                     break;
                 case ApplicationWorkflowAssignTo.GROUP:
                     if (!applicationWorkflow.groupId) {
-                        shouldContinue = true;
+                        shouldContinue = false;
                     } else {
                         const userGroups = await groupRepo.findUserGroupByGroupId(applicationWorkflow.groupId);
                         const hasUser = userGroups.find(userGroup => userGroup.userId === userId);
                         if (!hasUser) {
-                            shouldContinue = true;
+                            shouldContinue = false;
                         }
                     }
                     break;
