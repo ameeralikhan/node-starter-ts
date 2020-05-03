@@ -164,6 +164,7 @@ export const getExecutionInProcessLoggedInUserId: Joi.SchemaMap = {
         ApplicationExecutionStatus.APPROVED,
         ApplicationExecutionStatus.REJECT,
         ApplicationExecutionStatus.CLARITY,
+        ApplicationExecutionStatus.IN_PROGRESS
     ])
 };
 
