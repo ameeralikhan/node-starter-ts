@@ -505,7 +505,8 @@ export const getParticipatedApplicationExecutionQuery =
                 where ef."applicationExecutionId" = execution.id and
                 app.subject ilike concat('%', ef."fieldId", '%') limit 1
             ) as title,
-            "outWorkflow"."canWithdraw"
+            "outWorkflow"."canWithdraw",
+            u."firstName" as "createdByName"
             from "applicationExecution" execution
             inner join application app on execution."applicationId" = app.id and app."isActive" = true
             inner join "user" u on u.id = execution."createdBy"
