@@ -231,6 +231,7 @@ const transformExecutionData = async (
             if (executionWorkflow.status !== ApplicationExecutionStatus.APPROVED &&
                 executionWorkflow.status !== ApplicationExecutionStatus.REJECT &&
                 status !== ApplicationExecutionStatus.WITHDRAW &&
+                status !== ApplicationExecutionStatus.IN_PROGRESS &&
                 status !== 'participated') {
                 const shouldContinue = await checkWorkflowPermission(plainExecution,
                     executionWorkflow.applicationWorkflowId, user.userId);
