@@ -403,7 +403,8 @@ export const getApplicationExecutionsForTimeReport = async (
 
 // Raw query
 export const getDraftApplicationExecutionQuery =
-    async (userId: string, status: string, applicationId?: string): Promise<IGetExecutionSelect[]> => {
+    async (userId: string, status: string, applicationId?: string,
+           startDate?: string, endDate?: string): Promise<IGetExecutionSelect[]> => {
         let query = `select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
         u."managerId", u."departmentId", u."officeLocationId", execution."applicationId", execution."updatedAt",
         u."firstName" as "createdByName",
@@ -419,6 +420,12 @@ export const getDraftApplicationExecutionQuery =
         and execution."isActive" = true`;
         if (applicationId) {
             query += ` and execution."applicationId" = '${applicationId}'`;
+        }
+        if (startDate) {
+            query += ` and execution."createdAt" >= '${startDate}'`;
+        }
+        if (endDate) {
+            query += ` and execution."createdAt" < '${endDate}'`;
         }
         const result = await Database.query(query).then((res) => res[0]);
         return result;
@@ -463,7 +470,8 @@ export const getApplicationExecutionInProcessQuery =
 };
 
 export const getApplicationExecutionByWorkflowTypeAndStatusQuery =
-    async (status: string, type: string, applicationId?: string): Promise<IGetExecutionSelect[]> => {
+    async (status: string, type: string, applicationId?: string,
+           startDate?: string, endDate?: string): Promise<IGetExecutionSelect[]> => {
         let query = `select distinct execution.id, execution."createdAt", execution."createdBy", app."name",
         u."managerId", u."departmentId", u."officeLocationId", execution."applicationId", execution."updatedAt",
         ew."applicationWorkflowId", workflow."showMap", workflow."canWithdraw",
@@ -483,6 +491,12 @@ export const getApplicationExecutionByWorkflowTypeAndStatusQuery =
         where execution."isActive" = true`;
         if (applicationId) {
             query += ` and execution."applicationId" = '${applicationId}'`;
+        }
+        if (startDate) {
+            query += ` and execution."createdAt" >= '${startDate}'`;
+        }
+        if (endDate) {
+            query += ` and execution."createdAt" < '${endDate}'`;
         }
         const result = await Database.query(query).then((res) => res[0]);
         return result;

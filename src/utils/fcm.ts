@@ -1,4 +1,4 @@
-import FCM from 'fcm-push';
+import * as FCM from 'fcm-push';
 import config from '../config';
 
 let globalFcm: any;

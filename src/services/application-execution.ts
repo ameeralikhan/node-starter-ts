@@ -35,6 +35,7 @@ import {
     IGetExecutionSelect, IReassignExecutionRequest, IGetWithdrawRequest
 } from '../interface/application';
 import { PERMISSION_STATUS_MAPPING } from '../constants/application';
+import { sendPushNotification } from './fcm';
 
 export const getAll = async (loggedInUser: any): Promise<IApplicationExecutionInstance[]> => {
     return applicationExecutionRepo.getAll(loggedInUser.userId, false);
@@ -94,14 +95,22 @@ export const getExecutionInProcessLoggedInUserId =
 
 export const getExecutionInProcessLoggedInUserIdByQuery =
     async (loggedInUser: any, status: string,
-           applicationId?: string, type?: string): Promise<IGetExecutionSelect[]> => {
+           applicationId?: string, type?: string,
+           startDate?: string, endDate?: string): Promise<IGetExecutionSelect[]> => {
     await validate({ loggedInUserId: loggedInUser.userId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
+    if (startDate) {
+        startDate = moment(startDate + ' 00:00:00').add(-5, 'h').toISOString();
+    }
+    if (endDate) {
+        endDate = moment(endDate + ' 23:59:59').add(-5, 'h').toISOString();
+    }
     let dbApplicationExecutions = [];
     if (!type) {
         if (status === ApplicationExecutionStatus.DRAFT ||
             status === ApplicationExecutionStatus.IN_PROGRESS) {
             dbApplicationExecutions = await
-                applicationExecutionRepo.getDraftApplicationExecutionQuery(loggedInUser.userId, status, applicationId);
+                applicationExecutionRepo.getDraftApplicationExecutionQuery(loggedInUser.userId, status,
+                    applicationId, startDate, endDate);
         } else {
             let isClarity = false;
             if (status === ApplicationExecutionStatus.CLARITY) {
@@ -111,12 +120,14 @@ export const getExecutionInProcessLoggedInUserIdByQuery =
                 getApplicationExecutionInProcessQuery({
                     userId: loggedInUser.userId,
                     status,
-                    applicationId, isClarity
+                    applicationId, isClarity,
+                    startDate,
+                    endDate
                 });
         }
     } else {
         dbApplicationExecutions = await applicationExecutionRepo.getApplicationExecutionByWorkflowTypeAndStatusQuery(
-            status, type, applicationId);
+            status, type, applicationId, startDate, endDate);
     }
     let response = [];
     if (status === ApplicationExecutionStatus.CLARITY ||
@@ -707,6 +718,12 @@ export const saveApplicationExecutionWorkflow =
                 status: ApplicationExecutionStatus.APPROVED,
                 updatedBy: loggedInUserId
             });
+            // send notification to initiator
+            if (toSaveExecution.createdByUser && toSaveExecution.createdByUser.deviceId) {
+                await sendPushNotification(toSaveExecution.createdByUser.deviceId, {
+                    executionId: toSaveExecution.id
+                }, 'Execution Completed', 'Your initiated execution has completed');
+            }
         }
     } else {
         // mark execution as rejected or clarity

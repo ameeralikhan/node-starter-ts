@@ -14,7 +14,7 @@ const log = logger.getLoggerInstance();
  *
  * @return none
  */
-const sendPushNotification = (token: string, data: any, title: string, body: string) => {
+export const sendPushNotification = (token: string, data: any, title: string, body: string) => {
     data.title = title;
     data.body = body;
     data.id = data._id;
