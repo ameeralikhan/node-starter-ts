@@ -427,6 +427,7 @@ export const getDraftApplicationExecutionQuery =
         if (endDate) {
             query += ` and execution."createdAt" < '${endDate}'`;
         }
+        query += ` order by execution."createdAt" desc`;
         const result = await Database.query(query).then((res) => res[0]);
         return result;
 };
@@ -465,6 +466,7 @@ export const getApplicationExecutionInProcessQuery =
         if (payload.endDate) {
             query += ` and execution."createdAt" < '${payload.endDate}'`;
         }
+        query += ` order by execution."createdAt" desc`;
         const result = await Database.query(query).then((res) => res[0]);
         return result;
 };
@@ -498,6 +500,7 @@ export const getApplicationExecutionByWorkflowTypeAndStatusQuery =
         if (endDate) {
             query += ` and execution."createdAt" < '${endDate}'`;
         }
+        query += ` order by execution."createdAt" desc`;
         const result = await Database.query(query).then((res) => res[0]);
         return result;
 };
