@@ -23,7 +23,8 @@ import { IApplicationInstance, IApplicationAttributes } from '../models/applicat
 import { IApplicationExecutionInstance, IApplicationExecutionAttributes } from '../models/application-execution';
 import { IApplicationFormFieldInstance } from '../models/application-form-field';
 import { Role } from '../enum/role';
-import { ApplicationExecutionStatus,
+import {
+    ApplicationExecutionStatus,
     ApplicationWorkflowType,
     ApplicationWorkflowPermissionType,
     ApplicationWorkflowFieldPermission,
@@ -58,8 +59,8 @@ export const getByApplicationId = async (applicationId: string): Promise<IApplic
 };
 
 export const getDetailedExecutionById = async (executionId: string,
-                                               loggedInUser: any,
-                                               status: string): Promise<IApplicationExecutionAttributes> => {
+    loggedInUser: any,
+    status: string): Promise<IApplicationExecutionAttributes> => {
     const execution = await applicationExecutionRepo.findById(executionId);
     if (!execution) {
         throw boom.badRequest('Invalid execution id');
@@ -74,125 +75,139 @@ export const getDetailedExecutionById = async (executionId: string,
 
 export const getExecutionByLoggedInUserId =
     async (loggedInUser: any, type: string, status?: string): Promise<IApplicationExecutionAttributes[]> => {
-    await validate({ loggedInUserId: loggedInUser.userId, type, status }, joiSchema.getExecutionByLoggedInUserId);
-    let dbApplicationExecutions: IApplicationExecutionInstance[] = [];
-    if (status === ApplicationExecutionStatus.DRAFT) {
-        dbApplicationExecutions = await applicationExecutionRepo.getDraftApplicationExecutions(loggedInUser.userId);
-    } else {
-        dbApplicationExecutions = await applicationExecutionRepo.
-            getApplicationExecutionsForApproval(type);
-    }
-    return transformExecutionData(dbApplicationExecutions, loggedInUser, status);
-};
+        await validate({ loggedInUserId: loggedInUser.userId, type, status }, joiSchema.getExecutionByLoggedInUserId);
+        let dbApplicationExecutions: IApplicationExecutionInstance[] = [];
+        if (status === ApplicationExecutionStatus.DRAFT) {
+            dbApplicationExecutions = await applicationExecutionRepo.getDraftApplicationExecutions(loggedInUser.userId);
+        } else {
+            dbApplicationExecutions = await applicationExecutionRepo.
+                getApplicationExecutionsForApproval(type);
+        }
+        return transformExecutionData(dbApplicationExecutions, loggedInUser, status);
+    };
 
 export const getExecutionInProcessLoggedInUserId =
     async (loggedInUser: any, status: string): Promise<IApplicationExecutionAttributes[]> => {
-    await validate({ loggedInUserId: loggedInUser.userId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
-    const dbApplicationExecutions = await
-        applicationExecutionRepo.getApplicationExecutionInProcess(loggedInUser.userId, status);
-    return transformExecutionData(dbApplicationExecutions, loggedInUser, status);
-};
+        await validate({ loggedInUserId: loggedInUser.userId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
+        const dbApplicationExecutions = await
+            applicationExecutionRepo.getApplicationExecutionInProcess(loggedInUser.userId, status);
+        return transformExecutionData(dbApplicationExecutions, loggedInUser, status);
+    };
 
 export const getExecutionInProcessLoggedInUserIdByQuery =
     async (loggedInUser: any, status: string,
-           applicationId?: string, type?: string,
-           startDate?: string, endDate?: string): Promise<IGetExecutionSelect[]> => {
-    await validate({ loggedInUserId: loggedInUser.userId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
-    if (startDate) {
-        startDate = moment(startDate + ' 00:00:00').add(-5, 'h').toISOString();
-    }
-    if (endDate) {
-        endDate = moment(endDate + ' 23:59:59').add(-5, 'h').toISOString();
-    }
-    let dbApplicationExecutions = [];
-    if (!type) {
-        if (status === ApplicationExecutionStatus.DRAFT ||
-            status === ApplicationExecutionStatus.IN_PROGRESS) {
-            dbApplicationExecutions = await
-                applicationExecutionRepo.getDraftApplicationExecutionQuery(loggedInUser.userId, status,
-                    applicationId, startDate, endDate);
-        } else {
-            let isClarity = false;
-            if (status === ApplicationExecutionStatus.CLARITY) {
-                isClarity = true;
+        applicationId?: string, type?: string,
+        startDate?: string, endDate?: string): Promise<IGetExecutionSelect[]> => {
+        await validate({ loggedInUserId: loggedInUser.userId, status }, joiSchema.getExecutionInProcessLoggedInUserId);
+        if (startDate) {
+            startDate = moment(startDate + ' 00:00:00').add(-5, 'h').toISOString();
+        }
+        if (endDate) {
+            endDate = moment(endDate + ' 23:59:59').add(-5, 'h').toISOString();
+        }
+        let dbApplicationExecutions = [];
+        if (!type) {
+            if (status === ApplicationExecutionStatus.DRAFT ||
+                status === ApplicationExecutionStatus.IN_PROGRESS) {
+                dbApplicationExecutions = await
+                    applicationExecutionRepo.getDraftApplicationExecutionQuery(loggedInUser.userId, status,
+                        applicationId, startDate, endDate);
+            } else {
+                let isClarity = false;
+                if (status === ApplicationExecutionStatus.CLARITY) {
+                    isClarity = true;
+                }
+                dbApplicationExecutions = await applicationExecutionRepo.
+                    getApplicationExecutionInProcessQuery({
+                        userId: loggedInUser.userId,
+                        status,
+                        applicationId, isClarity,
+                        startDate,
+                        endDate
+                    });
             }
-            dbApplicationExecutions = await applicationExecutionRepo.
-                getApplicationExecutionInProcessQuery({
-                    userId: loggedInUser.userId,
-                    status,
-                    applicationId, isClarity,
-                    startDate,
-                    endDate
-                });
+        } else {
+            dbApplicationExecutions = await applicationExecutionRepo.getApplicationExecutionByWorkflowTypeAndStatusQuery(
+                status, type, applicationId, startDate, endDate);
         }
-    } else {
-        dbApplicationExecutions = await applicationExecutionRepo.getApplicationExecutionByWorkflowTypeAndStatusQuery(
-            status, type, applicationId, startDate, endDate);
-    }
-    let response = [];
-    if (status === ApplicationExecutionStatus.CLARITY ||
-        ((status === ApplicationExecutionStatus.DRAFT ||
-        status === ApplicationExecutionStatus.IN_PROGRESS) && !type)) {
-        response = dbApplicationExecutions;
+        let response = [];
+        if (status === ApplicationExecutionStatus.CLARITY ||
+            ((status === ApplicationExecutionStatus.DRAFT ||
+                status === ApplicationExecutionStatus.IN_PROGRESS) && !type)) {
+            response = dbApplicationExecutions;
+            return response;
+        }
+        for (const ex of dbApplicationExecutions) {
+            const shouldContinue = await checkWorkflowPermissionQuery(ex, loggedInUser.userId);
+            if (shouldContinue) {
+                response.push(ex);
+            }
+        }
         return response;
-    }
-    for (const ex of dbApplicationExecutions) {
-        const shouldContinue = await checkWorkflowPermissionQuery(ex, loggedInUser.userId);
-        if (shouldContinue) {
-            response.push(ex);
-        }
-    }
-    return response;
-};
+    };
 
 export const getExecutionParticipatedLoggedInUserId =
     async (loggedInUser: any): Promise<IApplicationExecutionAttributes[]> => {
-    await validate({ loggedInUserId: loggedInUser.userId }, joiSchema.getExecutionParticipatedLoggedInUserId);
-    // const executionIds = await
-    //     applicationExecutionRepo.getApplicationExecutionParticipatedIds(loggedInUser.userId);
-    // const ids: string[] = executionIds[0].map((execution: any) => execution.id);
-    const dbApplicationExecutions = await
-        applicationExecutionRepo.getApprovedApplicationExecutions(loggedInUser.userId);
-    return transformExecutionData(dbApplicationExecutions, loggedInUser, undefined);
-};
+        await validate({ loggedInUserId: loggedInUser.userId }, joiSchema.getExecutionParticipatedLoggedInUserId);
+        // const executionIds = await
+        //     applicationExecutionRepo.getApplicationExecutionParticipatedIds(loggedInUser.userId);
+        // const ids: string[] = executionIds[0].map((execution: any) => execution.id);
+        const dbApplicationExecutions = await
+            applicationExecutionRepo.getApprovedApplicationExecutions(loggedInUser.userId);
+        return transformExecutionData(dbApplicationExecutions, loggedInUser, undefined);
+    };
 
 export const getExecutionWithdrawLoggedInUserId =
     async (loggedInUser: any, payload: IGetWithdrawRequest): Promise<IApplicationExecutionAttributes[]> => {
-    await validate({ loggedInUserId: loggedInUser.userId }, joiSchema.getExecutionParticipatedLoggedInUserId);
-    const isAdmin = loggedInUser.roles.includes(Role.SUPER_ADMIN);
-    if (payload.startDate) {
-        payload.startDate = moment(payload.startDate + ' 00:00:00').add(-5, 'h').toISOString();
-    }
-    if (payload.endDate) {
-        payload.endDate = moment(payload.endDate + ' 23:59:59').add(-5, 'h').toISOString();
-    }
-    return applicationExecutionRepo.getApplicationExecutionInProcessQuery({
+        await validate({ loggedInUserId: loggedInUser.userId }, joiSchema.getExecutionParticipatedLoggedInUserId);
+        const isAdmin = loggedInUser.roles.includes(Role.SUPER_ADMIN);
+        if (payload.startDate) {
+            payload.startDate = moment(payload.startDate + ' 00:00:00').add(-5, 'h').toISOString();
+        }
+        if (payload.endDate) {
+            payload.endDate = moment(payload.endDate + ' 23:59:59').add(-5, 'h').toISOString();
+        }
+        return applicationExecutionRepo.getApplicationExecutionInProcessQuery({
             userId: loggedInUser.userId,
             status: ApplicationExecutionStatus.WITHDRAW,
             applicationId: payload.applicationId,
             startDate: payload.startDate,
             endDate: payload.endDate,
             isAdmin
-    });
-};
+        });
+    };
 
 export const getInProgressExecutions =
-    async (loggedInUser: any, applicationId: string): Promise<IGetExecutionSelect[]> => {
-    const forAdmin: boolean = loggedInUser.roles.includes(Role.SUPER_ADMIN);
-    const dbApplicationExecutions = await
-        applicationExecutionRepo.getAllExecutionsByStatus(loggedInUser.userId,
-            [ApplicationExecutionStatus.DRAFT, ApplicationExecutionStatus.IN_PROGRESS], applicationId, forAdmin);
-    return dbApplicationExecutions;
-};
+    async (loggedInUser: any, applicationId: string, startDate?: string, endDate?: string):
+        Promise<IGetExecutionSelect[]> => {
+        const forAdmin: boolean = loggedInUser.roles.includes(Role.SUPER_ADMIN);
+        if (startDate) {
+            startDate = moment(startDate + ' 00:00:00').add(-5, 'h').toISOString();
+        }
+        if (endDate) {
+            endDate = moment(endDate + ' 23:59:59').add(-5, 'h').toISOString();
+        }
+        const dbApplicationExecutions = await
+            applicationExecutionRepo.getAllExecutionsByStatus(loggedInUser.userId,
+                [ApplicationExecutionStatus.DRAFT, ApplicationExecutionStatus.IN_PROGRESS], applicationId, forAdmin, startDate, endDate);
+        return dbApplicationExecutions;
+    };
 
 export const getExecutionParticipatedLoggedInUserIdQuery =
-    async (loggedInUser: any, searchText?: string): Promise<IApplicationExecutionAttributes[]> => {
-    await validate({ loggedInUserId: loggedInUser.userId, searchText },
-        joiSchema.getExecutionParticipatedLoggedInUserId);
-    const dbApplicationExecutions = await
-        applicationExecutionRepo.getParticipatedApplicationExecutionQuery(loggedInUser.userId, searchText);
-    return dbApplicationExecutions;
-};
+    async (loggedInUser: any, searchText?: string, startDate?: string, endDate?: string):
+        Promise<IApplicationExecutionAttributes[]> => {
+        await validate({ loggedInUserId: loggedInUser.userId, searchText },
+            joiSchema.getExecutionParticipatedLoggedInUserId);
+        if (startDate) {
+            startDate = moment(startDate + ' 00:00:00').add(-5, 'h').toISOString();
+        }
+        if (endDate) {
+            endDate = moment(endDate + ' 23:59:59').add(-5, 'h').toISOString();
+        }
+        const dbApplicationExecutions = await
+            applicationExecutionRepo.getParticipatedApplicationExecutionQuery(loggedInUser.userId, searchText, startDate, endDate);
+        return dbApplicationExecutions;
+    };
 
 const transformExecutionData = async (
     dbApplicationExecutions: IApplicationExecutionInstance[],
@@ -214,7 +229,7 @@ const transformExecutionData = async (
             //     ));
             // }
             plainExecution.applicationExecutionWorkflows = _.sortBy(
-                    plainExecution.applicationExecutionWorkflows, 'createdAt');
+                plainExecution.applicationExecutionWorkflows, 'createdAt');
             let executionWorkflow: any = plainExecution.applicationExecutionWorkflows[
                 plainExecution.applicationExecutionWorkflows.length - 1
             ];
@@ -223,9 +238,9 @@ const transformExecutionData = async (
             }
             if (status === 'participated') {
                 plainExecution.applicationExecutionWorkflows = plainExecution.applicationExecutionWorkflows.filter(
-                (ex =>
-                    ex.createdBy === user.userId || ex.updatedBy === user.userId
-                ));
+                    (ex =>
+                        ex.createdBy === user.userId || ex.updatedBy === user.userId
+                    ));
                 executionWorkflow = plainExecution.applicationExecutionWorkflows[0];
             }
             if (executionWorkflow.status !== ApplicationExecutionStatus.APPROVED &&
@@ -247,14 +262,14 @@ const transformExecutionData = async (
             getByApplicationId(execution.applicationId);
         const draftExecution = (plainExecution.applicationExecutionWorkflows &&
             plainExecution.applicationExecutionWorkflows.length) ?
-                plainExecution.applicationExecutionWorkflows.find((ex) =>
+            plainExecution.applicationExecutionWorkflows.find((ex) =>
                 ex.status === ApplicationExecutionStatus.DRAFT) : null;
         const latestWorkflowId = draftExecution ? draftExecution.applicationWorkflowId : null;
         let title = plainExecution.application.subject;
         for (const sectionInstance of sections) {
             const section = sectionInstance.get({ plain: true });
             const type = status ? PERMISSION_STATUS_MAPPING[status]
-             || ApplicationWorkflowPermissionType.WORKFLOW : ApplicationWorkflowPermissionType.WORKFLOW;
+                || ApplicationWorkflowPermissionType.WORKFLOW : ApplicationWorkflowPermissionType.WORKFLOW;
             const applicationWorkflowId = type !== ApplicationWorkflowPermissionType.WORKFLOW
                 ? null : latestWorkflowId;
             if (!fieldPermissions || !fieldPermissions.length) {
@@ -272,7 +287,7 @@ const transformExecutionData = async (
                     if (plainExecution.applicationExecutionForms && title) {
                         // setting title
                         const formField = plainExecution.applicationExecutionForms
-                        .find(f => f.applicationFormFieldId === field.id);
+                            .find(f => f.applicationFormFieldId === field.id);
                         title = title.replace(`{${field.fieldId}}`, formField ? formField.value : '');
                         plainExecution.title = title;
                     }
@@ -334,7 +349,7 @@ const checkWorkflowPermission = async (
                 case ApplicationWorkflowAssignTo.MANAGER:
                     if (plainExecution.createdByUser &&
                         plainExecution.createdByUser.managerId !== userId) {
-                            shouldContinue = true;
+                        shouldContinue = true;
                     }
                     break;
                 case ApplicationWorkflowAssignTo.DEPARTMENT_HEAD:
@@ -344,7 +359,7 @@ const checkWorkflowPermission = async (
                             findById(plainExecution.createdByUser.departmentId);
                         if (department &&
                             department.userId !== userId) {
-                                shouldContinue = true;
+                            shouldContinue = true;
                         }
                     }
                     break;
@@ -355,7 +370,7 @@ const checkWorkflowPermission = async (
                             findById(plainExecution.createdByUser.officeLocationId);
                         if (officeLocation &&
                             officeLocation.userId !== userId) {
-                                shouldContinue = true;
+                            shouldContinue = true;
                         }
                     }
                     break;
@@ -413,7 +428,7 @@ const checkWorkflowPermissionQuery = async (execution: IGetExecutionSelect, user
                     break;
                 case ApplicationWorkflowAssignTo.MANAGER:
                     if (execution.managerId !== userId) {
-                            shouldContinue = false;
+                        shouldContinue = false;
                     }
                     break;
                 case ApplicationWorkflowAssignTo.DEPARTMENT_HEAD:
@@ -422,7 +437,7 @@ const checkWorkflowPermissionQuery = async (execution: IGetExecutionSelect, user
                             findById(execution.departmentId);
                         if (department &&
                             department.userId !== userId) {
-                                shouldContinue = false;
+                            shouldContinue = false;
                         }
                     }
                     break;
@@ -432,7 +447,7 @@ const checkWorkflowPermissionQuery = async (execution: IGetExecutionSelect, user
                             findById(execution.officeLocationId);
                         if (officeLocation &&
                             officeLocation.userId !== userId) {
-                                shouldContinue = false;
+                            shouldContinue = false;
                         }
                     }
                     break;
@@ -464,57 +479,57 @@ const checkWorkflowPermissionQuery = async (execution: IGetExecutionSelect, user
 
 export const getExecutionWorkflowsCount =
     async (loggedInUserId: string): Promise<IExecutionWorkflowCount> => {
-    let resp: IExecutionWorkflowCount = {
-        approval: 0,
-        inputRequest: 0,
-        clarification: 0,
-        draft: 0,
-        approved: 0,
-        reject: 0,
-        participated: 0
-    };
-    const response = await Promise.all([
-        applicationExecutionRepo.getApplicationExecutionInProcessCount(loggedInUserId,
-            ApplicationExecutionStatus.APPROVED),
-        applicationExecutionRepo.getApplicationExecutionInProcessCount(loggedInUserId,
-            ApplicationExecutionStatus.REJECT),
-        applicationExecutionRepo.getApplicationExecutionInProcessCount(loggedInUserId,
+        let resp: IExecutionWorkflowCount = {
+            approval: 0,
+            inputRequest: 0,
+            clarification: 0,
+            draft: 0,
+            approved: 0,
+            reject: 0,
+            participated: 0
+        };
+        const response = await Promise.all([
+            applicationExecutionRepo.getApplicationExecutionInProcessCount(loggedInUserId,
+                ApplicationExecutionStatus.APPROVED),
+            applicationExecutionRepo.getApplicationExecutionInProcessCount(loggedInUserId,
+                ApplicationExecutionStatus.REJECT),
+            applicationExecutionRepo.getApplicationExecutionInProcessCount(loggedInUserId,
                 ApplicationExecutionStatus.CLARITY),
-        applicationExecutionRepo.getApplicationExecutionsForApprovalCount(loggedInUserId,
-            ApplicationWorkflowType.APPROVAL),
-        applicationExecutionRepo.getApplicationExecutionsForApprovalCount(loggedInUserId,
-            ApplicationWorkflowType.INPUT),
-        applicationExecutionRepo.getDraftApplicationExecutionsCount(loggedInUserId),
-        applicationExecutionRepo.getApplicationExecutionParticipatedIds(loggedInUserId)
-    ]);
-    const participatedIds: string[] = response[6][0].map((execution: any) => execution.id);
-    resp = {
-        approval: response[3],
-        inputRequest: response[4],
-        clarification: response[2],
-        draft: response[5],
-        approved: response[0],
-        reject: response[1],
-        participated: participatedIds.length
+            applicationExecutionRepo.getApplicationExecutionsForApprovalCount(loggedInUserId,
+                ApplicationWorkflowType.APPROVAL),
+            applicationExecutionRepo.getApplicationExecutionsForApprovalCount(loggedInUserId,
+                ApplicationWorkflowType.INPUT),
+            applicationExecutionRepo.getDraftApplicationExecutionsCount(loggedInUserId),
+            applicationExecutionRepo.getApplicationExecutionParticipatedIds(loggedInUserId)
+        ]);
+        const participatedIds: string[] = response[6][0].map((execution: any) => execution.id);
+        resp = {
+            approval: response[3],
+            inputRequest: response[4],
+            clarification: response[2],
+            draft: response[5],
+            approved: response[0],
+            reject: response[1],
+            participated: participatedIds.length
+        };
+        return resp;
     };
-    return resp;
-};
 
 export const getExecutionParticipatedUsers =
     async (loggedInUser: any, executionId: string): Promise<IApplicationExecutionAttributes[]> => {
-    await validate({ loggedInUserId: loggedInUser.userId, executionId },
-        joiSchema.getExecutionParticipatedUsers);
-    const users = await applicationExecutionRepo.getParticipatedUsersByExecutionId(executionId);
-    let userIds = users.map((user) => user.createdBy);
-    const updatedByUserIds = users.filter((user) => user.updatedBy).map((user) => user.updatedBy);
-    userIds = updatedByUserIds.concat(userIds);
-    const dbUsers = await userRepo.findByIds(userIds);
-    return dbUsers;
-};
+        await validate({ loggedInUserId: loggedInUser.userId, executionId },
+            joiSchema.getExecutionParticipatedUsers);
+        const users = await applicationExecutionRepo.getParticipatedUsersByExecutionId(executionId);
+        let userIds = users.map((user) => user.createdBy);
+        const updatedByUserIds = users.filter((user) => user.updatedBy).map((user) => user.updatedBy);
+        userIds = updatedByUserIds.concat(userIds);
+        const dbUsers = await userRepo.findByIds(userIds);
+        return dbUsers;
+    };
 
 export const saveApplicationExecution = async (applicationId: string,
-                                               loggedInUserId: string,
-                                               applicationExecution: IApplicationExecutionAttributes) => {
+    loggedInUserId: string,
+    applicationExecution: IApplicationExecutionAttributes) => {
     await validate(applicationExecution, joiSchema.saveApplicationExecution);
     const savedApp = await applicationRepo.findById(applicationId);
     if (!savedApp) {
@@ -564,8 +579,8 @@ export const saveApplicationExecution = async (applicationId: string,
 };
 
 export const saveApplicationExecutionForm = async (applicationId: string,
-                                                   loggedInUserId: string,
-                                                   applicationExecution: IApplicationExecutionAttributes) => {
+    loggedInUserId: string,
+    applicationExecution: IApplicationExecutionAttributes) => {
     await validate(applicationExecution, joiSchema.saveApplicationExecutionForm);
     const savedApp = await applicationRepo.findById(applicationId);
     if (!savedApp) {
@@ -600,8 +615,8 @@ export const saveApplicationExecutionForm = async (applicationId: string,
 };
 
 export const publishApplicationExecution = async (applicationId: string,
-                                                  loggedInUserId: string,
-                                                  applicationExecutionId: string) => {
+    loggedInUserId: string,
+    applicationExecutionId: string) => {
     await validate({ applicationId, applicationExecutionId }, joiSchema.publishApplicationExecution);
     const savedApp = await applicationRepo.findById(applicationId);
     if (!savedApp) {
@@ -620,7 +635,7 @@ export const publishApplicationExecution = async (applicationId: string,
         startedAt: savedApplicationExecution.startedAt,
         status: ApplicationExecutionStatus.IN_PROGRESS,
         updatedBy: loggedInUserId
-     });
+    });
     const workflows = await applicationWorkflowRepo.getByApplicationId(applicationId);
     if (workflows && workflows.length) {
         const payload: IApplicationExecutionWorkflowAttributes = {
@@ -636,153 +651,154 @@ export const publishApplicationExecution = async (applicationId: string,
 
 export const saveApplicationExecutionWorkflow =
     async (applicationId: string, loggedInUserId: string, payload: IApplicationExecutionWorkflowAttributes) => {
-    await validate({ applicationId, ...payload }, joiSchema.saveApplicationExecutionWorkflow);
-    const savedApp = await applicationRepo.findById(applicationId);
-    if (!savedApp) {
-        throw boom.badRequest('Invalid application id');
-    }
-    const savedApplicationExecution = await applicationExecutionRepo.findById(payload.applicationExecutionId);
-    if (!savedApplicationExecution) {
-        throw boom.badRequest('Invalid application execution id');
-    }
-    if (!payload.id) {
-        throw boom.badRequest('Invalid id');
-    }
-    const savedExecutionWorkflow = await applicationExecutionWorkflowRepo.findById(payload.id);
-    if (!savedExecutionWorkflow) {
-        throw boom.badRequest('Invalid id');
-    }
-    let toSave = savedExecutionWorkflow.get({ plain: true });
-    const user = await userRepo.findById(loggedInUserId);
-    if (!user) {
-        throw boom.badRequest('Invalid user');
-    }
-    if (payload.clarificationDetails && payload.clarificationDetails.userId) {
-        const clarificationUser = await userRepo.findById(payload.clarificationDetails.userId);
-        if (!clarificationUser) {
-            throw boom.badRequest('Invalid clarification user');
+        await validate({ applicationId, ...payload }, joiSchema.saveApplicationExecutionWorkflow);
+        const savedApp = await applicationRepo.findById(applicationId);
+        if (!savedApp) {
+            throw boom.badRequest('Invalid application id');
         }
-        payload.clarificationUserId = payload.clarificationDetails.userId;
-    }
-    if (toSave.status === ApplicationExecutionStatus.APPROVED ||
-        toSave.status === ApplicationExecutionStatus.REJECT) {
-        throw boom.badRequest('Execution is already approved or reject, cannot be modified now');
-    }
-    if (payload.comments) {
-        for (const comment of payload.comments) {
-            comment.userId = comment.userId || user.id;
-            comment.userName = comment.userName || `${user.firstName} ${user.lastName}`;
+        const savedApplicationExecution = await applicationExecutionRepo.findById(payload.applicationExecutionId);
+        if (!savedApplicationExecution) {
+            throw boom.badRequest('Invalid application execution id');
         }
-    }
-    if (payload.status === ApplicationExecutionStatus.REJECT) {
-        payload.comments = payload.comments || [];
-        payload.comments.unshift({
-            userId: user.id,
-            time: new Date(),
-            comment: payload.rejectionDetails.comment,
-            userName: `${user.firstName} ${user.lastName}`
-        });
-    } else if (payload.status === ApplicationExecutionStatus.CLARITY) {
-        payload.comments = payload.comments || [];
-        payload.comments.unshift({
-            userId: user.id,
-            time: new Date(),
-            comment: payload.clarificationDetails.comment,
-            userName: `${user.firstName} ${user.lastName}`
-        });
-    }
-    toSave = {
-        id: toSave.id,
-        applicationExecutionId: toSave.applicationExecutionId,
-        applicationWorkflowId: toSave.applicationWorkflowId,
-        updatedBy: loggedInUserId,
-        ...payload
-    };
-    await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(toSave);
-    if (payload.status === ApplicationExecutionStatus.APPROVED) {
-        // move workflow to the next
-        const applicationWorkflows = await applicationWorkflowRepo.getByApplicationId(applicationId);
-        const indexOfWorkflow = applicationWorkflows.findIndex(col => col.id === toSave.applicationWorkflowId);
-        if (indexOfWorkflow > -1 && applicationWorkflows.length >= indexOfWorkflow + 2) {
-            const newExecutionWorkflow: IApplicationExecutionWorkflowAttributes = {
-                applicationExecutionId: payload.applicationExecutionId,
-                applicationWorkflowId: applicationWorkflows[indexOfWorkflow + 1].id,
-                comments: toSave.comments,
-                status: ApplicationExecutionStatus.DRAFT,
-                createdBy: loggedInUserId
-            };
-            await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(newExecutionWorkflow);
+        if (!payload.id) {
+            throw boom.badRequest('Invalid id');
+        }
+        const savedExecutionWorkflow = await applicationExecutionWorkflowRepo.findById(payload.id);
+        if (!savedExecutionWorkflow) {
+            throw boom.badRequest('Invalid id');
+        }
+        let toSave = savedExecutionWorkflow.get({ plain: true });
+        const user = await userRepo.findById(loggedInUserId);
+        if (!user) {
+            throw boom.badRequest('Invalid user');
+        }
+        if (payload.clarificationDetails && payload.clarificationDetails.userId) {
+            const clarificationUser = await userRepo.findById(payload.clarificationDetails.userId);
+            if (!clarificationUser) {
+                throw boom.badRequest('Invalid clarification user');
+            }
+            payload.clarificationUserId = payload.clarificationDetails.userId;
+        }
+        if (toSave.status === ApplicationExecutionStatus.APPROVED ||
+            toSave.status === ApplicationExecutionStatus.REJECT) {
+            throw boom.badRequest('Execution is already approved or reject, cannot be modified now');
+        }
+        if (payload.comments) {
+            for (const comment of payload.comments) {
+                comment.userId = comment.userId || user.id;
+                comment.userName = comment.userName || `${user.firstName} ${user.lastName}`;
+            }
+        }
+        if (payload.status === ApplicationExecutionStatus.REJECT) {
+            payload.comments = payload.comments || [];
+            payload.comments.unshift({
+                userId: user.id,
+                time: new Date(),
+                comment: payload.rejectionDetails.comment,
+                userName: `${user.firstName} ${user.lastName}`
+            });
+        } else if (payload.status === ApplicationExecutionStatus.CLARITY) {
+            payload.comments = payload.comments || [];
+            payload.comments.unshift({
+                userId: user.id,
+                time: new Date(),
+                comment: payload.clarificationDetails.comment,
+                userName: `${user.firstName} ${user.lastName}`
+            });
+        }
+        toSave = {
+            id: toSave.id,
+            applicationExecutionId: toSave.applicationExecutionId,
+            applicationWorkflowId: toSave.applicationWorkflowId,
+            updatedBy: loggedInUserId,
+            ...payload
+        };
+        await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(toSave);
+        if (payload.status === ApplicationExecutionStatus.APPROVED) {
+            // move workflow to the next
+            const applicationWorkflows = await applicationWorkflowRepo.getByApplicationId(applicationId);
+            const indexOfWorkflow = applicationWorkflows.findIndex(col => col.id === toSave.applicationWorkflowId);
+            if (indexOfWorkflow > -1 && applicationWorkflows.length >= indexOfWorkflow + 2) {
+                const newExecutionWorkflow: IApplicationExecutionWorkflowAttributes = {
+                    applicationExecutionId: payload.applicationExecutionId,
+                    applicationWorkflowId: applicationWorkflows[indexOfWorkflow + 1].id,
+                    comments: toSave.comments,
+                    status: ApplicationExecutionStatus.DRAFT,
+                    createdBy: loggedInUserId
+                };
+                await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(newExecutionWorkflow);
+            } else {
+                // if no workflow found, mark execution as approved
+                const toSaveExecution = savedApplicationExecution.get({ plain: true });
+                await applicationExecutionRepo.saveApplicationExecution({
+                    ...toSaveExecution,
+                    status: ApplicationExecutionStatus.APPROVED,
+                    updatedBy: loggedInUserId
+                });
+                // send notification to initiator
+                if (toSaveExecution.createdByUser && toSaveExecution.createdByUser.deviceId) {
+                    await sendPushNotification(toSaveExecution.createdByUser.deviceId, {
+                        executionId: toSaveExecution.id
+                    }, 'Execution Completed', 'Your initiated execution has completed');
+                }
+            }
         } else {
-            // if no workflow found, mark execution as approved
+            // mark execution as rejected or clarity
             const toSaveExecution = savedApplicationExecution.get({ plain: true });
             await applicationExecutionRepo.saveApplicationExecution({
                 ...toSaveExecution,
-                status: ApplicationExecutionStatus.APPROVED,
+                status: payload.status === ApplicationExecutionStatus.DRAFT ?
+                    ApplicationExecutionStatus.IN_PROGRESS : payload.status,
                 updatedBy: loggedInUserId
             });
-            // send notification to initiator
-            if (toSaveExecution.createdByUser && toSaveExecution.createdByUser.deviceId) {
-                await sendPushNotification(toSaveExecution.createdByUser.deviceId, {
-                    executionId: toSaveExecution.id
-                }, 'Execution Completed', 'Your initiated execution has completed');
-            }
         }
-    } else {
-        // mark execution as rejected or clarity
-        const toSaveExecution = savedApplicationExecution.get({ plain: true });
-        await applicationExecutionRepo.saveApplicationExecution({
-            ...toSaveExecution,
-            status: payload.status === ApplicationExecutionStatus.DRAFT ?
-                ApplicationExecutionStatus.IN_PROGRESS : payload.status,
-            updatedBy: loggedInUserId
-        });
-    }
-    return { success: true };
-};
+        return { success: true };
+    };
 
 export const publishApplicationExecutionWorkflow =
     async (applicationId: string, applicationExecutionId: string, applicationExecutionWorkflowId: string) => {
-    await validate({
-        applicationId,
-        applicationExecutionId,
-        applicationExecutionWorkflowId }, joiSchema.publishApplicationExecutionWorkflow);
-    const savedApp = await applicationRepo.findById(applicationId);
-    if (!savedApp) {
-        throw boom.badRequest('Invalid application id');
-    }
-    const savedApplicationExecution = await applicationExecutionRepo.findById(applicationExecutionId);
-    if (!savedApplicationExecution) {
-        throw boom.badRequest('Invalid application execution id');
-    }
-    if (!applicationExecutionWorkflowId) {
-        throw boom.badRequest('Invalid id');
-    }
-    const savedExecutionWorkflow = await applicationExecutionWorkflowRepo.findById(applicationExecutionWorkflowId);
-    if (!savedExecutionWorkflow) {
-        throw boom.badRequest('Invalid id');
-    }
-    const toSave = savedExecutionWorkflow.get({ plain: true });
-    toSave.status = ApplicationExecutionStatus.APPROVED;
-    await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(toSave);
-    // move workflow to the next
-    const applicationWorkflows = await applicationWorkflowRepo.getByApplicationId(applicationId);
-    const indexOfWorkflow = applicationWorkflows.findIndex(col => col.id === toSave.applicationWorkflowId);
-    if (indexOfWorkflow > -1 && applicationWorkflows.length >= indexOfWorkflow + 1) {
-        const payload: IApplicationExecutionWorkflowAttributes = {
+        await validate({
+            applicationId,
             applicationExecutionId,
-            applicationWorkflowId: applicationWorkflows[indexOfWorkflow].id,
-            status: ApplicationExecutionStatus.DRAFT
-        };
-        await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(payload);
-    } else {
-        // if no workflow found, mark execution as approved
-        await applicationExecutionRepo.saveApplicationExecution({
-            id: applicationExecutionId,
-            status: ApplicationExecutionStatus.APPROVED
-        });
-    }
-    return { success: true };
-};
+            applicationExecutionWorkflowId
+        }, joiSchema.publishApplicationExecutionWorkflow);
+        const savedApp = await applicationRepo.findById(applicationId);
+        if (!savedApp) {
+            throw boom.badRequest('Invalid application id');
+        }
+        const savedApplicationExecution = await applicationExecutionRepo.findById(applicationExecutionId);
+        if (!savedApplicationExecution) {
+            throw boom.badRequest('Invalid application execution id');
+        }
+        if (!applicationExecutionWorkflowId) {
+            throw boom.badRequest('Invalid id');
+        }
+        const savedExecutionWorkflow = await applicationExecutionWorkflowRepo.findById(applicationExecutionWorkflowId);
+        if (!savedExecutionWorkflow) {
+            throw boom.badRequest('Invalid id');
+        }
+        const toSave = savedExecutionWorkflow.get({ plain: true });
+        toSave.status = ApplicationExecutionStatus.APPROVED;
+        await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(toSave);
+        // move workflow to the next
+        const applicationWorkflows = await applicationWorkflowRepo.getByApplicationId(applicationId);
+        const indexOfWorkflow = applicationWorkflows.findIndex(col => col.id === toSave.applicationWorkflowId);
+        if (indexOfWorkflow > -1 && applicationWorkflows.length >= indexOfWorkflow + 1) {
+            const payload: IApplicationExecutionWorkflowAttributes = {
+                applicationExecutionId,
+                applicationWorkflowId: applicationWorkflows[indexOfWorkflow].id,
+                status: ApplicationExecutionStatus.DRAFT
+            };
+            await applicationExecutionWorkflowRepo.saveApplicationExecutionWorkflow(payload);
+        } else {
+            // if no workflow found, mark execution as approved
+            await applicationExecutionRepo.saveApplicationExecution({
+                id: applicationExecutionId,
+                status: ApplicationExecutionStatus.APPROVED
+            });
+        }
+        return { success: true };
+    };
 
 export const deleteApplicationExecution = async (id: string, loggedInUserId: string) => {
     const applicationExecution = await applicationExecutionRepo.findById(id);
@@ -838,7 +854,7 @@ export const withdraw = async (loggedInUserId: string, executionId: string, exec
     }
     await applicationExecutionWorkflowRepo.updateStatusById(ApplicationExecutionStatus.WITHDRAW, executionWorkflowId);
     const execution = {
-        ...applicationExecution.get({plain: true}),
+        ...applicationExecution.get({ plain: true }),
         id: executionId,
         status: ApplicationExecutionStatus.WITHDRAW,
     };

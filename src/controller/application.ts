@@ -97,10 +97,10 @@ export const getExecutionInProcessLoggedInUserIdByQuery = async (ctx: Context, n
   const type: string = ctx.request.query.type;
   const user: any = ctx.state.user;
   const applicationId: string = ctx.request.query.applicationId;
-  const startDate: Date = ctx.request.query.startDate;
-  const endDate: Date = ctx.request.query.endDate;
+  const startDate: string = ctx.request.query.startDate;
+  const endDate: string = ctx.request.query.endDate;
   ctx.state.data = await applicationExecutionService.
-    getExecutionInProcessLoggedInUserIdByQuery(user, status, applicationId, type);
+    getExecutionInProcessLoggedInUserIdByQuery(user, status, applicationId, type, startDate, endDate);
   await next();
 };
 
@@ -113,14 +113,18 @@ export const getExecutionParticipatedLoggedInUserId = async (ctx: Context, next:
 export const getExecutionParticipatedQuery = async (ctx: Context, next: () => void) => {
   const user: any = ctx.state.user;
   const searchText: string = ctx.request.query.searchText;
-  ctx.state.data = await applicationExecutionService.getExecutionParticipatedLoggedInUserIdQuery(user, searchText);
+  const startDate: string = ctx.request.query.startDate;
+  const endDate: string = ctx.request.query.endDate;
+  ctx.state.data = await applicationExecutionService.getExecutionParticipatedLoggedInUserIdQuery(user, searchText, startDate, endDate);
   await next();
 };
 
 export const getInProgressExecutions = async (ctx: Context, next: () => void) => {
   const user: any = ctx.state.user;
   const applicationId: string = ctx.params.applicationId;
-  ctx.state.data = await applicationExecutionService.getInProgressExecutions(user, applicationId);
+  const startDate: string = ctx.request.query.startDate;
+  const endDate: string = ctx.request.query.endDate;
+  ctx.state.data = await applicationExecutionService.getInProgressExecutions(user, applicationId, startDate, endDate);
   await next();
 };
 
