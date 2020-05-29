@@ -4,4 +4,4 @@
 require('ts-node/register');
 
 // register application
-require('../src');
+require('./src');

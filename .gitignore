@@ -48,6 +48,7 @@ config.json
 dist/
 upload/
 test/
+src/config/env/production.json
 
 # next.js build output
 .next

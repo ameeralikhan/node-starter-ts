@@ -12,14 +12,15 @@ import errorMiddleware from './middleware/error';
 import response from './middleware/response';
 import routes from './route/index';
 import { Logger } from './utils/logger';
+import compose = require('koa-compose');
 
 const whitelist = [
   'http://localhost:4200',
   'http://localhost:3000',
-  'http://aetasaal-api.herokuapp.com',
-  'https://aetasaal-api.herokuapp.com',
-  'http://aetasaal-web.herokuapp.com',
-  'https://aetasaal-web.herokuapp.com',
+  'http://aetasaal-api.aktechnos.com',
+  'https://aetasaal-api.aktechnos.com',
+  'https://aetasaal-web.aktechnos.com',
+  'http://aetasaal-web.aktechnos.com/',
   'http://localhost',
   'http://localhost:8100'
 ];
@@ -57,8 +58,9 @@ export async function startServer(log: Bunyan) {
   app.use(response());
 
   return new Promise((resolve, reject) => {
-    app.listen(config.server.port, () => {
-      log.info('server started on port %d with env=%s', config.server.port, config.env);
+    const p = process.env.PORT || config.server.port;
+    app.listen(p, () => {
+      log.info('server started on port %d with env=%s', p, config.env);
 
       resolve();
     });
