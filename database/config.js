@@ -3,7 +3,7 @@ require('ts-node/register');
 const config = require('../src/config/index.ts').default;
 
 module.exports = {
-    live: {
+    development: {
         host: 'localhost',
         port: 5432,
         username: 'postgres',
@@ -15,7 +15,7 @@ module.exports = {
         },
         operatorsAliases: false
     },
-    development: {
+    live_old: {
         host: 'ec2-54-235-208-103.compute-1.amazonaws.com',
         port: 5432,
         username: 'hmszolrlciatrx',
@@ -24,6 +24,18 @@ module.exports = {
         dialect: 'postgres',
         dialectOptions: {
             ssl: true
+        },
+        operatorsAliases: false
+    },
+    live: {
+        host: '185.67.0.30',
+        port: 5432,
+        username: 'postgres',
+        password: 'PpWXdf7aTC97nz6h',
+        database: 'aetasaal',
+        dialect: 'postgres',
+        dialectOptions: {
+            ssl: false
         },
         operatorsAliases: false
     }

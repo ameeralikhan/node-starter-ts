@@ -70,7 +70,7 @@ export const define = (sequelize: Sequelize.Sequelize): IApplicationModel => {
         allowNull: true,
       },
       userIds: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(1000),
         allowNull: true,
       },
       canAllStart: {
