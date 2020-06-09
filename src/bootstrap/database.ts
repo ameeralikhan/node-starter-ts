@@ -25,8 +25,5 @@ export const Database = new Sequelize({
 
     // See https://github.com/sequelize/sequelize/issues/8417
     operatorsAliases: false,
-
-    logging(msg: string, data: object) {
-        logger.debug({ sequelize: data }, msg.replace(/\r?\n|\r/g, '').replace(/\s{2,}/g, ' '));
-    }
+    logging: false
 });
