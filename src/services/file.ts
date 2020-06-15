@@ -1,4 +1,5 @@
 import * as fs from 'fs-extra';
+import * as moment from 'moment';
 import * as cloudinary from './cloudinary';
 import * as joiSchema from '../validations/schemas/file';
 import { validate } from './../validations/index';
@@ -24,9 +25,9 @@ export const uploadProfilePicture = async (userId: string, file: any) => {
 
 export const saveExecutionFile = async (prefix: string, file: any) => {
   await validate({ file }, joiSchema.uploadExecutionFile);
-  const fileName = file.name;
-  const nameToSave = `./upload/${prefix}_${fileName}`;
+  const fileName = `${prefix}_${moment().unix()}_${file.name}`;
+  const nameToSave = `./upload/${fileName}`;
   const buff = fs.readFileSync(file.path);
   fs.outputFileSync(nameToSave, buff);
-  return { fileKey: `${prefix}_${fileName}` };
+  return { fileKey: `${fileName}` };
 };
