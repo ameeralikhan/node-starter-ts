@@ -2,8 +2,6 @@ import * as boom from 'boom';
 import * as _ from 'lodash';
 import * as encryption from '../utils/encryption';
 import * as userRepo from '../repositories/user';
-import * as departmentRepo from '../repositories/department';
-import * as officeLocationRepo from '../repositories/office-location';
 import * as joiSchema from '../validations/schemas/user';
 import { IUserRequest } from '../interface/user';
 import { validate } from './../validations/index';
@@ -62,18 +60,7 @@ export const saveUser = async (payload: IUserRequest) => {
             throw boom.badRequest('Invalid manager id');
         }
     }
-    if (payload.departmentId) {
-        const department = await departmentRepo.findById(payload.departmentId);
-        if (!department) {
-            throw boom.badRequest('Invalid department id');
-        }
-    }
-    if (payload.officeLocationId) {
-        const officeLocation = await officeLocationRepo.findById(payload.officeLocationId);
-        if (!officeLocation) {
-            throw boom.badRequest('Invalid office location id');
-        }
-    }
+    
     let user: Partial<IUserRequest> = {
       id: payload.id,
       firstName: payload.firstName,

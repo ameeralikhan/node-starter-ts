@@ -1,4 +1,4 @@
-## `aetasaal-api`
+## `node-starter-ts`
 
 ### Prerequisites:
 

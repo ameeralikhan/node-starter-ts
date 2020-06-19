@@ -1,30 +1,30 @@
 export const EMAIL_TEMPLATES = {
   welcome: {
-    subject: 'Welcome to Aetasaal',
+    subject: 'Welcome to Example',
     template: 'welcome',
   },
   forgotPassword: {
-    subject: 'Aetasaal - Forgot Password',
+    subject: 'Example - Forgot Password',
     template: 'forgotPassword',
   },
   newPasswordCreation: {
-    subject: 'Aetasaal - New Password creation request',
+    subject: 'Example - New Password creation request',
     template: 'newPasswordCreation',
   },
   accountActivation: {
-    subject: 'Aetasaal - Account activation request',
+    subject: 'Example - Account activation request',
     template: 'accountActivation',
   },
   teacherSchedule: {
-    subject: 'Aetasaal - Schedule booking request',
+    subject: 'Example - Schedule booking request',
     template: 'teacherSchedule',
   },
   studentScheduleConfirmation: {
-    subject: 'Aetasaal - Schedule confirmation',
+    subject: 'Example - Schedule confirmation',
     template: 'studentScheduleConfirmation',
   },
   studentScheduleCancellation: {
-    subject: 'Aetasaal - Schedule cancel',
+    subject: 'Example - Schedule cancel',
     template: 'studentScheduleCancellation',
   },
 };

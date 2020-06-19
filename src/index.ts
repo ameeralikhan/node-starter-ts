@@ -4,7 +4,7 @@ import { startServer } from './server';
 import { Logger } from './utils/logger';
 import { loadTemplates } from './template/index';
 
-const log = new Logger('aetasaal-api').createLogger({ env: config.env });
+const log = new Logger('node-starter-api').createLogger({ env: config.env });
 
 start();
 

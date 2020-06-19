@@ -1,7 +1,7 @@
 import * as boom from 'boom';
 import { validate } from '../validations/index';
 
-import * as joiSchema from '../validations/schemas/office-location';
+import * as joiSchema from '../validations/schemas/role';
 import * as roleRepo from '../repositories/role';
 import { IRoleInstance, IRoleAttributes } from '../models/role';
 
@@ -10,7 +10,7 @@ export const getAll = async (): Promise<IRoleInstance[]> => {
 };
 
 export const saveRole = async (role: IRoleAttributes) => {
-    await validate(role, joiSchema.saveOfficeLocation);
+    await validate(role, joiSchema.saveRole);
     if (role.id) {
         const savedRole = await roleRepo.findById(role.id);
         if (!savedRole) {
@@ -22,7 +22,7 @@ export const saveRole = async (role: IRoleAttributes) => {
 };
 
 export const deleteRole = async (id: number) => {
-    await validate({ id }, joiSchema.deleteOfficeLocation);
+    await validate({ id }, joiSchema.deleteRole);
     const role = await roleRepo.findById(id);
     if (!role) {
         throw boom.badRequest('Invalid Role Id');

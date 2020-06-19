@@ -17,10 +17,6 @@ import compose = require('koa-compose');
 const whitelist = [
   'http://localhost:4200',
   'http://localhost:3000',
-  'http://api.aetasaal.com',
-  'https://api.aetasaal.com',
-  'https://workable.aetasaal.com',
-  'http://workable.aetasaal.com',
   'http://localhost',
   'http://localhost:8100'
 ];

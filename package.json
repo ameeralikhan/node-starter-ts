@@ -1,8 +1,8 @@
 {
-  "name": "aetasaal-api",
+  "name": "node-ts-starter",
   "private": true,
   "version": "1.0.0",
-  "description": "Aetasaal API",
+  "description": "Node Typescript boilerplate with koa and postgres",
   "scripts": {
     "build-ts": "tsc",
     "postinstall": "npm run build-ts",

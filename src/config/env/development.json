@@ -14,7 +14,7 @@
         "port": 5432,
         "username": "postgres",
         "password": "postgres",
-        "database": "aetasaal",
+        "database": "nodeStarterDB",
         "url": ""
     },
     "apiAccessKeys": {
@@ -24,20 +24,20 @@
         "host": "smtp.gmail.com",
         "port": 465,
         "secure": true,
-        "user": "info@tutorswebhub.com",
-        "password": "ISlA7Pl0"
+        "user": "info@example.com",
+        "password": "eXaMpLe"
     },
     "cloudinary": {
-        "name": "hkjwi1kol",
-        "apiKey": "732115177397848",
-        "apiSecret": "kdCEa_TfwwQEfgueAzcc8--7a30",
-        "env": "cloudinary://732115177397848:kdCEa_TfwwQEfgueAzcc8--7a30@hkjwi1kol/"
+        "name": "xxxxx",
+        "apiKey": "231465489416",
+        "apiSecret": "dsfDgfddDEDFE--7a30",
+        "env": "cloudinary://231465489416:dsfDgfddDEDFE--7a30@hkjwi1kolsdgh/"
     },
     "sendgrid": {
         "key": ""
     },
     "fcm": {
-        "serverKey": "AIzaSyAC_Sr8Spc8-D5wjzMGlh0EaPHsLhEtxE0"
+        "serverKey": "AIzaSyAC_Sr8Spc8-D5chwjzMGlh0PAEHsLhEtxE0"
     },
     "realTimeIntervalInMin": 2
 }

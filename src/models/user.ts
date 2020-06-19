@@ -138,9 +138,6 @@ export const define = (sequelize: Sequelize.Sequelize): IUserModel => {
   );
 
   model.associate = (models: IModelFactory) => {
-    model.hasMany(models.Department);
-    model.hasMany(models.OfficeLocation);
-    model.hasMany(models.UserGroup);
     model.hasMany(models.UserRole);
   };
 
